@@ -38,24 +38,24 @@ subprojects {
             }
         }
         js(IR) {
-            //compilations.all {
-            //    kotlinOptions.suppressWarnings = true
-            //    kotlinOptions.freeCompilerArgs = listOf()
-            //}
             binaries.executable()
             //useCommonJs()
             //nodejs()
             useEsModules()
             browser {
             }
+            compilations.all {
+                kotlinOptions.suppressWarnings = true
+                //kotlinOptions.freeCompilerArgs = listOf()
+            }
         }
         wasm {
-            //compilations.all {
-            //    kotlinOptions.suppressWarnings = true
-            //    kotlinOptions.freeCompilerArgs = listOf()
-            //}
             this.useEsModules()
             browser {
+            }
+            compilations.all {
+                kotlinOptions.suppressWarnings = true
+            //    kotlinOptions.freeCompilerArgs = listOf()
             }
         }
         sourceSets {
