@@ -73,6 +73,7 @@ subprojects {
                 kotlin.setSrcDirs(listOf("testJvm"))
                 resources.setSrcDirs(listOf<String>())
                 dependencies {
+                    implementation(kotlin("test"))
                 }
             }
             val jsMain by getting {
