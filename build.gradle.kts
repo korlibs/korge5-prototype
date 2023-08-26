@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
-
 plugins {
     kotlin("multiplatform") version "1.9.10"
     application
@@ -8,7 +5,9 @@ plugins {
 
 allprojects {
     repositories {
+        mavenLocal()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
     }
 }
 
@@ -30,6 +29,8 @@ subprojects {
         jvm {
             compilations.all {
                 kotlinOptions.jvmTarget = "1.8"
+                kotlinOptions.suppressWarnings = true
+                kotlinOptions.freeCompilerArgs = listOf()
             }
             //withJava()
             testRuns["test"].executionTask.configure {
@@ -37,15 +38,22 @@ subprojects {
             }
         }
         js(IR) {
+            //compilations.all {
+            //    kotlinOptions.suppressWarnings = true
+            //    kotlinOptions.freeCompilerArgs = listOf()
+            //}
             binaries.executable()
             //useCommonJs()
-            //useCommonJs()
+            //nodejs()
             useEsModules()
             browser {
             }
-            //nodejs()
         }
-        wasm() {
+        wasm {
+            //compilations.all {
+            //    kotlinOptions.suppressWarnings = true
+            //    kotlinOptions.freeCompilerArgs = listOf()
+            //}
             this.useEsModules()
             browser {
             }
@@ -54,6 +62,10 @@ subprojects {
             val commonMain by getting {
                 kotlin.setSrcDirs(listOf("src"))
                 resources.setSrcDirs(listOf("resources"))
+                dependencies {
+                    //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2-wasm0")
+                }
             }
             val commonTest by getting {
                 kotlin.setSrcDirs(listOf("test"))
@@ -61,12 +73,16 @@ subprojects {
 
                 dependencies {
                     implementation(kotlin("test"))
+                    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2-wasm0")
                 }
             }
             val jvmMain by getting {
                 kotlin.setSrcDirs(listOf("srcJvm"))
                 resources.setSrcDirs(listOf<String>())
+
                 dependencies {
+                    implementation("net.java.dev.jna:jna:5.13.0")
+                    implementation("net.java.dev.jna:jna-platform:5.13.0")
                 }
             }
             val jvmTest by getting {
