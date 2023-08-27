@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.9.10"
-    application
+    //application apply false
     `maven-publish`
 }
 

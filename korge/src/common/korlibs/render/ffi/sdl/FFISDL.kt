@@ -22,6 +22,7 @@ object SDL : FFILib(
     val SDL_InitSubSystem: (Int) -> Int by func()
     val SDL_QuitSubSystem: (Int) -> Int by func()
     val SDL_CreateWindow: (FFIPointer?, Int, Int, Int, Int, Int) -> FFIPointer? by func()
+    val SDL_GetError: () -> FFIPointer? by func()
     val SDL_Delay: (Int) -> Int by func()
     val SDL_PumpEvents: () -> Unit by func()
     val SDL_PollEvent: (IntArray) -> Boolean by func()

@@ -1,5 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
+apply(plugin = "application")
+
 object JvmAddOpens {
     val isWindows get() = Os.isFamily(Os.FAMILY_WINDOWS)
     val isMacos get() = Os.isFamily(Os.FAMILY_MAC)
@@ -61,9 +63,40 @@ tasks {
         this.args = listOf("run", "--inspect", "-A", "--unstable", File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
         //this.args = listOf("run", "-A", "--unstable", File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
     }
-    //afterEvaluate {
-    //    val jvmRun by getting(JavaExec::class) {
-    //        if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
-    //    }
-    //}
+
+    val jvmMainClasses by getting
+
+    val runJvm by creating(JavaExec::class) {
+        dependsOn("jvmMainClasses")
+        mainClass.set("MainKt")
+        //classpath = java.sourceSets["main"].runtimeClasspath
+        //classpath = kotlin.sourceSets["main"].kotlin.classesDirectory
+
+        val mainJvmCompilation = kotlin.targets.getByName("jvm").compilations["main"]
+        classpath(mainJvmCompilation.runtimeDependencyFiles)
+        classpath(mainJvmCompilation.compileDependencyFiles)
+        //if (project.korge.searchResourceProcessorsInMainSourceSet) {
+        classpath(mainJvmCompilation.output.allOutputs)
+        classpath(mainJvmCompilation.output.classesDirs)
+        //}
+        //project.kotlin.jvm()
+        //classpath(project.files().from(project.getCompilationKorgeProcessedResourcesFolder(mainJvmCompilation)))
+
+        //classpath(kotlin.sourceSets["main"].output.classesDirs, configurations.named("jvmRuntimeClasspath").get())
+        //println(jvmMainClasses.outputs.files.toList())
+        //println(kotlin.sourceSets["main"].output.classesDirs.toList())
+        //println(configurations.named("jvmRuntimeClasspath").get().toList())
+        if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
+        //jvmArgs("-XstartOnFirstThread")
+    }
+    /*
+    afterEvaluate {
+    }
+    afterEvaluate {
+        val jvmRun by creating(JavaExec::class) {
+            if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
+        }
+    }
+
+     */
 }

@@ -19,6 +19,7 @@ import kotlin.js.Date
 import kotlin.js.Promise
 
 
+//@JsName("Deno")
 //external class DenoPointer
 class DenoPointer
 

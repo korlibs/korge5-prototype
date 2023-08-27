@@ -1,5 +1,6 @@
 package korlibs.memory.internal
 
+import korlibs.io.runtime.deno.Deno
 import korlibs.memory.Arch
 import korlibs.memory.Os
 import korlibs.memory.Runtime
@@ -14,7 +15,19 @@ internal val isNodeJs: Boolean by lazy { js("((typeof process !== 'undefined') &
 internal val isShell: Boolean get() = !isWeb && !isNodeJs && !isWorker
 
 // @TODO: Check navigator.userAgent
-internal actual val currentOs: Os = Os.UNKNOWN
+internal actual val currentOs: Os get() = when {
+    isDenoJs -> {
+        when (Deno.build.os) {
+            "darwin" -> Os.MACOSX
+            "linux" -> Os.LINUX
+            "windows" -> Os.WINDOWS
+            else -> Os.UNKNOWN
+        }
+    }
+    else -> {
+        Os.UNKNOWN
+    }
+}
 internal actual val currentArch: Arch = Arch.UNKNOWN
 
 internal actual val currentRuntime: Runtime = Runtime.JS

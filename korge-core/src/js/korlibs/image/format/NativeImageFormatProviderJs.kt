@@ -5,6 +5,7 @@ import korlibs.datastructure.*
 import korlibs.image.bitmap.*
 import korlibs.image.color.*
 import korlibs.image.font.*
+import korlibs.image.format.providers.FFICoreGraphicsImageFormatProvider
 import korlibs.image.paint.*
 import korlibs.image.vector.*
 import korlibs.image.vector.renderer.*
@@ -25,7 +26,7 @@ import kotlin.coroutines.*
 import kotlin.math.*
 
 actual val nativeImageFormatProvider: NativeImageFormatProvider = when {
-    Platform.isJsDenoJs -> DenoNativeImageFormatProvider
+    Platform.isJsDenoJs -> FFICoreGraphicsImageFormatProvider
     Platform.isJsNodeJs -> NodeJsNativeImageFormatProvider
     else -> {
         checkIsJsBrowser()

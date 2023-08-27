@@ -6,6 +6,7 @@ import korlibs.time.seconds
 import korlibs.memory.*
 import korlibs.audio.internal.SampleConvert
 import korlibs.audio.internal.write
+import korlibs.audio.sound.backends.ffi.FFIOpenALNativeSoundProvider
 import korlibs.io.async.delay
 import korlibs.io.lang.Cancellable
 import korlibs.io.lang.cancel
@@ -13,11 +14,11 @@ import kotlinx.browser.document
 import kotlin.coroutines.CoroutineContext
 
 actual val nativeSoundProvider: NativeSoundProvider by lazy {
-    if (Platform.isJsBrowser) {
-        HtmlNativeSoundProvider()
-    } else {
-        DummyNativeSoundProvider
-    }
+	when {
+		Platform.isJsDenoJs -> FFIOpenALNativeSoundProvider()
+		Platform.isJsBrowser -> HtmlNativeSoundProvider()
+		else -> DummyNativeSoundProvider
+	}
 }
 
 class JsPlatformAudioOutput(coroutineContext: CoroutineContext, val freq: Int) : PlatformAudioOutput(coroutineContext, freq) {
@@ -95,7 +96,7 @@ class JsPlatformAudioOutput(coroutineContext: CoroutineContext, val freq: Int) :
 	override val availableSamples get() = totalShorts
 
 	override suspend fun add(samples: AudioSamples, offset: Int, size: Int) {
-		//println("addSamples: $available, $size")
+		//println("addSamples: ${samples}, offset=$offset, size=$size")
 		//println(samples.sliceArray(offset until offset + size).toList())
 		totalShorts += size
 		if (!HtmlSimpleSound.available) {
