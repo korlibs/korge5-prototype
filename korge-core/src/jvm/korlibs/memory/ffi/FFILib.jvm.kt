@@ -521,8 +521,8 @@ private val DenoWasmServerCode = """
             case 1012: { // free
               const ptrs = new Int32Array(payload.buffer);
               for (const ptr of ptrs) {
-                wasmExports.free(ptr);
-            }
+                if (ptr != 0) wasmExports.free(ptr);
+              }
               if (debug) console.log("!!CMD: free...", ptrs);
               await writePacket(conn, new Uint8Array(0));
               break;

@@ -93,7 +93,7 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
         return ptr
     }
     actual fun freeBytes(vararg ptrs: Int) {
-        for (ptr in ptrs) wasmExports["free"](ptr)
+        for (ptr in ptrs) if (ptr != 0) wasmExports["free"](ptr)
     }
 
     val syms: dynamic by lazy {
