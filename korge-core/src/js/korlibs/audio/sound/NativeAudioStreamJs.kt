@@ -43,6 +43,7 @@ class JsPlatformAudioOutput(coroutineContext: CoroutineContext, val freq: Int) :
         val outChannels = Array(e.outputBuffer.numberOfChannels) { e.outputBuffer.getChannelData(it) }
 		var hasData = true
 
+		checkIsJsBrowser()
 		if (!document.asDynamic().hidden) {
 			for (channel in 0 until nchannels) {
 				val deque = deques[channel]

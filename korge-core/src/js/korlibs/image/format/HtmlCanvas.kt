@@ -23,7 +23,7 @@ external interface HTMLImageElementLike : TexImageSource {
 
 object HtmlCanvas {
 	fun createCanvas(width: Int, height: Int): HTMLCanvasElementLike {
-		if (Platform.isJsNodeJs) error("Canvas not available on Node.JS")
+        checkIsJsBrowser()
         val out = document.createElement("canvas").unsafeCast<HTMLCanvasElement>()
         out.width = width
         out.height = height

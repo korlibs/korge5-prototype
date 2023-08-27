@@ -775,7 +775,11 @@ abstract class BaseAwtGameWindow(
 
         val clazz = Dyn.global["com.apple.eawt.event.GestureUtilities"]
         logger.info { " -- GestureUtilities=$clazz" }
-        clazz.dynamicInvoke("addGestureListenerTo", contentComponent, gestureListener)
+        try {
+            clazz.dynamicInvoke("addGestureListenerTo", contentComponent, gestureListener)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
 
         //val value = (contentComponent as JComponent).getClientProperty("com.apple.eawt.event.internalGestureHandler");
         //println("value $value");

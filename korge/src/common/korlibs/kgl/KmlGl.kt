@@ -121,7 +121,10 @@ open class KmlGl : Extra by Extra.Mixin(), AGFeatures {
     open fun stencilOp(fail: Int, zfail: Int, zpass: Int): Unit = TODO()
     open fun stencilOpSeparate(face: Int, sfail: Int, dpfail: Int, dppass: Int): Unit = TODO()
     open fun texImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: Buffer?): Unit = TODO()
-    open fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, data: NativeImage): Unit = TODO()
+    open fun texImage2D(target: Int, level: Int, internalformat: Int, format: Int, type: Int, data: NativeImage): Unit {
+        val buffer = Int32Buffer(data.readPixelsUnsafe(0, 0, data.width, data.height))
+        texImage2D(target, level, internalformat, data.width, data.height, 0, format, type, buffer.buffer)
+    }
     open fun texParameterf(target: Int, pname: Int, param: Float): Unit = TODO()
     open fun texParameterfv(target: Int, pname: Int, params: Buffer): Unit = TODO()
     open fun texParameteri(target: Int, pname: Int, param: Int): Unit = TODO()

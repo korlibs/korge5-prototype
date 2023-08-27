@@ -18,8 +18,8 @@ internal fun Buffer.Companion.equalsCommon(
     sizeInBytes: Int,
     use64: Boolean = true,
 ): Boolean {
-    check(srcPosBytes + sizeInBytes <= src.sizeInBytes)
-    check(dstPosBytes + sizeInBytes <= dst.sizeInBytes)
+    check(srcPosBytes + sizeInBytes <= src.sizeInBytes) { "src: $srcPosBytes + $sizeInBytes <= ${src.sizeInBytes}" }
+    check(dstPosBytes + sizeInBytes <= dst.sizeInBytes) { "dst: $dstPosBytes + $sizeInBytes <= ${dst.sizeInBytes}" }
     //for (n in 0 until sizeInBytes) {
     //    if (src.getUnalignedInt8(srcPosBytes + n) != dst.getUnalignedInt8(dstPosBytes + n)) return false
     //}

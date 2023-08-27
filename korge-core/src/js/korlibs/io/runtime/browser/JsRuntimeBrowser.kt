@@ -9,6 +9,7 @@ import korlibs.io.net.http.Http
 import korlibs.io.net.http.HttpClient
 import korlibs.io.runtime.JsRuntime
 import korlibs.io.stream.*
+import korlibs.memory.checkIsJsBrowser
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
@@ -29,7 +30,10 @@ object JsRuntimeBrowser : JsRuntime() {
     override val rawOsName: String = navigator.platform.unsafeCast<String>()
     override val isBrowser get() = true
 
-    val href by lazy { document.location?.href ?: "." }
+    val href by lazy {
+        checkIsJsBrowser()
+        document.location?.href ?: "."
+    }
     val baseUrl by lazy { if (href.endsWith("/")) href else href.substringBeforeLast('/') }
 
     override fun existsSync(path: String): Boolean {
@@ -38,8 +42,11 @@ object JsRuntimeBrowser : JsRuntime() {
 
     override fun currentDir(): String = baseUrl
 
-    override fun envs(): Map<String, String> =
-        QueryString.decode((document.location?.search ?: "").trimStart('?')).map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
+    override fun envs(): Map<String, String> {
+        checkIsJsBrowser()
+        return QueryString.decode((document.location?.search ?: "").trimStart('?'))
+            .map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
+    }
 
     override fun langs(): List<String> = window.navigator.languages.asList()
     override fun openVfs(path: String): VfsFile {

@@ -1,5 +1,6 @@
 package korlibs.memory
 
+import korlibs.io.lang.printStackTrace
 import korlibs.memory.internal.*
 
 interface Platform {
@@ -50,7 +51,6 @@ interface Platform {
     val isJsWorker: Boolean get() = rawPlatformName == "js-worker" || rawPlatformName == "wasm-worker"
     val isJsBrowserOrWorker: Boolean get() = isJsBrowser || isJsWorker
 
-
     companion object : Platform {
         override val endian: Endian get() = Endian.NATIVE
         override val isLittleEndian: Boolean get() = currentIsLittleEndian
@@ -87,4 +87,11 @@ interface Platform {
         override val rawOsName: String,
         override val hasMultithreadedSharedHeap: Boolean,
     ) : Platform
+}
+
+fun checkIsJsBrowser() {
+    if (Platform.isJsNodeJs || Platform.isJsDenoJs) {
+        printStackTrace()
+        error("JS not browser but ${Platform.rawPlatformName}")
+    }
 }

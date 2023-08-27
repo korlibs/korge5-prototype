@@ -7,6 +7,7 @@ import korlibs.logger.Logger
 import korlibs.io.async.launchImmediately
 import korlibs.io.file.std.uniVfs
 import korlibs.io.lang.Cancellable
+import korlibs.memory.checkIsJsBrowser
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CancellationException
@@ -376,6 +377,7 @@ object HtmlSimpleSound {
 		val _scratchBuffer = ctx?.createBuffer(1, 1, 22050)
 		lateinit var unlock: (e: Event) -> Unit
 		unlock = {
+            checkIsJsBrowser()
             // Remove the touch start listener.
             document.removeEventListener("keydown", unlock, true)
             document.removeEventListener("touchstart", unlock, true)
@@ -402,6 +404,7 @@ object HtmlSimpleSound {
 			}
 		}
 
+        checkIsJsBrowser()
 		document.addEventListener("keydown", unlock, true)
 		document.addEventListener("touchstart", unlock, true)
 		document.addEventListener("touchend", unlock, true)

@@ -9,7 +9,10 @@ internal actual val miniEnvironmentVariables: Map<String, String> by lazy {
     when {
         jsTypeOf(process) != "undefined" -> jsObjectToMap(process.env)
         jsTypeOf(Deno) != "undefined" -> jsObjectToMap(Deno.env)
-        else -> QueryString_decode((document.location?.search ?: "").trimStart('?')).map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
+        else -> {
+            //checkIsJsBrowser()
+            QueryString_decode((document.location?.search ?: "").trimStart('?')).map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
+        }
     }
 }
 

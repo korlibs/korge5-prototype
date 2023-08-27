@@ -25,8 +25,12 @@ import kotlin.coroutines.*
 import kotlin.math.*
 
 actual val nativeImageFormatProvider: NativeImageFormatProvider = when {
+    Platform.isJsDenoJs -> DenoNativeImageFormatProvider
     Platform.isJsNodeJs -> NodeJsNativeImageFormatProvider
-    else -> HtmlNativeImageFormatProvider
+    else -> {
+        checkIsJsBrowser()
+        HtmlNativeImageFormatProvider
+    }
 }
 
 object NodeJsNativeImageFormatProvider : BaseNativeImageFormatProvider() {
@@ -153,6 +157,7 @@ object HtmlNativeImageFormatProvider : NativeImageFormatProvider() {
 	}
 
 	override suspend fun display(bitmap: Bitmap, kind: Int) {
+        checkIsJsBrowser()
 		if (kind == 1) {
 			val img = document.createElement("img")
 			img.setAttribute("src", "data:image/png;base64," + PNG.encode(bitmap).toBase64())
@@ -211,7 +216,7 @@ object BrowserImage {
 		// Doesn't work with Kotlin.JS
 		//val img = document.createElement("img") as HTMLImageElement
 		//println("[1]")
-        if (Platform.isJsNodeJs) error("Canvas not available on NodeJS")
+        checkIsJsBrowser()
 
         val img = document.createElement("img").unsafeCast<HTMLImageElement>()
         img.onload = {

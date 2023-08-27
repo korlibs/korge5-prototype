@@ -72,10 +72,10 @@ abstract class Vfs : AsyncCloseable {
 		handler: VfsProcessHandler = VfsProcessHandler()
 	): Int {
         checkExecFolder(path, cmdAndArgs)
-        unsupported()
+        unsupported("exec")
     }
 
-	open suspend fun open(path: String, mode: VfsOpenMode): AsyncStream = unsupported()
+	open suspend fun open(path: String, mode: VfsOpenMode): AsyncStream = unsupported("open")
 
 	open suspend fun openInputStream(path: String): AsyncInputStream = open(path, VfsOpenMode.READ)
 
@@ -182,12 +182,12 @@ abstract class Vfs : AsyncCloseable {
 
 	open suspend fun stat(path: String): VfsStat = createNonExistsStat(path)
 
-    private fun unsupported(): Nothing = korlibs.io.lang.unsupported("unsupported for ${this::class} : $this")
+    protected fun unsupported(): Nothing = korlibs.io.lang.unsupported("unsupported for ${this::class} : $this")
 
 	suspend fun listSimple(path: String): List<VfsFile> = this.listFlow(path).toList()
-    open suspend fun listFlow(path: String): Flow<VfsFile> = unsupported()
+    open suspend fun listFlow(path: String): Flow<VfsFile> = unsupported("listFlow")
 
-	open suspend fun mkdir(path: String, attributes: List<Attribute>): Boolean = unsupported()
+	open suspend fun mkdir(path: String, attributes: List<Attribute>): Boolean = unsupported("mkdir")
     open suspend fun mkdirs(path: String, attributes: List<Attribute>): Boolean {
         if (path == "") return false
         if (stat(path).exists) return false // Already exists, and it is a directory
@@ -198,7 +198,7 @@ abstract class Vfs : AsyncCloseable {
         return mkdir(path, attributes)
     }
 	open suspend fun rmdir(path: String): Boolean = delete(path) // For compatibility
-	open suspend fun delete(path: String): Boolean = unsupported()
+	open suspend fun delete(path: String): Boolean = unsupported("delete")
 	open suspend fun rename(src: String, dst: String): Boolean {
         if (file(src).isDirectory()) error("Unsupported renaming directories in $this")
 		file(src).copyTo(file(dst))
@@ -316,11 +316,14 @@ enum class VfsOpenMode(
 	val cmode: String,
 	val write: Boolean,
 	val createIfNotExists: Boolean = false,
-	val truncate: Boolean = false
+	val truncate: Boolean = false,
+	val read: Boolean = true,
+	val append: Boolean = false,
+	val createNew: Boolean = false,
 ) {
 	READ("rb", write = false),
 	WRITE("r+b", write = true, createIfNotExists = true),
-	APPEND("a+b", write = true, createIfNotExists = true),
+	APPEND("a+b", write = true, createIfNotExists = true, append = true),
 	CREATE_OR_TRUNCATE("w+b", write = true, createIfNotExists = true, truncate = true),
 	CREATE("w+b", write = true, createIfNotExists = true),
 	CREATE_NEW("w+b", write = true);

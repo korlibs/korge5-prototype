@@ -10,6 +10,7 @@ import korlibs.io.async.*
 import korlibs.io.file.*
 import korlibs.math.geom.*
 import korlibs.memory.*
+import korlibs.render.deno.DenoJsGameWindow
 import kotlinx.browser.*
 import kotlinx.coroutines.*
 import org.w3c.dom.*
@@ -554,7 +555,11 @@ private external interface JsGamepadEvent {
 
 class NodeJsGameWindow : JsGameWindow()
 
-actual fun CreateDefaultGameWindow(config: GameWindowCreationConfig): GameWindow = if (Platform.isJsNodeJs) NodeJsGameWindow() else BrowserCanvasJsGameWindow()
+actual fun CreateDefaultGameWindow(config: GameWindowCreationConfig): GameWindow = when {
+    Platform.isJsDenoJs -> DenoJsGameWindow()
+    Platform.isJsNodeJs -> NodeJsGameWindow()
+    else -> BrowserCanvasJsGameWindow()
+}
 
 /*
 public external open class TouchEvent(type: String, eventInitDict: MouseEventInit = definedExternally) : UIEvent {

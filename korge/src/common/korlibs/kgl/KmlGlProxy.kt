@@ -1635,7 +1635,7 @@ open class KmlGlProxyLogToString(parent: KmlGl = KmlGlDummy()) : KmlGlProxy(pare
         if (res != null) log.add(res)
     }
 }
-class LogKmlGlProxy(parent: KmlGl = KmlGlDummy(), var logBefore: Boolean = false, var logAfter: Boolean = true) : KmlGlProxy(parent) {
+open class LogKmlGlProxy(parent: KmlGl = KmlGlDummy(), var logBefore: Boolean = false, var logAfter: Boolean = true) : KmlGlProxy(parent) {
 	override fun before(name: String, params: List<Any?>) {
         if (logBefore) println("before: $name (${serializeParams(name, params)})")
 	}
