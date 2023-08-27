@@ -205,8 +205,6 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
                                 Float::class -> func?.invokeFloat(args)
                                 Double::class -> func?.invokeDouble(args)
                                 else -> func?.invoke((nfunc.ret as KClass<*>).java, args)
-                            }.also {
-                                //println("    -> RESULT: $it")
                             }
                         }
                     }
@@ -302,6 +300,7 @@ class DenoWasmSocket {
     val iis = socket.getInputStream()
 
     val debug = false
+    //val debug = true
 
     fun loadWASM(bytes: ByteArray) {
         writeReadMessage(1000, bytes)

@@ -88,9 +88,9 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
     }
 
     actual fun allocBytes(bytes: ByteArray): Int {
-        return wasmExports["malloc"](bytes.size).also { ptr ->
-            writeBytes(ptr, bytes)
-        }
+        val ptr = wasmExports["malloc"](bytes.size)
+        writeBytes(ptr, bytes)
+        return ptr
     }
     actual fun freeBytes(vararg ptrs: Int) {
         for (ptr in ptrs) wasmExports["free"](ptr)

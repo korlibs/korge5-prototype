@@ -49,9 +49,10 @@ class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
         Buffer(readBytes(ptr2, width * height * 4)).getArrayInt32(0, pixels)
         //memory.getUnalignedArrayInt32(ptr2, pixels)
 
-        free(memTemp)
-        free(ptr)
-        free(ptr2)
+        freeBytes(memTemp, ptr, ptr2)
+        //free(memTemp)
+        //free(ptr)
+        //free(ptr2)
 
         return Bitmap32(width, height, pixels)
     }
