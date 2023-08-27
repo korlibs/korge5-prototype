@@ -8,6 +8,7 @@ import korlibs.crypto.encoding.fromBase64
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.color.Colors
 import korlibs.image.format.providers.FFICoreGraphicsImageFormatProvider
+import korlibs.image.format.readBitmap
 import korlibs.io.async.delay
 import korlibs.io.file.std.localCurrentDirVfs
 import korlibs.io.file.std.resourcesVfs
@@ -37,16 +38,17 @@ import korlibs.time.seconds
 //}
 
 suspend fun main() = Korge {
+    image(resourcesVfs["Exif5-2x.avif"].readBitmap())
     solidRect(Size(100, 100), Colors.RED)
     val rect = solidRect(Size(100, 100), Colors.BLUEVIOLET).xy(200, 0)
     keys {
         down { println("KeyDown: $it") }
         up { println("KeyUp: $it") }
     }
-    val sound = resourcesVfs["demo.mp3"].readSound()
+    //val sound = resourcesVfs["demo.mp3"].readSound()
 
     while (true) {
-        sound.play()
+        //sound.play()
         tween(rect::x[100.0], time = 1.seconds)
         tween(rect::x[200.0], time = 1.seconds)
     }
