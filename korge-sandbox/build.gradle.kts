@@ -48,55 +48,48 @@ tasks {
     //println(jsBrowserDevelopmentExecutableDistribution.outputs.files.toList())
     //val jsFile = File(jsMainClasses.outputs.files.first(), "${project.name}.js")
 
-    // esbuild --bundle korge-sandbox/build/compileSync/js/main/developmentExecutable/kotlin/korge5-korge-sandbox.mjs --outfile=out.js
-
+    //  esbuild --bundle korge5-korge-sandbox.mjs --outfile=out.js --minify '--banner:js=#!/usr/bin/env -S deno run --inspect -A --unstable'
     val runDeno by creating(Exec::class) {
-        dependsOn("jsBrowserDevelopmentExecutableDistribution")
-        //dependsOn("jsBrowserDistribution")
-        //dependsOn("jsMainClasses")
-        group = "deno"
+        dependsOn("jsDevelopmentExecutableCompileSync")
+        group = "run"
         executable = "deno"
-        //this.args = listOf("run", "-A", "--unstable", file("build/compileSync/js/main/developmentExecutable/kotlin/lol.mjs").absolutePath)
-        //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/developmentExecutable/${project.name}.js").absolutePath)
-        //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/developmentExecutable/${project.name}.js").absolutePath)
-        //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/productionExecutable/${project.name}.js").absolutePath)
-        this.args = listOf("run", "--inspect", "-A", "--unstable", File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
-        //this.args = listOf("run", "-A", "--unstable", File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
+        args("run", "--inspect", "-A", "--unstable", File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
+    }
+
+    val runDenoRelease by creating(Exec::class) {
+        dependsOn("jsProductionExecutableCompileSync")
+        group = "run"
+        executable = "deno"
+        args("run", "--inspect", "-A", "--unstable", File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
+    }
+
+    val buildDenoRelease by creating(Exec::class) {
+        dependsOn("jsProductionExecutableCompileSync")
+        group = "dist"
+        executable = "esbuild"
+        val releaseOutput = File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath
+        val outFile = File(buildDir, "dist/out.js").absolutePath
+        args("--bundle", releaseOutput, "--outfile=$outFile", "--minify", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
+        workingDir(rootProject.rootDir)
+        doLast {
+            File(outFile).setExecutable(true)
+        }
     }
 
     val jvmMainClasses by getting
 
+
     val runJvm by creating(JavaExec::class) {
         dependsOn("jvmMainClasses")
         mainClass.set("MainKt")
-        //classpath = java.sourceSets["main"].runtimeClasspath
-        //classpath = kotlin.sourceSets["main"].kotlin.classesDirectory
+        group = "run"
 
         val mainJvmCompilation = kotlin.targets.getByName("jvm").compilations["main"]
         classpath(mainJvmCompilation.runtimeDependencyFiles)
         classpath(mainJvmCompilation.compileDependencyFiles)
-        //if (project.korge.searchResourceProcessorsInMainSourceSet) {
         classpath(mainJvmCompilation.output.allOutputs)
         classpath(mainJvmCompilation.output.classesDirs)
-        //}
-        //project.kotlin.jvm()
-        //classpath(project.files().from(project.getCompilationKorgeProcessedResourcesFolder(mainJvmCompilation)))
-
-        //classpath(kotlin.sourceSets["main"].output.classesDirs, configurations.named("jvmRuntimeClasspath").get())
-        //println(jvmMainClasses.outputs.files.toList())
-        //println(kotlin.sourceSets["main"].output.classesDirs.toList())
-        //println(configurations.named("jvmRuntimeClasspath").get().toList())
         if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
         //jvmArgs("-XstartOnFirstThread")
     }
-    /*
-    afterEvaluate {
-    }
-    afterEvaluate {
-        val jvmRun by creating(JavaExec::class) {
-            if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
-        }
-    }
-
-     */
 }
