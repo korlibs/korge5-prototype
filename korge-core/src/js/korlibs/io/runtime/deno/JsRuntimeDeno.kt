@@ -10,11 +10,14 @@ import korlibs.io.stream.AsyncStream
 import korlibs.io.stream.AsyncStreamBase
 import korlibs.io.stream.toAsyncStream
 import korlibs.io.util.JsBigInt
+import korlibs.memory.Platform
 import kotlinx.coroutines.await
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import org.khronos.webgl.*
+import org.khronos.webgl.ArrayBufferView
+import org.khronos.webgl.Uint8Array
+import org.w3c.dom.url.URL
 import kotlin.js.Date
 import kotlin.js.Promise
 
@@ -91,6 +94,8 @@ fun DenoPointer.writeBytes(data: ByteArray) {
 }
 */
 
+external private val import: dynamic
+
 object JsRuntimeDeno : JsRuntime() {
     override fun existsSync(path: String): Boolean = try {
         Deno.statSync(path)
@@ -99,7 +104,12 @@ object JsRuntimeDeno : JsRuntime() {
         false
     }
 
-    override fun currentDir(): String = Deno.cwd()
+    override fun currentDir(): String {
+        //val url = URL(import.meta.url)
+        val str = URL(".", import.meta.url).pathname
+        return if (Platform.isWindows) str.substring(1) else str
+        //return Deno.cwd()
+    }
 
     override fun env(key: String): String? = Deno.env.get(key)
     override fun envs() = jsObjectToMap(Deno.env.toObject())

@@ -10,6 +10,7 @@ import korlibs.image.color.Colors
 import korlibs.image.format.providers.FFICoreGraphicsImageFormatProvider
 import korlibs.io.async.delay
 import korlibs.io.file.std.localCurrentDirVfs
+import korlibs.io.file.std.resourcesVfs
 import korlibs.io.file.std.tempVfs
 import korlibs.korge.Korge
 import korlibs.korge.bitmapfont.debugBmpFont
@@ -42,10 +43,10 @@ suspend fun main() = Korge {
         down { println("KeyDown: $it") }
         up { println("KeyUp: $it") }
     }
-    //val sound = tempVfs["demo.mp3"].readSound()
+    val sound = resourcesVfs["demo.mp3"].readSound()
 
     while (true) {
-        //sound.play()
+        sound.play()
         tween(rect::x[100.0], time = 1.seconds)
         tween(rect::x[200.0], time = 1.seconds)
     }

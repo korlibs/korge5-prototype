@@ -46,9 +46,11 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
                     )
                 ).symbols
             } catch (e: Throwable) {
-                e.printStackTrace()
+                //e.printStackTrace()
                 null
             }
+        }.unsafeCast<Any?>().also {
+            println("dymlib=$it")
         }
     }
 
