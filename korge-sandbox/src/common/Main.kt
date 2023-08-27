@@ -1,6 +1,7 @@
 import korlibs.crypto.encoding.fromBase64
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.color.Colors
+import korlibs.image.format.nativeImageFormatProvider
 import korlibs.image.format.readBitmap
 import korlibs.io.file.VfsFile
 import korlibs.io.file.std.resourcesVfs
@@ -12,9 +13,9 @@ import korlibs.korge.view.image
 import korlibs.korge.view.solidRect
 import korlibs.korge.view.xy
 import korlibs.math.geom.Size
+import korlibs.memory.*
 import korlibs.memory.ffi.WASMLib
-import korlibs.memory.getUnalignedArrayInt32
-import korlibs.memory.getUnalignedInt32
+import korlibs.time.measureTime
 import korlibs.time.seconds
 
 //suspend fun main() {
@@ -39,12 +40,14 @@ class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
         val memTemp = malloc(16)
         val ptr = allocBytes(bytes)
         val ptr2 = decode(ptr, bytes.size, memTemp, memTemp + 4)
-        val width = memory.getUnalignedInt32(memTemp)
-        val height = memory.getUnalignedInt32(memTemp + 4)
+        val buffer = Buffer(readBytes(memTemp, 8))
+        val width = buffer.getInt32(0)
+        val height = buffer.getInt32(1)
         //Console.log("width", width)
         //Console.log("height", height)
         val pixels = IntArray(width * height)
-        memory.getUnalignedArrayInt32(ptr2, pixels)
+        Buffer(readBytes(ptr2, width * height * 4)).getArrayInt32(0, pixels)
+        //memory.getUnalignedArrayInt32(ptr2, pixels)
 
         free(memTemp)
         free(ptr)
@@ -55,10 +58,19 @@ class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
 }
 
 suspend fun main() = Korge {
+    val avifBytes = resourcesVfs["Exif5-2x.avif"].readBytes()
+    val webpBytes = resourcesVfs["Exif5-2x.webp"].readBytes()
+    run {
+        val wasm = WebpWASM(resourcesVfs["webp.wasm"])
+        for (n in 0 until 50) {
+            println(measureTime { wasm.decodeWebpBytes(webpBytes) })
+        }
+    }
     val wasm = WebpWASM(resourcesVfs["webp.wasm"])
     val webpImage = wasm.decodeWebpBytes(resourcesVfs["Exif5-2x.webp"].readBytes())
 
-    image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(300, 0)
+    val avifImage = nativeImageFormatProvider.decode(avifBytes)
+    image(avifImage).xy(300, 0)
     image(webpImage).xy(300, 300)
     solidRect(Size(100, 100), Colors.RED)
     val rect = solidRect(Size(100, 100), Colors.BLUEVIOLET).xy(200, 0)

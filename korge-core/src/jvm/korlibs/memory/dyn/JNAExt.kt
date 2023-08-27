@@ -2,6 +2,12 @@ package korlibs.memory.dyn
 
 import com.sun.jna.Memory
 
+fun Memory(data: ByteArray): Memory {
+    val out = Memory(data.size.toLong())
+    for (n in data.indices) out.setByte((n).toLong(), data[n])
+    return out
+}
+
 fun Memory(data: IntArray): Memory {
     val out = Memory(data.size.toLong() * 4)
     for (n in data.indices) out.setInt((n * 4).toLong(), data[n])

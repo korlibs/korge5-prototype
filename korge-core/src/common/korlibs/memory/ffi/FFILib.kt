@@ -1,8 +1,6 @@
 package korlibs.memory.ffi
 
 import korlibs.datastructure.fastCastTo
-import korlibs.memory.Buffer
-import korlibs.memory.setArrayInt8
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -15,22 +13,33 @@ expect fun FFIPointer.getStringz(): String
 expect fun FFIPointer.readInts(size: Int, offset: Int = 0): IntArray
 
 expect class FFILibSym(lib: FFILib) {
-    val memory: Buffer
+    fun readBytes(pos: Int, size: Int): ByteArray
+    fun writeBytes(pos: Int, data: ByteArray)
+    fun allocBytes(bytes: ByteArray): Int
+    fun freeBytes(vararg ptrs: Int)
     fun <T> get(name: String): T
 }
 
 enum class FFILibKind { NATIVE, WASM }
 
 open class WASMLib(content: ByteArray) : FFILib(listOf(), content, FFILibKind.WASM) {
-    val memory: Buffer by lazy { sym.memory }
+    //val memory: Buffer by lazy { sym.memory }
 
     val malloc: (Int) -> Int by func()
     val free: (Int) -> Unit by func()
 
+    fun readBytes(pos: Int, size: Int): ByteArray = sym.readBytes(pos, size)
+    fun writeBytes(pos: Int, data: ByteArray) = sym.writeBytes(pos, data)
+
     fun allocBytes(bytes: ByteArray): Int {
-        val ptr = malloc(bytes.size)
-        memory.setArrayInt8(ptr, bytes)
-        return ptr
+        return sym.allocBytes(bytes)
+        //val ptr = malloc(bytes.size)
+        //writeBytes(ptr, bytes)
+        //memory.setArrayInt8(ptr, bytes)
+        //return ptr
+    }
+    fun freeBytes(vararg ptrs: Int) {
+        sym.freeBytes(*ptrs)
     }
 }
 

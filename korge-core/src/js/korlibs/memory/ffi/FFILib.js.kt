@@ -5,8 +5,7 @@ import korlibs.io.jsObject
 import korlibs.io.runtime.deno.*
 import korlibs.memory.Buffer
 import korlibs.memory.ffi.FFILibKind.WASM
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.DataView
+import org.khronos.webgl.*
 import kotlin.reflect.KClassifier
 
 fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
@@ -70,8 +69,31 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
         return _wasmExports
     }
 
-    actual val memory: Buffer by lazy {
-        Buffer(DataView(wasmExports.memory.buffer))
+    val mem: ArrayBuffer by lazy {
+        wasmExports.memory.buffer
+    }
+    val u8: Uint8Array by lazy {
+        Uint8Array(mem)
+    }
+
+    actual fun readBytes(pos: Int, size: Int): ByteArray {
+        val out = ByteArray(size)
+        val u8 = this.u8
+        for (n in out.indices) out[n] = u8[pos + n]
+        return out
+    }
+
+    actual fun writeBytes(pos: Int, data: ByteArray) {
+        for (n in data.indices) u8[pos + n] = data[n]
+    }
+
+    actual fun allocBytes(bytes: ByteArray): Int {
+        return wasmExports["malloc"](bytes.size).also { ptr ->
+            writeBytes(ptr, bytes)
+        }
+    }
+    actual fun freeBytes(vararg ptrs: Int) {
+        for (ptr in ptrs) wasmExports["free"](ptr)
     }
 
     val syms: dynamic by lazy {
