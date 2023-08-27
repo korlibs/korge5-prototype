@@ -4,6 +4,9 @@ import korlibs.image.bitmap.NativeImage
 import korlibs.io.jsObject
 import korlibs.io.runtime.deno.*
 import korlibs.memory.Buffer
+import korlibs.memory.ffi.FFILibKind.WASM
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.DataView
 import kotlin.reflect.KClassifier
 
 fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
@@ -29,8 +32,47 @@ fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
     }
 }
 
+external class WebAssembly {
+    class Instance(module: Module, imports: dynamic) {
+        val exports: dynamic
+        val memory: ArrayBuffer
+    }
+    class Module(data: ByteArray)
+}
+
+private external val JSON: dynamic
+
 actual class FFILibSym actual constructor(val lib: FFILib) {
     val symbolsByName: Map<String, FFILib.FuncDelegate<*>> by lazy { lib.functions.associateBy { it.name } }
+
+    private var _wasmExports: dynamic = null
+
+    val wasmExports: dynamic get() {
+        if (_wasmExports == null) {
+            _wasmExports = try {
+                val module = WebAssembly.Module(lib.content!!)
+                val imports = jsObject(
+                    "wasi_snapshot_preview1" to jsObject(
+                        "proc_exit" to { console.log("proc_exit", js("(arguments)")) },
+                        "fd_close" to { console.log("fd_close", js("(arguments)")) },
+                        "fd_write" to { console.log("fd_write", js("(arguments)")) },
+                        "fd_seek" to { console.log("fd_seek", js("(arguments)")) },
+                    )
+                )
+                WebAssembly.Instance(module, imports).exports
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                null
+            }.unsafeCast<Any?>().also {
+                //println("exports=${JSON.stringify(it)}")
+            }
+        }
+        return _wasmExports
+    }
+
+    actual val memory: Buffer by lazy {
+        Buffer(DataView(wasmExports.memory.buffer))
+    }
 
     val syms: dynamic by lazy {
         lib.paths.firstNotNullOfOrNull { path ->
@@ -68,7 +110,12 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
     }
 
     actual fun <T> get(name: String): T {
-        if (syms == null) error("Can't get symbol '$name' for ${lib::class} : '${lib.paths}'")
+        val syms = if (lib.kind == WASM) {
+            wasmExports
+        } else {
+            if (syms == null) error("Can't get symbol '$name' for ${lib::class} : '${lib.paths}'")
+            syms
+        }
         //return syms[name]
         return preprocessFunc(symbolsByName[name]!!, syms[name])
     }

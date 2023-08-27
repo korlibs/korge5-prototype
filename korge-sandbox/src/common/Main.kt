@@ -1,20 +1,10 @@
-import korlibs.audio.sound.AudioTone
-import korlibs.audio.sound.backends.ffi.AL
-import korlibs.audio.sound.backends.ffi.FFIOpenALNativeSoundProvider
-import korlibs.audio.sound.playAndWait
-import korlibs.audio.sound.readSound
-import korlibs.audio.sound.toStream
 import korlibs.crypto.encoding.fromBase64
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.color.Colors
-import korlibs.image.format.providers.FFICoreGraphicsImageFormatProvider
 import korlibs.image.format.readBitmap
-import korlibs.io.async.delay
-import korlibs.io.file.std.localCurrentDirVfs
+import korlibs.io.file.VfsFile
 import korlibs.io.file.std.resourcesVfs
-import korlibs.io.file.std.tempVfs
 import korlibs.korge.Korge
-import korlibs.korge.bitmapfont.debugBmpFont
 import korlibs.korge.input.keys
 import korlibs.korge.tween.get
 import korlibs.korge.tween.tween
@@ -22,14 +12,9 @@ import korlibs.korge.view.image
 import korlibs.korge.view.solidRect
 import korlibs.korge.view.xy
 import korlibs.math.geom.Size
-import korlibs.memory.Platform
-import korlibs.memory.ffi.FFILib
-import korlibs.memory.ffi.getStringz
-import korlibs.render.ffi.sdl.SDL
-import korlibs.render.ffi.sdl.SDL_WINDOWPOS_CENTERED
-import korlibs.render.ffi.sdl.SDL_WINDOW_OPENGL
-import korlibs.render.ffi.sdl.SDL_WINDOW_RESIZABLE
-import korlibs.time.milliseconds
+import korlibs.memory.ffi.WASMLib
+import korlibs.memory.getUnalignedArrayInt32
+import korlibs.memory.getUnalignedInt32
 import korlibs.time.seconds
 
 //suspend fun main() {
@@ -37,8 +22,44 @@ import korlibs.time.seconds
 //    println(FFICoreGraphicsImageFormatProvider.decode(DEBUG_FONT_BYTES))
 //}
 
+object SimpleWASM : WASMLib("AGFzbQEAAAABBwFgAn9/AX8DAgEABAUBcAEBAQUDAQAABhQDfwBBCAt/AUGIgAILfwBBiIACCwcQAgNzdW0AAAZtZW1vcnkCAAkGAQBBAQsACgoBCAAgACABag8L".fromBase64()) {
+    val sum: (Int, Int) -> Int by func()
+    init { finalize() }
+}
+
+class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
+    companion object {
+        suspend operator fun invoke(file: VfsFile): WebpWASM = WebpWASM(file.readBytes())
+    }
+    val decode: (data: Int, size: Int, widthPtr: Int, heightPtr: Int) -> Int by func()
+    val get_info: (data: Int, size: Int) -> Int by func()
+    init { finalize() }
+
+    fun decodeWebpBytes(bytes: ByteArray): Bitmap32 {
+        val memTemp = malloc(16)
+        val ptr = allocBytes(bytes)
+        val ptr2 = decode(ptr, bytes.size, memTemp, memTemp + 4)
+        val width = memory.getUnalignedInt32(memTemp)
+        val height = memory.getUnalignedInt32(memTemp + 4)
+        //Console.log("width", width)
+        //Console.log("height", height)
+        val pixels = IntArray(width * height)
+        memory.getUnalignedArrayInt32(ptr2, pixels)
+
+        free(memTemp)
+        free(ptr)
+        free(ptr2)
+
+        return Bitmap32(width, height, pixels)
+    }
+}
+
 suspend fun main() = Korge {
-    image(resourcesVfs["Exif5-2x.avif"].readBitmap())
+    val wasm = WebpWASM(resourcesVfs["webp.wasm"])
+    val webpImage = wasm.decodeWebpBytes(resourcesVfs["Exif5-2x.webp"].readBytes())
+
+    image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(300, 0)
+    image(webpImage).xy(300, 300)
     solidRect(Size(100, 100), Colors.RED)
     val rect = solidRect(Size(100, 100), Colors.BLUEVIOLET).xy(200, 0)
     keys {
