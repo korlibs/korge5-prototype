@@ -5,6 +5,7 @@ import korlibs.io.jsObject
 import korlibs.io.runtime.deno.Deno
 import korlibs.io.runtime.deno.DenoPointer
 import korlibs.io.runtime.deno.def
+import korlibs.logger.Logger
 import korlibs.math.geom.SizeInt
 import korlibs.memory.TypedBuffer
 import org.khronos.webgl.*

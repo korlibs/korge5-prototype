@@ -19,7 +19,9 @@ import kotlin.js.Date
 import kotlin.js.Promise
 
 
-interface DenoPointer
+//external class DenoPointer
+class DenoPointer
+
 val DenoPointer.value: JsBigInt get() = Deno.UnsafePointer.value(this)
 
 fun DenoPointer.readStringz(offset: Int = 0): String {

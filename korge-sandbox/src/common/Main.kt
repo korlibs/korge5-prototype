@@ -1,25 +1,33 @@
-import korlibs.image.color.Colors
-import korlibs.io.file.std.localCurrentDirVfs
 import korlibs.korge.Korge
-import korlibs.korge.input.keys
-import korlibs.korge.tween.get
-import korlibs.korge.tween.tween
-import korlibs.korge.view.solidRect
-import korlibs.korge.view.xy
-import korlibs.math.geom.Size
-import korlibs.time.seconds
-import kotlinx.coroutines.flow.toList
+import korlibs.memory.ffi.FFILib
+
+object LibC : FFILib("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
+    val cos by func<(value: Double) -> Double>()
+    val cosf by func<(value: Float) -> Float>()
+    init {
+        finalize()
+    }
+}
 
 suspend fun main() = Korge {
+    println("-----------------")
+    println(LibC.cos(.5))
+    println(LibC.cosf(.5f))
+    println("+++++++++++++++++")
+    /*
     println("STARTED!")
     solidRect(Size(100, 100), Colors.RED)
     val rect = solidRect(Size(100, 100), Colors.GREEN).xy(200, 0)
     keys {
-        down {
-            println("KeyDown: $it")
-        }
+        down { println("KeyDown: $it") }
+        up { println("KeyUp: $it") }
     }
-    tween(rect::x[100.0], time = 2.seconds)
+    while (true) {
+        tween(rect::x[100.0], time = 1.seconds)
+        tween(rect::x[200.0], time = 1.seconds)
+    }
+
+     */
 }
 
 /*

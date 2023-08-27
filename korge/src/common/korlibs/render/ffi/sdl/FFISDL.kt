@@ -1,36 +1,49 @@
-package korlibs.render.deno
+package korlibs.render.ffi.sdl
 
 import korlibs.event.Key
-import korlibs.io.jsObject
-import korlibs.io.runtime.deno.Deno
-import korlibs.io.runtime.deno.def
+import korlibs.memory.Platform
+import korlibs.memory.ffi.FFILib
+import korlibs.memory.ffi.FFIPointer
 
-private const val libName = "/opt/homebrew/Cellar/sdl2/2.28.1/lib/libSDL2.dylib"
 
-val SDL = Deno.dlopen<dynamic>(
-    libName,
-    jsObject(
-        "SDL_GetWindowSize" to def("void", "pointer", "buffer", "buffer"),
-        "SDL_SetWindowSize" to def("void", "pointer", "i32", "i32"),
-        "SDL_GL_CreateContext" to def("pointer", "pointer"),
-        "SDL_GL_SwapWindow" to def("void", "pointer"),
-        "SDL_GL_MakeCurrent" to def("i32", "pointer", "pointer"),
-        "SDL_InitSubSystem" to def("i32", "i32"),
-        "SDL_QuitSubSystem" to def("i32", "i32"),
-        "SDL_CreateWindow" to def("pointer", "buffer", "i32", "i32", "i32", "i32", "i32"),
-        //'SDL_GetWindowSurface' to jsObject(surfaceTypePtr, [ windowTypePtr ] ],
-        //'SDL_UpdateWindowSurface' to jsObject('int', [ windowTypePtr ] ],
-        "SDL_Delay" to def("i32", "i32"),
-        "SDL_PollEvent" to def("i32", "buffer"),
-    )
-).symbols
+object SDL : FFILib(
+    "/Library/Frameworks/SDL2.framework/SDL2",
+    "/opt/homebrew/Cellar/sdl2/2.28.1/lib/libSDL2.dylib",
+    "libSDL2",
+    "SDL2.dll",
+) {
+    val SDL_GetWindowSize: (FFIPointer?, IntArray, IntArray) -> Unit by func()
+    val SDL_SetWindowSize: (window: FFIPointer?, width: Int, height: Int) -> Unit by func()
+    val SDL_SetWindowPosition: (FFIPointer?, Int, Int) -> Unit by func()
+    val SDL_SetWindowTitle: (FFIPointer?, ByteArray) -> Unit by func()
+    val SDL_GL_CreateContext: (FFIPointer?) -> FFIPointer? by func()
+    val SDL_GL_SwapWindow: (FFIPointer?) -> Unit by func()
+    val SDL_GL_MakeCurrent: (FFIPointer?, FFIPointer?) -> Int by func()
+    val SDL_InitSubSystem: (Int) -> Int by func()
+    val SDL_QuitSubSystem: (Int) -> Int by func()
+    val SDL_CreateWindow: (FFIPointer?, Int, Int, Int, Int, Int) -> FFIPointer? by func()
+    val SDL_Delay: (Int) -> Int by func()
+    val SDL_PumpEvents: () -> Unit by func()
+    val SDL_PollEvent: (IntArray) -> Boolean by func()
+    val SDL_WaitEventTimeout: (IntArray, Int) -> Int by func()
+
+    init {
+        finalize()
+    }
+}
+
+const val SDL_WINDOWPOS_CENTERED = 0x2FFF0000
 
 const val SDL_QUIT = 0x100
 const val SDL_KEYDOWN = 0x300
 const val SDL_KEYUP = 0x301
 
-/**< Key pressed */
+const val SDL_WINDOWEVENT  = 0x200 /**< Window state change */
+
+const val SDL_MOUSEMOTION    = 0x400 /**< Mouse moved */
 const val SDL_MOUSEBUTTONDOWN = 0x401
+const val SDL_MOUSEBUTTONUP = 0x0402          /**< Mouse button released */
+const val SDL_MOUSEWHEEL = 0x403
 
 const val GL_DEPTH_BUFFER_BIT = 0x00000100
 const val GL_STENCIL_BUFFER_BIT = 0x00000400
@@ -505,5 +518,22 @@ object SDL_SCANCODES {
         SDL_SCANCODE_X to Key.X,
         SDL_SCANCODE_Y to Key.Y,
         SDL_SCANCODE_Z to Key.Z,
+
+        SDL_SCANCODE_F1 to Key.F1,
+        SDL_SCANCODE_F2 to Key.F2,
+        SDL_SCANCODE_F3 to Key.F3,
+        SDL_SCANCODE_F4 to Key.F4,
+        SDL_SCANCODE_F5 to Key.F5,
+        SDL_SCANCODE_F6 to Key.F6,
+        SDL_SCANCODE_F7 to Key.F7,
+        SDL_SCANCODE_F8 to Key.F8,
+        SDL_SCANCODE_F9 to Key.F9,
+        SDL_SCANCODE_F10 to Key.F10,
+        SDL_SCANCODE_F11 to Key.F11,
+        SDL_SCANCODE_F12 to Key.F12,
+        SDL_SCANCODE_F13 to Key.F13,
+        SDL_SCANCODE_F14 to Key.F14,
+        SDL_SCANCODE_F15 to Key.F15,
+        SDL_SCANCODE_F16 to Key.F16,
     )
 }

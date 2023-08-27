@@ -58,7 +58,7 @@ tasks {
         //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/developmentExecutable/${project.name}.js").absolutePath)
         //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/developmentExecutable/${project.name}.js").absolutePath)
         //this.args = listOf("run", "-A", "--unstable", File(buildDir, "dist/js/productionExecutable/${project.name}.js").absolutePath)
-        this.args = listOf("run", "-A", "--unstable", File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
+        this.args = listOf("run", "--inspect", "-A", "--unstable", File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
         //this.args = listOf("run", "-A", "--unstable", File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
     }
     //afterEvaluate {
