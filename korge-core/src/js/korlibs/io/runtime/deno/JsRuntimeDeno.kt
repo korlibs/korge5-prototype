@@ -106,7 +106,9 @@ object JsRuntimeDeno : JsRuntime() {
 
     override fun currentDir(): String {
         //val url = URL(import.meta.url)
-        val str = URL(".", import.meta.url).pathname
+        //console.log("Deno.mainModule", Deno.mainModule)
+        //console.log("import.meta.url", import.meta.url)
+        val str = URL(".", Deno.mainModule).pathname
         return if (Platform.isWindows) str.substring(1) else str
         //return Deno.cwd()
     }
@@ -241,9 +243,9 @@ external interface DenoDlOpen<T> {
 external interface DenoBuild {
     /** aarch64-apple-darwin */
     val target: String
-    /** aarch64 */
+    /** x86_64, aarch64 */
     val arch: String
-    /** darwin, linux, windows */
+    /** darwin, linux, windows, freebsd, netbsd, aix, solaris, illumos */
     val os: String
     /** apple */
     val vendor: String
@@ -269,6 +271,7 @@ external object Deno {
     fun <T> dlopen(path: String, symbols: dynamic): DenoDlOpen<T>
     fun addSignalListener(s: String, function: () -> Unit)
 
+    val mainModule: String
     val build: DenoBuild
 
     val env: dynamic

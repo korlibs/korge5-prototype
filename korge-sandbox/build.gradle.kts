@@ -86,7 +86,7 @@ tasks {
         executable = "esbuild"
         val releaseOutput = File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath
         val outFile = File(buildDir, "dist/out.js").absolutePath
-        args("--bundle", releaseOutput, "--log-level=error", "--outfile=$outFile", "--minify", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
+        args("--bundle", releaseOutput, "--log-level=error", "--outfile=$outFile", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
         workingDir(rootProject.rootDir)
         doLast {
             File(outFile).setExecutable(true)

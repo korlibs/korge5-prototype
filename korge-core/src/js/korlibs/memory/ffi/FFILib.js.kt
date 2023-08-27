@@ -50,7 +50,7 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
                 null
             }
         }.unsafeCast<Any?>().also {
-            println("dymlib=$it")
+            //println("dymlib=$it : ${lib.paths}")
         }
     }
 
