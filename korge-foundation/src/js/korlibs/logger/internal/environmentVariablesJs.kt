@@ -1,8 +1,9 @@
 package korlibs.logger.internal
 
+import korlibs.js.Deno
 import kotlinx.browser.*
 
-private external val Deno: dynamic
+
 private external val process: dynamic
 
 internal actual val miniEnvironmentVariables: Map<String, String> by lazy {
