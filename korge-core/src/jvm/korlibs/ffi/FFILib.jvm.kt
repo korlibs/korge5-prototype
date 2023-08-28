@@ -507,7 +507,10 @@ while (running) {
   if (isDeno) {
     readAndProcessPacket(Deno.stdin, Deno.stdout);
   } else {
-    readAndProcessPacket(process.stdin.fd, process.stdout.fd);
+    // I think (pure conjecture) that process.stdin.fd is a getter that, when referenced, will put stdin in non-blocking mode (which is causing the error). When you use the file descriptor directly, you work around that.
+    // https://stackoverflow.com/questions/40362369/stdin-read-fails-on-some-input
+    //readAndProcessPacket(process.stdin.fd, process.stdout.fd);
+    readAndProcessPacket(0, 1);
   }
 }
 """.trimIndent()
