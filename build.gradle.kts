@@ -134,11 +134,3 @@ subprojects {
     //    }
     //}
 }
-
-allprojects {
-    tasks {
-        val clean by getting  {
-            delete(file(".gradle"))
-        }
-    }
-}
