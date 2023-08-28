@@ -1,22 +1,7 @@
 package korlibs.ffi
 
-actual class FFILibSym actual constructor(lib: BaseLib) {
-    actual fun <T> get(name: String): T {
-        TODO("Not yet implemented")
-    }
-
-    actual fun readBytes(pos: Int, size: Int): ByteArray {
-        TODO("Not yet implemented")
-    }
-
-    actual fun writeBytes(pos: Int, data: ByteArray) {
-    }
-
-    actual fun allocBytes(bytes: ByteArray): Int {
-        TODO("Not yet implemented")
-    }
-
-    actual fun freeBytes(vararg ptrs: Int) {
+actual fun FFILibSym(lib: BaseLib): FFILibSym {
+    return object : FFILibSym {
     }
 }
 

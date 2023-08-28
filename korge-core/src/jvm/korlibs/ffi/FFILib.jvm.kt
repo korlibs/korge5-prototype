@@ -3,16 +3,18 @@ package korlibs.ffi
 import com.sun.jna.Function
 import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
+import korlibs.datastructure.lock.Lock
 import korlibs.io.serialization.json.Json
 import korlibs.memory.readS32LE
 import korlibs.memory.write32LE
 import korlibs.memory.writeBytes
+import java.io.Closeable
 import java.io.File
 import java.io.InputStream
+import java.io.OutputStream
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
-import java.net.*
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 import kotlin.reflect.KClass
@@ -52,7 +54,7 @@ open class DENOEval {
             window.byteArrayToBase64 = function(bytes) {
                 var binaryString = "";
                 for (var i = 0; i < bytes.length; i++) binaryString += String.fromCharCode(bytes[i] & 0xFF);
-                //console.log('binaryString', binaryString);
+                //console.error('binaryString', binaryString);
                 return btoa(binaryString);
             }            
         """.trimIndent()
@@ -75,10 +77,10 @@ open class DENOEval {
             const wasmModule = new WebAssembly.Module(wasmBytes);
             const wasmInstance = new WebAssembly.Instance(wasmModule, {
                 "wasi_snapshot_preview1": {
-                    "proc_exit": function() { console.log(arguments); },
-                    fd_close: function() { console.log(arguments); },
-                    fd_write: function() { console.log(arguments); },
-                    fd_seek: function() { console.log(arguments); },
+                    "proc_exit": function() { console.error(arguments); },
+                    fd_close: function() { console.error(arguments); },
+                    fd_write: function() { console.error(arguments); },
+                    fd_seek: function() { console.error(arguments); },
                 }
             });
             window.lastId = window.lastId || 1;
@@ -87,8 +89,8 @@ open class DENOEval {
             const id = window.lastId++;
             window.wasmExports[id] = wasmInstance.exports;
             window.mem[id] = new Int8Array(wasmInstance.exports.memory.buffer);
-            //console.log(window.wasmExports);
-            console.log(id);
+            //console.error(window.wasmExports);
+            console.error(id);
         """
         ).toInt())
     }
@@ -98,7 +100,7 @@ open class DENOEval {
         return Json.parse(
             sendEval(
                 """
-            console.log(JSON.stringify(window.wasmExports[$id].$name($paramsStr)))
+            console.error(JSON.stringify(window.wasmExports[$id].$name($paramsStr)))
         """
             )
         )
@@ -124,7 +126,7 @@ open class DENOEval {
             const ptr = $ptr;
             const mem = window.mem[$id];
             for (let n = 0; n < wasmBytes.length; n++) wasmBytes[n] = mem[ptr + n];
-            console.log(byteArrayToBase64(wasmBytes));
+            console.error(byteArrayToBase64(wasmBytes));
         """
         )
         return base64.fromBase64()
@@ -135,7 +137,7 @@ open class DENOEval {
         val SOF = "<<<START_OF_COMMAND>>>"
         val EOF = "<<<END_OF_COMMAND>>>"
         val bytes =
-            "console.log('$SOF'); try { eval(${code.quoted}) } catch (e) { console.log(e); } finally { console.log('$EOF'); }\n".toByteArray()
+            "console.error('$SOF'); try { eval(${code.quoted}) } catch (e) { console.error(e); } finally { console.error('$EOF'); }\n".toByteArray()
         process.outputStream.write(bytes)
         process.outputStream.flush()
         val data = StringBuilder()
@@ -169,7 +171,11 @@ open class DENOEval {
 
  */
 
-actual class FFILibSym actual constructor(val lib: BaseLib) {
+actual fun FFILibSym(lib: BaseLib): FFILibSym {
+    return FFILibSymJVM(lib)
+}
+
+class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
     val nlib by lazy {
         lib as FFILib
         lib.paths.firstNotNullOfOrNull {
@@ -207,29 +213,20 @@ actual class FFILibSym actual constructor(val lib: BaseLib) {
         }
     }
 
-    val wasm by lazy {
+    val wasm: DenoWASM by lazy {
         if (libWasm == null) error("Not a WASM module")
-        DenoWasmSocket().also {
-            it.loadWASM(libWasm.content)
-        }
-    }
-    /*
-    val wasm: DENOEval.WasmModule by lazy {
-        if (lib.kind != FFILibKind.WASM) error("Not a WASM module")
-        DENOEval.loadWASM(lib.content!!)
+        DenoWasmProcessStdin.open(libWasm.content)
     }
 
-     */
+    override fun <T> get(name: String): T = functions[name] as T
+    override fun readBytes(pos: Int, size: Int): ByteArray = wasm.readBytes(pos, size)
+    override fun writeBytes(pos: Int, data: ByteArray) = wasm.writeBytes(pos, data)
+    override fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)
+    override fun freeBytes(vararg ptrs: Int) = wasm.free(*ptrs)
 
-    actual fun <T> get(name: String): T = functions[name] as T
-    actual fun readBytes(pos: Int, size: Int): ByteArray = wasm.readBytes(pos, size)
-    actual fun writeBytes(pos: Int, data: ByteArray) = wasm.writeBytes(pos, data)
-    actual fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)
-    actual fun freeBytes(vararg ptrs: Int) = wasm.free(*ptrs)
-
-    fun unload() {
+    override fun close() {
         if (libWasm != null) {
-            wasm.unloadWASM()
+            wasm.close()
         }
     }
 }
@@ -245,10 +242,32 @@ actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
     return this.getIntArray(0L, size)
 }
 
-object DenoWasmServerSocket {
+object DenoWasmProcessStdin {
     //val PORT = 9090
     val PORT = 8080
-    val file = File("/tmp/deno.wasm.server.deno.ts").also { it.writeText(DenoWasmServerCode) }
+    //val file = File("/tmp/deno.wasm.stdin.deno.ts").also { it.writeText(DenoWasmServerStdinCode) }
+    val file = File("/tmp/deno.wasm.stdin.deno.ts")
+    val process = ProcessBuilder("deno", "run", "-A", "--unstable", file.absolutePath)
+        .redirectError(File("/tmp/deno.wasm.stderr"))
+        .start()
+
+    val io = DenoWasmIO(process.outputStream, process.inputStream, Closeable { })
+    var lastId = 1
+
+    fun open(wasmModuleBytes: ByteArray): DenoWASM {
+        return DenoWASM(io, lastId++, wasmModuleBytes)
+    }
+
+    fun close() {
+        process.destroy()
+    }
+}
+
+/*
+class DenoWasmServerSocket {
+    //val PORT = 9090
+    val PORT = 8080
+    val file = File("/tmp/deno.wasm.server.deno.ts").also { it.writeText(DenoWasmServerSocketCode) }
     //val process = ProcessBuilder("sh", "-c", "nohup", "deno", "run", "-A", "--unstable", file.absolutePath)
     val process = ProcessBuilder("deno", "run", "-A", "--unstable", file.absolutePath)
         .also { it.redirectError(File("/tmp/deno.wasm.server.deno.ts.err")) }
@@ -269,105 +288,107 @@ object DenoWasmServerSocket {
         process.destroy()
     }
 }
+*/
 
-class DenoWasmSocket {
-    //val channel = SocketChannel.open(StandardProtocolFamily.UNIX)
-    //channel.connect(socketAddress);
-    //it.connect(UnixDomainSocketAddress.of("/tmp/deno.wasm.socket"))
-    val socket = Socket().also {
-        it.connect(InetSocketAddress(DenoWasmServerSocket.PORT))
-        /*
-        Thread.sleep(200L)
-        for (n in 0 until 10) {
-            try {
-                it.connect(InetSocketAddress("127.0.0.1", DenoWasmServerSocket.PORT))
-                break
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                Thread.sleep(100L + n * 10)
-            }
-        }
-
-         */
+class DenoWASM(val io: DenoWasmIO, val streamId: Int, val wasmModuleBytes: ByteArray) : Closeable {
+    init {
+        io.loadWASM(streamId, wasmModuleBytes)
     }
+    //fun open(bytes: ByteArray) { io.loadWASM(streamId, bytes) }
 
-    val os = socket.getOutputStream()
-    val iis = socket.getInputStream()
+    fun writeBytes(ptr: Int, bytes: ByteArray) { io.writeBytes(streamId, ptr, bytes) }
+    fun allocAndWrite(bytes: ByteArray): Int = io.allocAndWrite(streamId, bytes)
+    fun free(vararg ptrs: Int) { io.free(streamId, *ptrs) }
+    fun readBytes(ptr: Int, len: Int): ByteArray = io.readBytes(streamId, ptr, len)
+    fun executeFunction(name: String, vararg params: Any?): Any? = io.executeFunction(streamId, name, *params)
 
+    override fun close() { io.unloadWASM(streamId) }
+}
+
+class DenoWasmIO(val output: OutputStream, val input: InputStream, val close: Closeable? = null) {
     val debug = false
     //val debug = true
 
-    fun loadWASM(bytes: ByteArray) {
-        writeReadMessage(1000, bytes)
+    fun close() {
+        close?.close()
+    }
+
+    fun loadWASM(streamId: Int, bytes: ByteArray) {
+        writeReadMessage(1000, streamId, bytes)
         if (debug) println("CMD:loadWASM")
     }
 
-    fun unloadWASM() {
-        writeReadMessage(1001, byteArrayOf())
+    fun unloadWASM(streamId: Int) {
+        writeReadMessage(1001, streamId, byteArrayOf())
         if (debug) println("CMD:unloadWASM")
     }
 
-    fun writeBytes(ptr: Int, bytes: ByteArray) {
+    fun writeBytes(streamId: Int, ptr: Int, bytes: ByteArray) {
         val payload = ByteArray(4 + bytes.size)
         payload.write32LE(0, ptr)
         payload.writeBytes(4, bytes)
-        writeReadMessage(1010, payload)
+        writeReadMessage(1010, streamId, payload)
         if (debug) println("CMD:writeBytes:ptr=$ptr, bytes=${bytes.size}")
     }
 
-    fun allocAndWrite(bytes: ByteArray): Int {
-        return writeReadMessage(1011, bytes).readS32LE(0)
+    fun allocAndWrite(streamId: Int, bytes: ByteArray): Int {
+        return writeReadMessage(1011, streamId, bytes).readS32LE(0)
     }
-    fun free(vararg ptrs: Int) {
+    fun free(streamId: Int, vararg ptrs: Int) {
         val payload = ByteArray(ptrs.size * 4)
         for (n in 0 until ptrs.size) {
             payload.write32LE(n * 4, ptrs[n])
         }
-        writeReadMessage(1012, payload)
+        writeReadMessage(1012, streamId, payload)
         if (debug) println("CMD:free:ptrs=${ptrs.toList()}")
     }
 
-    fun readBytes(ptr: Int, len: Int): ByteArray {
+    fun readBytes(streamId: Int, ptr: Int, len: Int): ByteArray {
         val payload = ByteArray(8)
         payload.write32LE(0, ptr)
         payload.write32LE(4, len)
         if (debug) println("CMD:readBytes:ptr=$ptr,len=$len")
-        return writeReadMessage(1020, payload)
+        return writeReadMessage(1020, streamId, payload)
     }
 
-    fun executeFunction(name: String, vararg params: Any?): Any? {
-        val resultBytes = writeReadMessage(1030, Json.stringify(mapOf("func" to name, "params" to params.toList())).encodeToByteArray())
+    fun executeFunction(streamId: Int, name: String, vararg params: Any?): Any? {
+        val resultBytes = writeReadMessage(1030, streamId, Json.stringify(mapOf("func" to name, "params" to params.toList())).encodeToByteArray())
         val data = resultBytes.decodeToString()
         if (debug) println("CMD:executeFunction:name=$name, params=${params.toList()}")
         return Json.parse(data)
     }
 
-    private fun writeReadMessage(type: Int, payload: ByteArray): ByteArray {
-        writeMessage(type, payload)
-        return readMessage(type)
+    private val lock = Lock()
+
+    private fun writeReadMessage(type: Int, streamId: Int, payload: ByteArray): ByteArray = lock {
+        _writeMessage(type, streamId, payload)
+        return _readMessage(type)
     }
 
-    private fun writeMessage(type: Int, payload: ByteArray) {
-        val buffer = ByteArray(8)
+    private fun _writeMessage(type: Int, streamId: Int, payload: ByteArray) {
+        val buffer = ByteArray(12)
         buffer.write32LE(0, type)
-        buffer.write32LE(4, payload.size)
+        buffer.write32LE(4, streamId)
+        buffer.write32LE(8, payload.size)
         //println("writeMessage: type=$type, payload=${payload.size}")
         //socket.channel.write(arrayOf(buffer, ByteBuffer.wrap(payload)))
-        os.write(buffer)
-        os.write(payload)
-        os.flush()
+        output.write(buffer)
+        output.write(payload)
+        output.flush()
     }
 
-    private fun readMessage(type: Int): ByteArray {
+    private fun _readMessage(type: Int): ByteArray {
         //println(" -- readMessage type=$type")
-        val sizeBuffer = ByteArray(4)
-        iis.readBytesExact(sizeBuffer)
+        val sizeBuffer = input.readBytesExact(4)
         val len = sizeBuffer.readS32LE(0)
         //println(" -- readMessage: len=$len")
-        val out = ByteArray(len)
-        iis.readBytesExact(out)
+        val out = input.readBytesExact(len)
         //println(" --> ${out.size}")
         return out
+    }
+
+    private fun InputStream.readBytesExact(size: Int): ByteArray {
+        return readBytesExact(ByteArray(size))
     }
 
     private fun InputStream.readBytesExact(b: ByteArray): ByteArray {
@@ -378,7 +399,9 @@ class DenoWasmSocket {
             //println("   - READ $offset, $remaining")
             val len = read(b, offset, remaining)
             //println("      -> $len")
-            if (len < 0) error("Socket error: len=$len")
+            if (len < 0) {
+                error("InputStream error: len=$len")
+            }
             if (len <= 0) break
             offset += len
             remaining -= len
@@ -387,24 +410,187 @@ class DenoWasmSocket {
         //println("REMAINING: $remaining : ${b.toList()}")
         return b
     }
-
-    private fun SocketChannel.readFully(b: ByteBuffer) {
-        var remaining = b.remaining()
-        while (remaining > 0) {
-            val read = read(b)
-            remaining -= read
-        }
-    }
 }
 
-private val DenoWasmServerCode = """
+private val DenoWasmServerStdinCode = /* language: javascript **/"""
+    const debug = Deno.env.get("DEBUG") == "true";
+
+    function readSyncExact(reader: Deno.ReaderSync, size: number): Uint8Array {
+      if (size >= 32 * 1024 * 1024) throw new Error("too big to read");
+      var out = new Uint8Array(size);
+      var pos = 0;
+      while (pos < size) {
+        var read = reader.readSync(out.subarray(pos));
+        if (read == null || read <= 0) throw Error("Broken pipe");
+        pos += read;
+      }
+      return out;
+    }
+
+    function writeSyncExact(writer: Deno.WriterSync, data: Uint8Array): number {
+      var pos = 0;
+      while (pos < data.length) {
+        var written = writer.writeSync(data.subarray(pos));
+        if (written <= 0) throw Error("Broken pipe");
+        pos += written;
+      }
+      return pos;
+    }
+
+    function readPacket(reader: Deno.ReaderSync) {
+      const [kind, streamId, len] = new Int32Array(
+        (readSyncExact(reader, 12)).buffer,
+      );
+      const payload = readSyncExact(reader, len);
+      if (debug) {
+        console.error("   packet: ", "id:", streamId, "kind:", kind, "len:", len);
+      }
+      return { kind, streamId, payload };
+    }
+
+    function writePacket(writer: Deno.WriterSync, payload: Uint8Array) {
+      const data = new Uint8Array(4 + payload.length);
+      const dview = new DataView(data.buffer);
+      dview.setInt32(0, payload.length, true);
+      data.set(payload, 4);
+      const written = writeSyncExact(writer, data);
+      if (written != data.length) {
+        throw new Error(
+          `Not written as many bytes as expected! ${"$"}{written}, but expected ${"$"}{data.length}`,
+        );
+      }
+    }
+
+    class WasmModule {
+      constructor(
+        public exports: any,
+        public u8: Uint8Array,
+      ) {
+      }
+    }
+
+    const wasmModules = new Map<number, WasmModule>();
+
+    function readAndProcessPacket(
+      reader: Deno.ReaderSync,
+      writer: Deno.WriterSync,
+    ) {
+      const { kind, streamId, payload } = readPacket(reader);
+      const wasmModule = wasmModules.get(streamId);
+      // write bytes
+      switch (kind) {
+        case 1000: { // Load WASM module
+          const wasmModule = new WebAssembly.Module(payload);
+          if (debug) console.error("!!CMD: Loaded WASM... ", wasmModule);
+          const wasmInstance = new WebAssembly.Instance(wasmModule, {
+            "wasi_snapshot_preview1": {
+              proc_exit: () => console.error(arguments),
+              fd_close: () => console.error(arguments),
+              fd_write: () => console.error(arguments),
+              fd_seek: () => console.error(arguments),
+            },
+          });
+          wasmModules.set(
+            streamId,
+            new WasmModule(
+              wasmInstance.exports,
+              new Uint8Array((<any> wasmInstance.exports.memory).buffer),
+            ),
+          );
+          writePacket(writer, new Uint8Array(0));
+          break;
+        }
+        case 1001: { // Unload WASM module and close connection
+          if (debug) console.error("!!CMD: Unload WASM...");
+          wasmModules.delete(streamId);
+          writePacket(writer, new Uint8Array(0));
+          break;
+        }
+        case 1010: { // writeBytes
+          const [offset] = new Int32Array(payload.buffer, 0, 1);
+          const data = new Uint8Array(payload, 4);
+          if (debug) console.error("!!CMD: Write Bytes...", offset, data.length);
+          wasmModule?.u8?.set(data, offset);
+          writePacket(writer, new Uint8Array(0));
+          break;
+        }
+        case 1011: { // allocAndWrite
+          let offset = 0;
+          if (wasmModule) {
+            offset = wasmModule.exports.malloc(payload.length);
+            if (debug) {
+              console.error("!!CMD: allocAndWrite...", offset, payload.length);
+            }
+            wasmModule.u8?.set(payload, offset);
+          }
+          writePacket(writer, new Uint8Array(new Int32Array([offset]).buffer));
+          break;
+        }
+        case 1012: { // free
+          if (wasmModule) {
+            const ptrs = new Int32Array(payload.buffer);
+            for (const ptr of ptrs) {
+              if (ptr != 0) wasmModule.exports.free(ptr);
+            }
+            if (debug) console.error("!!CMD: free...", ptrs);
+          }
+          writePacket(writer, new Uint8Array(0));
+          break;
+        }
+        case 1020: { // readBytes
+          const info = new Int32Array(payload.buffer);
+          const offset = info[0];
+          const len = info[1];
+          if (debug) console.error("!!CMD: Read Bytes...", offset, len, payload);
+          writePacket(
+            writer,
+            wasmModule
+              ? new Uint8Array(wasmModule.u8!.buffer, offset, len)
+              : new Uint8Array(len),
+          );
+          break;
+        }
+        case 1030: { // executeFunction
+          const json = JSON.parse(new TextDecoder().decode(payload));
+          if (debug) console.error("!!CMD: executeFunction...", json);
+          let result = null;
+          try {
+            result = wasmModule!.exports[json.func](...json.params);
+          } catch (e) {
+            console.warn(e);
+            console.warn(e.stack);
+          }
+          const resultPayload = new TextEncoder().encode(JSON.stringify(result));
+          writePacket(writer, resultPayload);
+          break;
+        }
+        default:
+          console.error(`!!ERROR: Invalid message: ${"$"}{kind}`);
+      }
+    }
+
+    addEventListener("unhandledrejection", (event) => {
+      console.warn(`UNHANDLED PROMISE REJECTION: ${"$"}{event.reason}`);
+      console.warn(event.reason.stack);
+      event.preventDefault();
+    });
+
+    let running = true;
+
+    while (running) {
+      readAndProcessPacket(Deno.stdin, Deno.stdout);
+    }
+""".trimIndent()
+
+/*
+private val DenoWasmServerSocketCode = """
     // deno run -A --unstable temp.ts
     
     const host = Deno.env.get("HOST") || '127.0.0.1';
     const port = Deno.env.get("PORT") || 8080;
     const listener = Deno.listen({ host: host, port: port });
     //const listener = Deno.listen({ path: "/tmp/deno.wasm.socket", transport: "unix" });
-    console.log(`listening on ${'$'}{host}:${'$'}{port}`);
+    console.error(`listening on ${'$'}{host}:${'$'}{port}`);
     
     const debug = false
     
@@ -420,7 +606,7 @@ private val DenoWasmServerCode = """
         const readCount = await reader.read(
           new Uint8Array(buf.buffer, pos, remaining),
         );
-        if (debug) console.log("readExact", readCount, count, pos, remaining);
+        if (debug) console.error("readExact", readCount, count, pos, remaining);
         if (readCount == null) {
           //break;
           throw new Error("socket error");
@@ -445,7 +631,7 @@ private val DenoWasmServerCode = """
     async function readPacket(conn: Deno.Conn) {
       const [kind, len] = new Int32Array((await readExact(conn, 8)).buffer);
       const payload = await readExact(conn, len);
-      if (debug) console.log("   packet: ", "kind:", kind, "len:", len);
+      if (debug) console.error("   packet: ", "kind:", kind, "len:", len);
       return { kind, payload };
     }
     
@@ -472,13 +658,13 @@ private val DenoWasmServerCode = """
           switch (kind) {
             case 1000: { // Load WASM module
               const wasmModule = new WebAssembly.Module(payload);
-              if (debug) console.log("!!CMD: Loaded WASM... ", wasmModule);
+              if (debug) console.error("!!CMD: Loaded WASM... ", wasmModule);
               const wasmInstance = new WebAssembly.Instance(wasmModule, {
                 "wasi_snapshot_preview1": {
-                  proc_exit: () => console.log(arguments),
-                  fd_close: () => console.log(arguments),
-                  fd_write: () => console.log(arguments),
-                  fd_seek: () => console.log(arguments),
+                  proc_exit: () => console.error(arguments),
+                  fd_close: () => console.error(arguments),
+                  fd_write: () => console.error(arguments),
+                  fd_seek: () => console.error(arguments),
                 },
               });
               wasmExports = wasmInstance.exports;
@@ -488,7 +674,7 @@ private val DenoWasmServerCode = """
               break;
             }
             case 1001: { // Unload WASM module and close connection
-                if (debug) console.log("!!CMD: Unload WASM...");
+                if (debug) console.error("!!CMD: Unload WASM...");
               wasmExports = null;
               wasmMemory = null;
               await writePacket(conn, new Uint8Array(0));
@@ -498,14 +684,14 @@ private val DenoWasmServerCode = """
             case 1010: { // writeBytes
               const [offset] = new Int32Array(payload.buffer, 0, 1);
               const data = new Uint8Array(payload, 4);
-              if (debug) console.log("!!CMD: Write Bytes...", offset, data.length);
+              if (debug) console.error("!!CMD: Write Bytes...", offset, data.length);
               wasmMemoryU8?.set(data, offset);
               await writePacket(conn, new Uint8Array(0));
               break;
             }
             case 1011: { // allocAndWrite
               const offset = wasmExports.malloc(payload.length);
-              if (debug) console.log("!!CMD: allocAndWrite...", offset, payload.length);
+              if (debug) console.error("!!CMD: allocAndWrite...", offset, payload.length);
               wasmMemoryU8?.set(payload, offset);
               await writePacket(
                 conn,
@@ -518,7 +704,7 @@ private val DenoWasmServerCode = """
               for (const ptr of ptrs) {
                 if (ptr != 0) wasmExports.free(ptr);
               }
-              if (debug) console.log("!!CMD: free...", ptrs);
+              if (debug) console.error("!!CMD: free...", ptrs);
               await writePacket(conn, new Uint8Array(0));
               break;
             }
@@ -526,7 +712,7 @@ private val DenoWasmServerCode = """
               const info = new Int32Array(payload.buffer);
               const offset = info[0]
               const len = info[1];
-              if (debug) console.log("!!CMD: Read Bytes...", offset, len, payload);
+              if (debug) console.error("!!CMD: Read Bytes...", offset, len, payload);
               await writePacket(
                 conn,
                 new Uint8Array(wasmMemoryU8!.buffer, offset, len),
@@ -535,7 +721,7 @@ private val DenoWasmServerCode = """
             }
             case 1030: { // executeFunction
               const json = JSON.parse(new TextDecoder().decode(payload));
-              if (debug) console.log("!!CMD: executeFunction...", json);
+              if (debug) console.error("!!CMD: executeFunction...", json);
               let result = null;
               try {
                 result = wasmExports[json.func](...json.params);
@@ -567,8 +753,10 @@ private val DenoWasmServerCode = """
     });
     
     for await (const conn of listener) {
-      console.log("conn", conn);
+      console.error("conn", conn);
       handleConnection(conn);
     }
 
 """.trimIndent()
+
+ */

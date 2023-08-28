@@ -2,6 +2,7 @@ package korlibs.ffi
 
 import korlibs.datastructure.fastCastTo
 import korlibs.io.file.sync.SyncIOAPI
+import korlibs.io.lang.Closeable
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -13,12 +14,15 @@ expect val FFIPointer?.str: String
 expect fun FFIPointer.getStringz(): String
 expect fun FFIPointer.readInts(size: Int, offset: Int = 0): IntArray
 
-expect class FFILibSym(lib: BaseLib) {
-    fun readBytes(pos: Int, size: Int): ByteArray
-    fun writeBytes(pos: Int, data: ByteArray)
-    fun allocBytes(bytes: ByteArray): Int
-    fun freeBytes(vararg ptrs: Int)
-    fun <T> get(name: String): T
+expect fun FFILibSym(lib: BaseLib): FFILibSym
+
+interface FFILibSym : Closeable {
+    fun readBytes(pos: Int, size: Int): ByteArray = TODO()
+    fun writeBytes(pos: Int, data: ByteArray): Unit = TODO()
+    fun allocBytes(bytes: ByteArray): Int = TODO()
+    fun freeBytes(vararg ptrs: Int): Unit = TODO()
+    fun <T> get(name: String): T = TODO()
+    override fun close() {}
 }
 
 abstract class BaseLib {

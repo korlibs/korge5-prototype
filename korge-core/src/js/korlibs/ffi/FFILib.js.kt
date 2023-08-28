@@ -44,7 +44,11 @@ external class WebAssembly {
 
 private external val JSON: dynamic
 
-actual class FFILibSym actual constructor(val lib: BaseLib) {
+actual fun FFILibSym(lib: BaseLib): FFILibSym {
+    return FFILibSymJS(lib)
+}
+
+class FFILibSymJS(val lib: BaseLib) : FFILibSym {
     val symbolsByName: Map<String, BaseLib.FuncDelegate<*>> by lazy { lib.functions.associateBy { it.name } }
 
     private var _wasmExports: dynamic = null
@@ -79,23 +83,23 @@ actual class FFILibSym actual constructor(val lib: BaseLib) {
         Uint8Array(mem)
     }
 
-    actual fun readBytes(pos: Int, size: Int): ByteArray {
+    override fun readBytes(pos: Int, size: Int): ByteArray {
         val out = ByteArray(size)
         val u8 = this.u8
         for (n in out.indices) out[n] = u8[pos + n]
         return out
     }
 
-    actual fun writeBytes(pos: Int, data: ByteArray) {
+    override fun writeBytes(pos: Int, data: ByteArray) {
         for (n in data.indices) u8[pos + n] = data[n]
     }
 
-    actual fun allocBytes(bytes: ByteArray): Int {
+    override fun allocBytes(bytes: ByteArray): Int {
         val ptr = wasmExports["malloc"](bytes.size)
         writeBytes(ptr, bytes)
         return ptr
     }
-    actual fun freeBytes(vararg ptrs: Int) {
+    override fun freeBytes(vararg ptrs: Int) {
         for (ptr in ptrs) if (ptr != 0) wasmExports["free"](ptr)
     }
 
@@ -139,7 +143,7 @@ actual class FFILibSym actual constructor(val lib: BaseLib) {
 
     val libIsWasm = lib is WASMLib
 
-    actual fun <T> get(name: String): T {
+    override fun <T> get(name: String): T {
         val syms = if (libIsWasm) {
             wasmExports
         } else {
@@ -148,6 +152,10 @@ actual class FFILibSym actual constructor(val lib: BaseLib) {
         }
         //return syms[name]
         return preprocessFunc(symbolsByName[name]!!, syms[name])
+    }
+
+    override fun close() {
+        super.close()
     }
 }
 
