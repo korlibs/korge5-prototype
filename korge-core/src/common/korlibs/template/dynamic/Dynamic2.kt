@@ -155,26 +155,41 @@ object Dynamic2 {
 
     suspend fun accessAny(instance: Any?, key: Any?, mapper: ObjectMapper2): Any? = mapper.accessAny(instance, key)
 
-    suspend fun setAny(instance: Any?, key: Any?, value: Any?, mapper: ObjectMapper2): Unit = when (instance) {
-        null -> Unit
-        is Dynamic2Settable -> instance.dynamic2Set(key, value)
-        is MutableMap<*, *> -> (instance as MutableMap<Any?, Any?>).set(key, value)
-        is MutableList<*> -> (instance as MutableList<Any?>)[toInt(key)] = value
-        else -> {
-            DynamicContext {
-                when {
-                    mapper.hasProperty(instance, key.toDynamicString()) -> mapper.set(instance, key, value)
-                    mapper.hasMethod(instance, key.toDynamicString()) -> {
-                        mapper.invokeAsync(
-                            instance::class as KClass<Any>,
-                            instance as Any?,
-                            key.toDynamicString(),
-                            listOf(value)
-                        )
-                        Unit
+    suspend fun setAny(instance: Any?, key: Any?, value: Any?, mapper: ObjectMapper2): Unit {
+        when (instance) {
+            null -> Unit
+            is Dynamic2Settable -> {
+                instance.dynamic2Set(key, value)
+                Unit
+            }
+            is MutableMap<*, *> -> {
+                (instance as MutableMap<Any?, Any?>).set(key, value)
+                Unit
+            }
+            is MutableList<*> -> {
+                (instance as MutableList<Any?>)[toInt(key)] = value
+                Unit
+            }
+            else -> {
+                DynamicContext {
+                    when {
+                        mapper.hasProperty(instance, key.toDynamicString()) -> {
+                            mapper.set(instance, key, value)
+                            Unit
+                        }
+                        mapper.hasMethod(instance, key.toDynamicString()) -> {
+                            mapper.invokeAsync(
+                                instance::class as KClass<Any>,
+                                instance as Any?,
+                                key.toDynamicString(),
+                                listOf(value)
+                            )
+                            Unit
+                        }
+                        else -> Unit
                     }
-                    else -> Unit
                 }
+                Unit
             }
         }
     }

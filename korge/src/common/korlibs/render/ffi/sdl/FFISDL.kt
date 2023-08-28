@@ -5,12 +5,13 @@ import korlibs.memory.Platform
 import korlibs.memory.ffi.FFILib
 import korlibs.memory.ffi.FFIPointer
 
-
 object SDL : FFILib(
-    "/Library/Frameworks/SDL2.framework/SDL2",
-    "/opt/homebrew/Cellar/sdl2/2.28.1/lib/libSDL2.dylib",
-    "libSDL2",
-    "SDL2.dll",
+    "SDL2",
+    //"/Library/Frameworks/SDL2.framework/SDL2",
+    //"/opt/homebrew/Cellar/sdl2/2.28.1/lib/libSDL2.dylib",
+    //"libSDL2",
+    //"/usr/lib/aarch64-linux-gnu/libSDL2-2.0.so",
+    //"SDL2.dll",
 ) {
     val SDL_GetWindowSize: (FFIPointer?, IntArray, IntArray) -> Unit by func()
     val SDL_SetWindowSize: (window: FFIPointer?, width: Int, height: Int) -> Unit by func()

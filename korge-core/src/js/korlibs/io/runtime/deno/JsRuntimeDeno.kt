@@ -1,6 +1,7 @@
 package korlibs.io.runtime.deno
 
 import korlibs.bignumber.BigInt
+import korlibs.datastructure.Array_from
 import korlibs.io.file.*
 import korlibs.io.jsObject
 import korlibs.io.jsObjectToMap
@@ -183,7 +184,7 @@ class DenoAsyncStreamBase(val file: DenoFsFile) : AsyncStreamBase() {
     override suspend fun read(position: Long, buffer: ByteArray, offset: Int, len: Int): Int {
         file.seek(position.toDouble()).await()
         val read = file.read(Uint8Array(buffer.asUint8Array().buffer, offset, len)).await()
-        return read.toInt()
+        return read?.toInt() ?: -1
     }
 
     override suspend fun write(position: Long, buffer: ByteArray, offset: Int, len: Int) {
@@ -228,12 +229,17 @@ external interface DenoFileInfo {
 }
 
 external interface DenoFsFile {
-    fun truncate(len: Double): Promise<dynamic>
+    fun truncate(len: Double? = definedExternally): Promise<Unit>
+    fun truncateSync(len: Double? = definedExternally): Unit
     fun close()
-    fun seek(pos: Double): Promise<Double>
-    fun write(data: Uint8Array): Promise<dynamic>
-    fun read(data: Uint8Array): Promise<Double>
+    fun seek(pos: Double, whence: Int = definedExternally): Promise<Double>
+    fun seekSync(pos: Double, whence: Int = definedExternally): Double
+    fun write(data: Uint8Array): Promise<Double>
+    fun writeSync(data: Uint8Array): Double
+    fun read(data: Uint8Array): Promise<Double?>
+    fun readSync(data: Uint8Array): Double?
     fun stat(): Promise<DenoFileInfo>
+    fun statSync(): DenoFileInfo
 }
 
 external interface DenoDlOpen<T> {
@@ -260,16 +266,31 @@ external interface DenoBuild {
 
 external object Deno {
     fun exit(exitCode: Int = definedExternally)
-    fun statSync(path: String): dynamic
     fun cwd(): String
+    fun realPathSync(path: String): String
+    fun readLinkSync(path: String): String?
+    fun linkSync(oldpath: String?, newpath: String?): String?
     fun open(path: String, options: dynamic): Promise<DenoFsFile>
+    fun openSync(path: String, options: dynamic): DenoFsFile
     fun readDir(path: String): JSAsyncIterable<DenoDirEntry>
-    fun mkdir(path: String, options: dynamic): Promise<Unit>
+    fun readDirSync(path: String): JSIterable<DenoDirEntry>
+    fun mkdir(path: String, options: dynamic = definedExternally): Promise<Unit>
+    fun mkdirSync(path: String, options: dynamic = definedExternally)
     fun remove(path: String, options: dynamic): Promise<Unit>
+    fun removeSync(path: String, options: dynamic = definedExternally)
     fun rename(oldPath: String, newPath: String): Promise<Unit>
     fun stat(path: String): Promise<DenoFileInfo>
+    fun statSync(path: String): DenoFileInfo
     fun <T> dlopen(path: String, symbols: dynamic): DenoDlOpen<T>
     fun addSignalListener(s: String, function: () -> Unit)
+    fun writeFileSync(path: String, data: ByteArray, options: dynamic = definedExternally)
+    fun readFileSync(path: String): ByteArray
+
+    object SeekMode {
+        val Start: Int // 0
+        val Current: Int // 1
+        val End: Int // 2
+    }
 
     val mainModule: String
     val build: DenoBuild
@@ -303,6 +324,11 @@ external interface DenoDirEntry {
 }
 
 external interface JSAsyncIterable<T>
+external interface JSIterable<T>
+
+fun <T> JSIterable<T>.toArray(): Array<T> {
+    return Array_from(this)
+}
 
 val Symbol_asyncIterator get() = Symbol.asyncIterator
 

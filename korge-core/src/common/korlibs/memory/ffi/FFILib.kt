@@ -1,6 +1,7 @@
 package korlibs.memory.ffi
 
 import korlibs.datastructure.fastCastTo
+import korlibs.io.file.sync.SyncIOAPI
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KType
@@ -49,6 +50,9 @@ open class WASMLib(content: ByteArray) : FFILib(listOf(), content, FFILibKind.WA
 //}
 
 open class FFILib(val paths: List<String>, val content: ByteArray? = null, val kind: FFILibKind = FFILibKind.NATIVE) {
+    @OptIn(SyncIOAPI::class)
+    val resolvedPath by lazy { LibraryResolver.resolve(*paths.toTypedArray()) }
+
     constructor(vararg paths: String?, kind: FFILibKind = FFILibKind.NATIVE) : this(paths.toList().filterNotNull(), kind = kind)
     constructor(data: ByteArray) : this(emptyList(), data, FFILibKind.WASM)
     //constructor(data: VfsFile) : this(emptyList(), data, FFILibKind.WASM)

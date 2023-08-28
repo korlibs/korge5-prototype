@@ -3,7 +3,7 @@ package korlibs.memory.dyn
 import korlibs.memory.atomic.KmemAtomicRef
 import kotlin.reflect.KProperty
 
-public open class DynamicLibrary(vararg names: String?) : DynamicLibraryBase(names.filterNotNull()) {
+public abstract class DynamicLibrary(vararg names: String?) : DynamicLibraryBase(names.filterNotNull()) {
 }
 
 public fun interface DynamicSymbolResolver {

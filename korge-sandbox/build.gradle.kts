@@ -39,6 +39,20 @@ kotlin {
     }
 }
 
+fun findExecutableOnPath(name: String): File? {
+    val isWindows = Os.isFamily(Os.FAMILY_WINDOWS)
+
+    for (dirname in System.getenv("PATH").split(File.pathSeparator)) {
+        val potentialNames = if (isWindows) listOf("$name.exe", "$name.cmd", "$name.bat") else listOf(name)
+        for (name in potentialNames) {
+            val file = File(dirname, name)
+            if (file.isFile && file.canExecute()) {
+                return file.absoluteFile
+            }
+        }
+    }
+    return null
+}
 
 tasks {
     val jsMainClasses by getting(Task::class)
@@ -73,7 +87,7 @@ tasks {
     val runDeno by creating(Exec::class) {
         dependsOn(compileSyncWithResources)
         group = "run"
-        executable = "deno"
+        executable = findExecutableOnPath("deno")?.absolutePath ?: "deno"
         args("run", "--inspect", "-A", "--unstable", File(buildDir, "jsDevelopment/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath)
     }
 

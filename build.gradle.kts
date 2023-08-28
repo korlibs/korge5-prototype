@@ -34,6 +34,7 @@ subprojects {
             compilations.all {
                 kotlinOptions.jvmTarget = "1.8"
                 kotlinOptions.suppressWarnings = true
+                //kotlinOptions.freeCompilerArgs = listOf("-Xuse-k2")
                 kotlinOptions.freeCompilerArgs = listOf()
             }
             //withJava()
@@ -132,4 +133,12 @@ subprojects {
     //        //testImplementation(project(path = ":another-project", configuration = "testArtifacts"))
     //    }
     //}
+}
+
+allprojects {
+    tasks {
+        val clean by getting  {
+            delete(file(".gradle"))
+        }
+    }
 }

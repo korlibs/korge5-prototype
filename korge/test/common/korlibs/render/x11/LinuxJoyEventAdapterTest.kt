@@ -12,7 +12,7 @@ class LinuxJoyEventAdapterTest {
     fun test() = suspendTest({ !Platform.isJs && !Platform.isWasm }) {
         val sync = MemorySyncIO()
         sync.writelink("/dev/input/by-id/usb-Xbox_Controller-joystick", "../js1")
-        sync.write("/dev/input/js1", byteArrayOf(
+        sync.writeAllBytes("/dev/input/js1", byteArrayOf(
             *packet(time = 0, type = LinuxJoyEventAdapter.JS_EVENT_BUTTON, value = Short.MAX_VALUE.toInt(), number = 0), // A
         ))
         val logs = arrayListOf<String>()

@@ -51,7 +51,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
     //init { RegisteredImageFormats.register(PNG) }
 
 
-    private object CoreFoundation : FFILib("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation") {
+    private object CoreFoundation : FFILib("CoreFoundation") {
         val CFDataCreate: (FFIPointer?, ByteArray, Int) -> FFIPointer? by func()
         val CFStringCreateWithBytes: (FFIPointer?, ByteArray, Int, Int, Boolean) -> FFIPointer? by func()
         val CFDictionaryGetValue: (FFIPointer?, FFIPointer?) -> FFIPointer? by func()
@@ -63,7 +63,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
         init { finalize() }
     }
 
-    private object CoreGraphics : FFILib("/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics") {
+    private object CoreGraphics : FFILib("CoreGraphics") {
         val CGImageGetWidth: (FFIPointer?) -> Int by func()
         val CGImageGetHeight: (FFIPointer?) -> Int by func()
         val CGColorSpaceCreateDeviceRGB: () -> FFIPointer? by func()
@@ -79,7 +79,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
         init { finalize() }
     }
 
-    private object ImageIO : FFILib("/System/Library/Frameworks/ImageIO.framework/ImageIO") {
+    private object ImageIO : FFILib("ImageIO") {
         val CGImageSourceCreateWithData: (FFIPointer?, FFIPointer?) -> FFIPointer? by func()
         val CGImageSourceCopyPropertiesAtIndex: (FFIPointer?, Int, FFIPointer?) -> FFIPointer? by func()
         val CGImageSourceCreateImageAtIndex: (FFIPointer?, Int, FFIPointer?) -> FFIPointer? by func()

@@ -97,7 +97,7 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
     }
 
     val syms: dynamic by lazy {
-        lib.paths.firstNotNullOfOrNull { path ->
+        (listOfNotNull(lib.resolvedPath) + lib.paths).firstNotNullOfOrNull { path ->
             try {
                 Deno.dlopen<dynamic>(
                     path, jsObject(
@@ -114,7 +114,9 @@ actual class FFILibSym actual constructor(val lib: FFILib) {
                 null
             }
         }.unsafeCast<Any?>().also {
-            //println("dymlib=$it : ${lib.paths}")
+            if (it == null) {
+                println("Couldn't load library: dymlib=$it : ${lib.resolvedPath}")
+            }
         }
     }
 
