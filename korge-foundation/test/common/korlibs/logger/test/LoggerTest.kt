@@ -1,11 +1,12 @@
 package korlibs.logger.test
 
 import korlibs.logger.Logger
-import korlibs.logger.atomic.KloggerAtomicRef
+import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlin.test.*
 
 class LoggerTest {
-	private val out = KloggerAtomicRef(listOf<String>())
+	private val out = atomic(listOf<String>())
 
 	@Test
 	fun simple() {

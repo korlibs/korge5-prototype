@@ -1,6 +1,5 @@
 package korlibs.bignumber
 
-import korlibs.bignumber.internal.*
 import kotlin.test.*
 
 abstract class AbstractBigIntTest {
@@ -126,9 +125,9 @@ abstract class AbstractBigIntTest {
 
 	@Test
 	fun testTrailingZeros() {
-        assertEquals(32, 0.trailingZeros())
-        assertEquals(0, 1.trailingZeros())
-        assertEquals(1, 2.trailingZeros())
+        assertEquals(32, 0.countTrailingZeroBits())
+        assertEquals(0, 1.countTrailingZeroBits())
+        assertEquals(1, 2.countTrailingZeroBits())
         assertEquals(16, CommonBigInt("000000000000000000000000000000", 2).trailingZeros())
 		assertEquals(0,  CommonBigInt("000000000000000000000000000001", 2).trailingZeros())
 		assertEquals(7,  CommonBigInt("100000000000000000000010000000", 2).trailingZeros())
@@ -143,9 +142,9 @@ abstract class AbstractBigIntTest {
 
     @Test
     fun testLeadingZeros() {
-        assertEquals(32, 0.leadingZeros())
-        assertEquals(31, 1.leadingZeros())
-        assertEquals(30, 2.leadingZeros())
+        assertEquals(32, 0.countLeadingZeroBits())
+        assertEquals(31, 1.countLeadingZeroBits())
+        assertEquals(30, 2.countLeadingZeroBits())
         assertEquals(15, CommonBigInt("000000000000000000000000000001", 2).leadingZeros())
         assertEquals(2,  CommonBigInt("100000000000000000000010000000", 2).leadingZeros())
         assertEquals(2,  CommonBigInt("100000000000000000000010100000", 2).leadingZeros())

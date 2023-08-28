@@ -1,8 +1,24 @@
-package korlibs.logger.internal
+package korlibs.logger
 
 import korlibs.js.Deno
-import kotlinx.browser.*
+import kotlinx.browser.document
 
+actual object Console : BaseConsole() {
+    override fun logInternal(kind: Kind, vararg msg: Any?) {
+        when (kind) {
+            Kind.ERROR -> console.error(*msg)
+            Kind.WARN -> console.warn(*msg)
+            Kind.INFO -> console.info(*msg)
+            Kind.DEBUG -> console.log(*msg)
+            Kind.TRACE -> console.log(*msg)
+            Kind.LOG -> console.log(*msg)
+        }
+    }
+}
+
+actual object DefaultLogOutput : Logger.Output {
+    override fun output(logger: Logger, level: Logger.Level, msg: Any?) = Logger.ConsoleLogOutput.output(logger, level, msg)
+}
 
 private external val process: dynamic
 
