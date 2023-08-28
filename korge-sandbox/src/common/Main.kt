@@ -1,9 +1,9 @@
 import korlibs.crypto.encoding.fromBase64
 import korlibs.ffi.WASMLib
-import korlibs.image.format.WEBP
+import korlibs.image.format.*
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
-import korlibs.korge.view.image
+import korlibs.korge.view.*
 import korlibs.time.measureTime
 
 //suspend fun main() {
@@ -17,9 +17,9 @@ object SimpleWASM : WASMLib("AGFzbQEAAAABBwFgAn9/AX8DAgEABAUBcAEBAQUDAQAABhQDfwB
 }
 
 suspend fun main() = Korge {
-    //val bytes = resourcesVfs["Exif5-2x.webp"].readBytes()
-    //for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) })
+    //run { val bytes = resourcesVfs["Exif5-2x.webp"].readBytes(); for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) }) }
     image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
+    image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(100, 100)
 
     /*
     //val WEBP = WEBPImageFormat(resourcesVfs["webp.wasm"])
@@ -28,7 +28,6 @@ suspend fun main() = Korge {
     println(resourcesVfs["Exif5-2x.webp"].readImageInfo(WEBP.toProps()))
     println(resourcesVfs["Exif5-2x.avif"].readImageInfo(WEBP.toProps()))
     image(resourcesVfs["Exif5-2x.webp"].readImageData(WEBP.toProps()).mainBitmap)
-    image(resourcesVfs["Exif5-2x.avif"].readImageData(WEBP.toProps()).mainBitmap).xy(100, 100)
 
      */
     return@Korge

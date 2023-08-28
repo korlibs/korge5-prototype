@@ -34,10 +34,13 @@ open class LibraryResolver(val fs: SyncIO, val platform: Platform) {
             }
 
             platform.isWindows -> {
-                listOf("$name.dll", name)
+                listOf(name, "$name.dll", "../$name.dll", "../../$name.dll", "../../../$name.dll", "C:/WINDOWS/SYSTEM32/$name.dll")
                     .map { fs.file(it) }
-                    .filter { it.exists() }
-                    .firstNotNullOfOrNull { it.name }
+                    .filter {
+                        //println("$it exists: ${it.exists()}")
+                        it.exists()
+                    }
+                    .firstNotNullOfOrNull { it.fullPath }
             }
 
             else -> {

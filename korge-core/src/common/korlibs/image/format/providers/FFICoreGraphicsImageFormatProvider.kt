@@ -25,7 +25,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
                 return ImageInfo {width = size.width; height = size.height}
             }
             else -> {
-                error("Unsupported paltform '${Platform.os}'")
+                error("Unsupported platform decodeHeaderInternal '${Platform.os}'")
             }
         }
     }
@@ -41,7 +41,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
                 )
             }
             else -> {
-                error("Unsupported paltform '${Platform.os}'")
+                error("Unsupported platform decodeInternal '${Platform.os}'")
             }
         }
     }

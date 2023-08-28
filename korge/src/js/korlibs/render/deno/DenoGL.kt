@@ -1,5 +1,7 @@
 package korlibs.render.deno
 
+import korlibs.ffi.*
+import korlibs.io.file.sync.*
 import korlibs.js.*
 import korlibs.kgl.KmlGl
 import korlibs.memory.Buffer
@@ -13,7 +15,9 @@ private fun jsObject(vararg pairs: Pair<String, dynamic>): dynamic {
     return obj
 }
 
-internal val DenoGL = Deno.dlopen<dynamic>("/System/Library/Frameworks/OpenGL.framework/OpenGL", jsObject(
+@OptIn(SyncIOAPI::class)
+internal val DenoGL = Deno.dlopen<dynamic>(
+    LibraryResolver.resolve("OpenGL", "opengl32", "GL", "gl") ?: error("Can't find OpenGL library"), jsObject(
     "glActiveTexture" to def("void", "i32"),
     "glAttachShader" to def("void", "i32", "i32"),
     "glBindAttribLocation" to def("void", "i32", "i32", "buffer"),

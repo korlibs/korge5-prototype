@@ -90,11 +90,23 @@ actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
     return this.getIntArray(0L, size)
 }
 
+private val PATHS: List<String> by lazy { System.getenv("PATH").split(File.pathSeparatorChar) }
+
+
+
 object DenoWasmProcessStdin {
     val temp = System.getProperty("java.io.tmpdir")
-    val file = File("$temp/deno.wasm.stdin.deno.ts").also { it.writeText(DenoWasmServerStdinCode) }
-    val process = ProcessBuilder("deno", "run", "-A", "--unstable", file.absolutePath)
+    val file = File("$temp/korge.wasm.js")
+        .also { it.writeText(DenoWasmServerStdinCode) }
+
+    val commands: List<String> by lazy {
+        ExecutableResolver.findInPaths("deno", PATHS)?.let { return@lazy listOf(it, "run", "-A", "--unstable", file.absolutePath) }
+        ExecutableResolver.findInPaths("node", PATHS)?.let { return@lazy listOf(it, file.absolutePath) }
+        emptyList()
+    }
+    val process = ProcessBuilder(commands)
         .redirectError(ProcessBuilder.Redirect.INHERIT)
+        //.also { println("WASM: $commands") }
         .start()
 
     val io = DenoWasmIO(process.outputStream, process.inputStream, Closeable { })
@@ -235,171 +247,193 @@ class DenoWasmIO(
 }
 
 private val DenoWasmServerStdinCode = /* language: javascript **/"""
-    const debug = Deno.env.get("DEBUG") == "true";
+// ISOMORPHIC: works on Deno and node
+const isDeno = (typeof Deno) !== "undefined";
+const debugEnv = isDeno ? Deno.env.get("DEBUG") : process.env
+const debug = debugEnv == "true";
+const fs = (isDeno) ? null : require('fs');
 
-    function readSyncExact(reader: Deno.ReaderSync, size: number): Uint8Array {
-      if (size >= 32 * 1024 * 1024) throw new Error("too big to read");
-      var out = new Uint8Array(size);
-      var pos = 0;
-      while (pos < size) {
-        var read = reader.readSync(out.subarray(pos));
-        if (read == null || read <= 0) throw Error("Broken pipe");
-        pos += read;
-      }
-      return out;
-    }
+function readSyncExact(reader, size) {
+  if (size >= 32 * 1024 * 1024) throw new Error(`too big to read ${'$'}{size}`);
+  var out = new Uint8Array(size);
+  var pos = 0;
+  while (pos < size) {
+    const chunk = out.subarray(pos)
+    var read = isDeno
+      ? reader.readSync(chunk)
+      : fs.readSync(reader, chunk);
+    if (read == null || read <= 0) throw Error("Broken pipe");
+    pos += read;
+  }
+  return out;
+}
 
-    function writeSyncExact(writer: Deno.WriterSync, data: Uint8Array): number {
-      var pos = 0;
-      while (pos < data.length) {
-        var written = writer.writeSync(data.subarray(pos));
-        if (written <= 0) throw Error("Broken pipe");
-        pos += written;
-      }
-      return pos;
-    }
+function writeSyncExact(writer, data) {
+  var pos = 0;
+  while (pos < data.length) {
+    const chunk = data.subarray(pos)
+    var written = isDeno
+      ? writer.writeSync(chunk)
+      : fs.writeSync(writer, chunk);
+    if (written <= 0) throw Error("Broken pipe");
+    pos += written;
+  }
+  return pos;
+}
 
-    function readPacket(reader: Deno.ReaderSync) {
-      const [kind, streamId, len] = new Int32Array(
-        (readSyncExact(reader, 12)).buffer,
+function readPacket(reader) {
+  const [kind, streamId, len] = new Int32Array(
+    (readSyncExact(reader, 12)).buffer,
+  );
+  const payload = readSyncExact(reader, len);
+  if (debug) {
+    console.error("   packet: ", "id:", streamId, "kind:", kind, "len:", len);
+  }
+  return { kind, streamId, payload };
+}
+
+function writePacket(writer, payload) {
+  const data = new Uint8Array(4 + payload.length);
+  const dview = new DataView(data.buffer);
+  dview.setInt32(0, payload.length, true);
+  data.set(payload, 4);
+  const written = writeSyncExact(writer, data);
+  if (written != data.length) {
+    throw new Error(
+      `Not written as many bytes as expected! ${'$'}{written}, but expected ${'$'}{data.length}`,
+    );
+  }
+}
+
+class WasmModule {
+  constructor(
+    exports,
+    u8,
+  ) {
+    this.exports = exports
+    this.u8 = u8
+  }
+}
+
+const wasmModules = new Map();
+
+function readAndProcessPacket(
+  reader,
+  writer,
+) {
+  const { kind, streamId, payload } = readPacket(reader);
+  const wasmModule = wasmModules.get(streamId);
+  // write bytes
+  switch (kind) {
+    case 1000: { // Load WASM module
+      const wasmModule = new WebAssembly.Module(payload);
+      if (debug) console.error("!!CMD: Loaded WASM... ", wasmModule);
+      const wasmInstance = new WebAssembly.Instance(wasmModule, {
+        "wasi_snapshot_preview1": {
+          proc_exit: () => console.error(arguments),
+          fd_close: () => console.error(arguments),
+          fd_write: () => console.error(arguments),
+          fd_seek: () => console.error(arguments),
+        },
+      });
+      wasmModules.set(
+        streamId,
+        new WasmModule(
+          wasmInstance.exports,
+          new Uint8Array((wasmInstance.exports.memory).buffer),
+        ),
       );
-      const payload = readSyncExact(reader, len);
-      if (debug) {
-        console.error("   packet: ", "id:", streamId, "kind:", kind, "len:", len);
+      writePacket(writer, new Uint8Array(0));
+      break;
+    }
+    case 1001: { // Unload WASM module and close connection
+      if (debug) console.error("!!CMD: Unload WASM...");
+      wasmModules.delete(streamId);
+      writePacket(writer, new Uint8Array(0));
+      break;
+    }
+    case 1010: { // writeBytes
+      const [offset] = new Int32Array(payload.buffer, 0, 1);
+      const data = new Uint8Array(payload, 4);
+      if (debug) console.error("!!CMD: Write Bytes...", offset, data.length);
+      wasmModule?.u8?.set(data, offset);
+      writePacket(writer, new Uint8Array(0));
+      break;
+    }
+    case 1011: { // allocAndWrite
+      let offset = 0;
+      if (wasmModule) {
+        offset = wasmModule.exports.malloc(payload.length);
+        if (debug) {
+          console.error("!!CMD: allocAndWrite...", offset, payload.length);
+        }
+        wasmModule.u8?.set(payload, offset);
       }
-      return { kind, streamId, payload };
+      writePacket(writer, new Uint8Array(new Int32Array([offset]).buffer));
+      break;
     }
-
-    function writePacket(writer: Deno.WriterSync, payload: Uint8Array) {
-      const data = new Uint8Array(4 + payload.length);
-      const dview = new DataView(data.buffer);
-      dview.setInt32(0, payload.length, true);
-      data.set(payload, 4);
-      const written = writeSyncExact(writer, data);
-      if (written != data.length) {
-        throw new Error(
-          `Not written as many bytes as expected! ${"$"}{written}, but expected ${"$"}{data.length}`,
-        );
+    case 1012: { // free
+      if (wasmModule) {
+        const ptrs = new Int32Array(payload.buffer);
+        for (const ptr of ptrs) {
+          if (ptr != 0) wasmModule.exports.free(ptr);
+        }
+        if (debug) console.error("!!CMD: free...", ptrs);
       }
+      writePacket(writer, new Uint8Array(0));
+      break;
     }
-
-    class WasmModule {
-      constructor(
-        public exports: any,
-        public u8: Uint8Array,
-      ) {
+    case 1020: { // readBytes
+      const info = new Int32Array(payload.buffer);
+      const offset = info[0];
+      const len = info[1];
+      if (debug) console.error("!!CMD: Read Bytes...", offset, len, payload);
+      writePacket(
+        writer,
+        wasmModule
+          ? new Uint8Array(wasmModule.u8.buffer, offset, len)
+          : new Uint8Array(len),
+      );
+      break;
+    }
+    case 1030: { // executeFunction
+      const json = JSON.parse(new TextDecoder().decode(payload));
+      if (debug) console.error("!!CMD: executeFunction...", json);
+      let result = null;
+      try {
+        result = wasmModule.exports[json.func](...json.params);
+      } catch (e) {
+        console.warn(e);
+        console.warn(e.stack);
       }
+      const resultPayload = new TextEncoder().encode(JSON.stringify(result));
+      writePacket(writer, resultPayload);
+      break;
     }
+    default:
+      console.error(`!!ERROR: Invalid message: ${'$'}{kind}`);
+  }
+}
 
-    const wasmModules = new Map<number, WasmModule>();
+function unhandledrejection(event) {
+  console.warn(`UNHANDLED PROMISE REJECTION: ${'$'}{event.reason}`);
+  console.warn(event.reason.stack);
+  event.preventDefault();
+}
 
-    function readAndProcessPacket(
-      reader: Deno.ReaderSync,
-      writer: Deno.WriterSync,
-    ) {
-      const { kind, streamId, payload } = readPacket(reader);
-      const wasmModule = wasmModules.get(streamId);
-      // write bytes
-      switch (kind) {
-        case 1000: { // Load WASM module
-          const wasmModule = new WebAssembly.Module(payload);
-          if (debug) console.error("!!CMD: Loaded WASM... ", wasmModule);
-          const wasmInstance = new WebAssembly.Instance(wasmModule, {
-            "wasi_snapshot_preview1": {
-              proc_exit: () => console.error(arguments),
-              fd_close: () => console.error(arguments),
-              fd_write: () => console.error(arguments),
-              fd_seek: () => console.error(arguments),
-            },
-          });
-          wasmModules.set(
-            streamId,
-            new WasmModule(
-              wasmInstance.exports,
-              new Uint8Array((<any> wasmInstance.exports.memory).buffer),
-            ),
-          );
-          writePacket(writer, new Uint8Array(0));
-          break;
-        }
-        case 1001: { // Unload WASM module and close connection
-          if (debug) console.error("!!CMD: Unload WASM...");
-          wasmModules.delete(streamId);
-          writePacket(writer, new Uint8Array(0));
-          break;
-        }
-        case 1010: { // writeBytes
-          const [offset] = new Int32Array(payload.buffer, 0, 1);
-          const data = new Uint8Array(payload, 4);
-          if (debug) console.error("!!CMD: Write Bytes...", offset, data.length);
-          wasmModule?.u8?.set(data, offset);
-          writePacket(writer, new Uint8Array(0));
-          break;
-        }
-        case 1011: { // allocAndWrite
-          let offset = 0;
-          if (wasmModule) {
-            offset = wasmModule.exports.malloc(payload.length);
-            if (debug) {
-              console.error("!!CMD: allocAndWrite...", offset, payload.length);
-            }
-            wasmModule.u8?.set(payload, offset);
-          }
-          writePacket(writer, new Uint8Array(new Int32Array([offset]).buffer));
-          break;
-        }
-        case 1012: { // free
-          if (wasmModule) {
-            const ptrs = new Int32Array(payload.buffer);
-            for (const ptr of ptrs) {
-              if (ptr != 0) wasmModule.exports.free(ptr);
-            }
-            if (debug) console.error("!!CMD: free...", ptrs);
-          }
-          writePacket(writer, new Uint8Array(0));
-          break;
-        }
-        case 1020: { // readBytes
-          const info = new Int32Array(payload.buffer);
-          const offset = info[0];
-          const len = info[1];
-          if (debug) console.error("!!CMD: Read Bytes...", offset, len, payload);
-          writePacket(
-            writer,
-            wasmModule
-              ? new Uint8Array(wasmModule.u8!.buffer, offset, len)
-              : new Uint8Array(len),
-          );
-          break;
-        }
-        case 1030: { // executeFunction
-          const json = JSON.parse(new TextDecoder().decode(payload));
-          if (debug) console.error("!!CMD: executeFunction...", json);
-          let result = null;
-          try {
-            result = wasmModule!.exports[json.func](...json.params);
-          } catch (e) {
-            console.warn(e);
-            console.warn(e.stack);
-          }
-          const resultPayload = new TextEncoder().encode(JSON.stringify(result));
-          writePacket(writer, resultPayload);
-          break;
-        }
-        default:
-          console.error(`!!ERROR: Invalid message: ${"$"}{kind}`);
-      }
-    }
+if (isDeno) {
+  addEventListener("unhandledrejection", unhandledrejection);
+} else {
+  process.on("unhandledrejection", unhandledrejection);
+}
 
-    addEventListener("unhandledrejection", (event) => {
-      console.warn(`UNHANDLED PROMISE REJECTION: ${"$"}{event.reason}`);
-      console.warn(event.reason.stack);
-      event.preventDefault();
-    });
+let running = true;
 
-    let running = true;
-
-    while (running) {
-      readAndProcessPacket(Deno.stdin, Deno.stdout);
-    }
+while (running) {
+  if (isDeno) {
+    readAndProcessPacket(Deno.stdin, Deno.stdout);
+  } else {
+    readAndProcessPacket(process.stdin.fd, process.stdout.fd);
+  }
+}
 """.trimIndent()

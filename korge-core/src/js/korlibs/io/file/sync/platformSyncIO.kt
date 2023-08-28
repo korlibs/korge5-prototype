@@ -12,7 +12,15 @@ object DenoSyncIO : SyncIO {
     override fun realpath(path: String): String = Deno.realPathSync(path)
     override fun readlink(path: String): String? = Deno.readLinkSync(path)
     override fun writelink(path: String, link: String?) { Deno.linkSync(path, link) }
-    override fun stat(path: String): SyncIOStat? = runCatching { Deno.statSync(path).toSyncIOStat(path) }.getOrNull()
+    override fun stat(path: String): SyncIOStat? = runCatching {
+        //try {
+            //println("STAT: '$path'")
+            Deno.statSync(path).toSyncIOStat(path)
+        //} catch (e: Throwable) {
+        //    e.printStackTrace()
+        //    throw e
+        //}
+    }.getOrNull()
     override fun mkdir(path: String): Boolean = runCatching { Deno.mkdirSync(path) }.isSuccess
     override fun rmdir(path: String): Boolean = runCatching { Deno.removeSync(path) }.isSuccess
     override fun delete(path: String): Boolean = runCatching { Deno.removeSync(path) }.isSuccess
