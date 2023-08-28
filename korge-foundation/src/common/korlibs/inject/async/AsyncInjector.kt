@@ -1,5 +1,6 @@
-package korlibs.inject
+package korlibs.inject.async
 
+/*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 import kotlin.reflect.*
@@ -242,3 +243,4 @@ class AsyncInjectorContext(val injector: AsyncInjector) : CoroutineContext.Eleme
 
     override val key get() = AsyncInjectorContext
 }
+*/

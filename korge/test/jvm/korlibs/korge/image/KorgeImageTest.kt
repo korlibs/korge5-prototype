@@ -3,7 +3,7 @@ package korlibs.korge.image
 import korlibs.image.format.*
 import korlibs.io.async.*
 import korlibs.io.file.std.*
-import korlibs.korge.Korge
+import korlibs.korge.KorgeConfig
 import korlibs.korge.testing.korgeScreenshotTestV2
 import korlibs.korge.view.image
 import korlibs.math.geom.slice.*
@@ -19,7 +19,7 @@ class KorgeImageTest {
     }
 
     @Test
-    fun renderGrayscaleJpegImage() = korgeScreenshotTestV2(Korge()) {
+    fun renderGrayscaleJpegImage() = korgeScreenshotTestV2(KorgeConfig()) {
         val img = image(resourcesVfs["img1_grayscale.jpg"].readBitmapNative())
         it.recordGolden(img, "grayscale_jpg")
         it.endTest()

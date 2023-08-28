@@ -140,7 +140,7 @@ class KorgeScreenshotTest {
 
     @Test
     fun test12() = korgeScreenshotTestV2(
-        Korge(
+        KorgeConfig(
             windowSize = Size(512, 512),
             virtualSize = Size(512, 512),
             backgroundColor = Colors.LIGHTGRAY

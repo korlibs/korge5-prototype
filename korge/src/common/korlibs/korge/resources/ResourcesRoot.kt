@@ -7,7 +7,7 @@ import korlibs.io.file.std.*
 import korlibs.io.resources.*
 
 //@Singleton
-class ResourcesRoot : AsyncDependency {
+class ResourcesRoot : InjectorDependency {
 	private lateinit var root: VfsFile
 	private lateinit var mountable: Mountable
 
@@ -23,7 +23,7 @@ class ResourcesRoot : AsyncDependency {
     ) = root[path]
 	operator fun get(path: VPath) = root[path.path]
 
-	override suspend fun init() {
+	override fun init(injector: Injector) {
 		root = MountableVfs() {
 			mountable = this
 		}

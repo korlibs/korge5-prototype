@@ -12,41 +12,41 @@ annotation class Singleton
 @Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD)
 annotation class Optional
 
-fun AsyncInjector.jvmAutomapping(): AsyncInjector = this.apply {
-	this.fallbackProvider = { kclazz, ctx -> AsyncInjector.jvmFallback(this, kclazz, ctx) }
+fun Injector.jvmAutomapping(): Injector = this.apply {
+	this.fallbackProvider = { kclazz, ctx -> Injector.jvmFallback(this, kclazz, ctx) }
 }
 
-suspend fun AsyncInjector.Companion.jvmFallback(
-    injector: AsyncInjector,
+fun Injector.Companion.jvmFallback(
+    injector: Injector,
     kclazz: KClass<*>,
-    ctx: AsyncInjector.RequestContext
-): AsyncObjectProvider<*> {
+    ctx: Injector.RequestContext
+): ObjectProvider<*> {
     return fallback(kclazz, ctx)
 }
 
-fun AsyncInjector.jvmRemoveMappingsByClassName(classNames: Set<String>) {
+fun Injector.jvmRemoveMappingsByClassName(classNames: Set<String>) {
     val classes = providersByClass.keys.filter { it.qualifiedName in classNames }
     for (clazz in classes) providersByClass.remove(clazz)
     parent?.jvmRemoveMappingsByClassName(classNames)
 }
 
-private suspend fun fallback(
+private fun fallback(
     kclazz: KClass<*>,
-    ctx: AsyncInjector.RequestContext
-): AsyncObjectProvider<*> {
+    ctx: Injector.RequestContext
+): ObjectProvider<*> {
 	val clazz = kclazz.java
 
 	val isPrototype = clazz.getAnnotation(Prototype::class.java) != null
 	val isSingleton = clazz.getAnnotation(Singleton::class.java) != null
-	val isAsyncFactoryClass = clazz.getAnnotation(AsyncFactoryClass::class.java) != null
+	val isAsyncFactoryClass = clazz.getAnnotation(FactoryClass::class.java) != null
 
 
-	val generator: suspend AsyncInjector.() -> Any? = {
+	val generator: Injector.() -> Any? = {
 		try {
 			// @TODO: Performance: Cache all this!
 			// Use: ClassFactory and stuff
 
-			val loaderClass = clazz.getAnnotation(AsyncFactoryClass::class.java)
+			val loaderClass = clazz.getAnnotation(FactoryClass::class.java)
 			val actualClass = loaderClass?.clazz?.java ?: clazz
 			if (actualClass.isInterface || Modifier.isAbstract(actualClass.modifiers)) throw IllegalArgumentException("Can't instantiate abstract or interface: $actualClass in $ctx")
 			val constructor = actualClass.declaredConstructors.firstOrNull()
@@ -73,7 +73,7 @@ private suspend fun fallback(
 					out.add(if (i.has(paramType.kotlin)) i.getOrNull(paramType.kotlin, ctx) else null)
 				} else {
 					out.add(
-						i.getOrNull(paramType.kotlin, ctx) ?: throw AsyncInjector.NotMappedException(
+						i.getOrNull(paramType.kotlin, ctx) ?: throw Injector.NotMappedException(
 							paramType.kotlin,
 							actualClass.kotlin,
 							ctx
@@ -85,7 +85,7 @@ private suspend fun fallback(
 			constructor.isAccessible = true
 			val instance = constructor.newInstance(*out.toTypedArray())
 
-			if (instance is AsyncDependency) instance.init()
+			if (instance is InjectorDependency) instance.init(this)
 
 			for (createdInstance in allInstances) {
 				if (createdInstance is InjectedHandler) {
@@ -94,7 +94,7 @@ private suspend fun fallback(
 			}
 
 			if (loaderClass != null) {
-				(instance as AsyncFactory<Any?>).create()
+				(instance as InjectorFactory<Any?>).create()
 			} else {
 				instance
 			}
@@ -106,9 +106,9 @@ private suspend fun fallback(
 	}
 
 	return when {
-		isPrototype -> PrototypeAsyncObjectProvider(generator)
-		isSingleton -> SingletonAsyncObjectProvider(generator)
-		isAsyncFactoryClass -> FactoryAsyncObjectProvider(generator as suspend AsyncInjector.() -> AsyncFactory<Any?>)
-		else -> PrototypeAsyncObjectProvider(generator)
+		isPrototype -> PrototypeObjectProvider(generator)
+		isSingleton -> SingletonObjectProvider(generator)
+		isAsyncFactoryClass -> FactoryObjectProvider(generator as Injector.() -> InjectorFactory<Any?>)
+		else -> PrototypeObjectProvider(generator)
 	}
 }

@@ -71,7 +71,7 @@ class SceneContainerTest : ViewsForTesting() {
         //log.injector.mapSingleton { ResourcesRoot() }
         val sceneContainer = sceneContainer(views)
         val startTime = time
-        sceneContainer.changeTo({ EmptyScene() }, time = 0.5.seconds, transition = MaskTransition(TransitionFilter.Transition.HORIZONTAL))
+        sceneContainer.changeTo(time = 0.5.seconds, transition = MaskTransition(TransitionFilter.Transition.HORIZONTAL)) { EmptyScene() }
         val transitionView = sceneContainer.firstChild as TransitionView
         assertEquals("MaskTransition", transitionView.transition.toString())
         assertEquals(1f, transitionView.ratio)

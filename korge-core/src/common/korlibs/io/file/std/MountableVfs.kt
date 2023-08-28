@@ -9,7 +9,7 @@ import korlibs.io.file.normalize
 import korlibs.io.file.pathInfo
 import korlibs.io.lang.FileNotFoundException
 
-suspend fun MountableVfs(closeMounts: Boolean = false, callback: suspend Mountable.() -> Unit): VfsFile =
+inline fun MountableVfs(closeMounts: Boolean = false, callback: Mountable.() -> Unit): VfsFile =
     MountableVfsSync(closeMounts) { callback() }
 
 inline fun MountableVfsSync(closeMounts: Boolean = false, callback: Mountable.() -> Unit): VfsFile =

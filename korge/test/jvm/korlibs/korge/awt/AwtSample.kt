@@ -17,7 +17,7 @@ object AwtSample {
             frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             frame.layout = GridLayout(5, 1)
             frame.add(JButton("[1]"))
-            frame.add(Korge(virtualSize = Size(512, 512), displayMode = KorgeDisplayMode.NO_SCALE).glCanvas {
+            frame.add(KorgeConfig(virtualSize = Size(512, 512), displayMode = KorgeDisplayMode.NO_SCALE).glCanvas {
                 views.clearColor = Colors.RED
                 solidRect(100, 100, Colors.YELLOW)
             })

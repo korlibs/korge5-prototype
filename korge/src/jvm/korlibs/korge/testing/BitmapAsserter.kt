@@ -149,7 +149,7 @@ suspend fun OffscreenStage.assertScreenshot(
     testIndex++
     val updateTestRef = Environment["UPDATE_TEST_REF"] == "true"
     val interactive = Environment["INTERACTIVE_SCREENSHOT"] == "true"
-    val context = injector.getSyncOrNull<OffscreenContext>() ?: OffscreenContext()
+    val context = injector.getOrNull<OffscreenContext>() ?: OffscreenContext()
     val outFile = File("src/jvmTest/screenshots/${context.testClassName.replace(".", "/")}/${context.testMethodName}_$name.png")
     val actualBitmap = simulateRenderFrame(view, posterize, includeBackground, useTexture)
 

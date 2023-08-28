@@ -40,6 +40,7 @@ subprojects {
             //withJava()
             testRuns["test"].executionTask.configure {
                 useJUnitPlatform()
+                testLogging { exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
             }
         }
         js(IR) {

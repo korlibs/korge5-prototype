@@ -2,7 +2,6 @@ package korlibs.korge.testing
 
 import korlibs.image.bitmap.*
 import korlibs.image.color.*
-import korlibs.io.async.*
 import korlibs.io.lang.Environment
 import korlibs.korge.*
 import korlibs.korge.annotations.*
@@ -11,14 +10,13 @@ import korlibs.korge.ui.*
 import korlibs.korge.view.*
 import korlibs.korge.view.Container
 import korlibs.korge.view.align.*
-import korlibs.korge.view.onClick
 import korlibs.math.geom.*
 import kotlinx.coroutines.sync.*
 import java.awt.*
 
 @OptIn(KorgeExperimental::class)
 inline fun korgeScreenshotTestV2(
-    korgeConfig: Korge,
+    korgeConfig: KorgeConfig,
     settings: KorgeScreenshotValidationSettings = KorgeScreenshotValidationSettings(),
     crossinline callback: suspend Stage.(korgeScreenshotTester: KorgeScreenshotTester) -> Unit = {},
 ) {
@@ -68,7 +66,7 @@ inline fun korgeScreenshotTestV2(
         println("Diffs found...")
         val interactive = Environment["INTERACTIVE_SCREENSHOT"] == "true"
         if (interactive) {
-            val config = Korge(
+            val config = KorgeConfig(
                 backgroundColor = Colors.LIGHTGRAY,
                 windowSize = Size(1280, 720),
                 virtualSize = Size(700, 480),

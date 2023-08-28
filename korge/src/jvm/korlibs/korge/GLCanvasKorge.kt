@@ -18,7 +18,7 @@ fun GLCanvasWithKorge(
     return canvas
 }
 
-fun Korge.glCanvas(block: suspend Stage.() -> Unit): GLCanvasWithKorge = GLCanvasWithKorge(this, block)
+fun KorgeConfig.glCanvas(block: suspend Stage.() -> Unit): GLCanvasWithKorge = GLCanvasWithKorge(this, block)
 
 open class GLCanvasWithKorge : GLCanvas() {
     lateinit var korge: GLCanvasKorge
