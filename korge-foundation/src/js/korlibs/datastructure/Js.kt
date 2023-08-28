@@ -8,9 +8,9 @@ actual class FastIntMap<T>(dummy: Boolean)
 
 @JsName("Map")
 private external class JsMap { }
+
 @JsName("Array")
-@PublishedApi
-internal external class JsArray<T> {
+external class JsArray<T> {
     var length: Int
     //@nativeGetter operator fun get(index: Int): T = definedExternally
     //@nativeSetter operator fun set(index: Int, value: T): T = definedExternally

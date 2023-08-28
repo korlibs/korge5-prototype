@@ -55,7 +55,7 @@ class KmlGlTest {
         val DenoGL = StringBuilder()
         val DenoKmlGlBuilder = StringBuilder()
 
-        DenoGL.appendLine("private val DenoGL = Deno.dlopen(\"/System/Library/Frameworks/OpenGL.framework/OpenGL\", jsObject(")
+        DenoGL.appendLine("object DenoGL : SymbolResolverFFILib({ SDL.SDL_GL_GetProcAddress(it) }) {")
         DenoKmlGlBuilder.appendLine("class DenoKmlGl : KmlGl() {")
         DenoKmlGlBuilder.appendLine("  fun String.strBA(): ByteArray = \"\$this\\u0000\".encodeToByteArray()")
         DenoKmlGlBuilder.appendLine("  fun DenoPointer.ptrToStr(): String = this.readStringz()")
@@ -102,10 +102,11 @@ class KmlGlTest {
                 else -> "= DenoGL.$glName($kotlinParamsCall)$suffix"
             }
             DenoKmlGlBuilder.appendLine("  override fun $name($kotlinParams): $retType $body")
-            DenoGL.appendLine("  \"$glName\" to def(${denoParams.joinToString(", ")}),")
+            //DenoGL.appendLine("  \"$glName\" to def(${denoParams.joinToString(", ")}),")
+            DenoGL.appendLine("  val $glName: ($kotlinParams) -> $retType by func()")
         }
         DenoKmlGlBuilder.appendLine("}")
-        DenoGL.appendLine(")).symbols")
+        DenoGL.appendLine("}")
 
         println(DenoGL)
         println(DenoKmlGlBuilder)

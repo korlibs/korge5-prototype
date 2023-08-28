@@ -9,6 +9,13 @@ import kotlin.reflect.*
 
 expect class FFIPointer
 
+expect class FFIMemory
+
+expect fun CreateFFIMemory(size: Int): FFIMemory
+expect fun CreateFFIMemory(bytes: ByteArray): FFIMemory
+
+expect val FFIMemory.pointer: FFIPointer
+
 expect fun CreateFFIPointer(ptr: Long): FFIPointer?
 expect val FFIPointer?.address: Long
 expect val FFIPointer?.str: String
@@ -23,6 +30,16 @@ expect fun FFIPointer.getUnalignedI32(offset: Int = 0): Int
 expect fun FFIPointer.getUnalignedI64(offset: Int = 0): Long
 expect fun FFIPointer.getUnalignedF32(offset: Int = 0): Float
 expect fun FFIPointer.getUnalignedF64(offset: Int = 0): Double
+expect fun FFIPointer.setUnalignedI8(value: Byte, offset: Int = 0)
+expect fun FFIPointer.setUnalignedI16(value: Short, offset: Int = 0)
+expect fun FFIPointer.setUnalignedI32(value: Int, offset: Int = 0)
+expect fun FFIPointer.setUnalignedI64(value: Long, offset: Int = 0)
+expect fun FFIPointer.setUnalignedF32(value: Float, offset: Int = 0)
+expect fun FFIPointer.setUnalignedF64(value: Double, offset: Int = 0)
+
+fun FFIPointer.setUnalignedFFIPointer(value: FFIPointer?, offset: Int = 0) {
+    if (FFI_POINTER_SIZE == 8) setUnalignedI64(value.address, offset) else setUnalignedI32(value.address.toInt(), offset)
+}
 
 fun FFIPointer.getUnalignedFFIPointer(offset: Int = 0): FFIPointer? =
     if (FFI_POINTER_SIZE == 8) CreateFFIPointer(getUnalignedI64(offset)) else CreateFFIPointer(getUnalignedI32(offset).toLong())
@@ -36,6 +53,10 @@ fun FFIPointer.getF64(offset: Int = 0): Double = getUnalignedF64(offset * 8)
 
 fun FFIPointer.getFFIPointer(offset: Int = 0): FFIPointer? =
     if (FFI_POINTER_SIZE == 8) CreateFFIPointer(getI64(offset)) else CreateFFIPointer(getI32(offset).toLong())
+
+fun ffiPointerArrayOf(vararg pointers: FFIPointer?): FFIPointerArray = FFIPointerArray(pointers.size).also {
+    for (n in pointers.indices) it[n] = pointers[n]
+}
 
 @Suppress("ReplaceSizeZeroCheckWithIsEmpty")
 data class FFIPointerArray(val data: IntArray) : List<FFIPointer?> {
@@ -95,15 +116,16 @@ interface FFILibSym : Closeable {
     fun allocBytes(bytes: ByteArray): Int = TODO()
     fun freeBytes(vararg ptrs: Int): Unit = TODO()
     fun <T> wasmFuncPointer(address: Int, type: KType): T = TODO()
-    fun <T> get(name: String): T = TODO()
+    fun <T> get(name: String, type: KType): T = TODO()
     override fun close() {}
 }
 
-abstract class BaseLib {
+abstract class BaseLib(val lazyCreate: Boolean = true) {
     val functions = arrayListOf<FuncDelegate<*>>()
+    open protected fun createFFILibSym(): FFILibSym =  FFILibSym(this)
     var _sym: FFILibSym? = null
     val sym: FFILibSym get() {
-        if (_sym == null) finalize()
+        if (_sym == null) _sym = createFFILibSym()
         return _sym!!
     }
     //val loaded: Boolean get() = sym != null
@@ -126,7 +148,7 @@ abstract class BaseLib {
         val ret = parts.second
         var cached: T? = null
         override fun getValue(thisRef: BaseLib, property: KProperty<*>): T {
-            if (cached == null) cached = base.sym.get(name)
+            if (cached == null) cached = base.sym.get(name, type)
             return cached.fastCastTo()
         }
     }
@@ -135,15 +157,17 @@ abstract class BaseLib {
         operator fun provideDelegate(
             thisRef: BaseLib,
             prop: KProperty<*>
-        ): ReadOnlyProperty<BaseLib, T> = FuncDelegate<T>(thisRef, extraName ?: prop.name, type).also { thisRef.functions.add(it) }
+        ): ReadOnlyProperty<BaseLib, T> = FuncDelegate<T>(thisRef, extraName ?: prop.name, type).also {
+            thisRef.functions.add(it)
+            if (!thisRef.lazyCreate) it.getValue(thisRef, prop)
+        }
     }
 
     inline fun <reified T : Function<*>> func(name: String? = null): FuncInfo<T> = FuncInfo<T>(typeOf<T>(), name)
 
     //inline fun <reified T : Function<*>> castToFunc(ptr: FFIPointer): T = sym.castToFunc(ptr, FuncInfo(typeOf<T>(), null))
-
-    private fun finalize() {
-        _sym = FFILibSym(this)
+    protected fun finalize() {
+        sym
     }
 }
 
@@ -184,6 +208,14 @@ open class FFILib(val paths: List<String>) : BaseLib() {
     val resolvedPath by lazy { LibraryResolver.resolve(*paths.toTypedArray()) }
 
     constructor(vararg paths: String?) : this(paths.toList().filterNotNull())
+}
+
+open class SymbolResolverFFILib(val resolve: (String) -> FFIPointer?) : BaseLib(lazyCreate = false) {
+    override fun createFFILibSym(): FFILibSym {
+        return object : FFILibSym {
+            override fun <T> get(name: String, type: KType): T = resolve(name)?.castToFunc(type) ?: error("Can't find symbol '$name'")
+        }
+    }
 }
 
 /*

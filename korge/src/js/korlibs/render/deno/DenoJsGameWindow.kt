@@ -6,6 +6,7 @@ import korlibs.graphics.AG
 import korlibs.graphics.gl.AGOpengl
 import korlibs.io.async.launchImmediately
 import korlibs.js.Deno
+import korlibs.kgl.*
 import korlibs.math.geom.SizeInt
 import korlibs.render.GameWindow
 import korlibs.render.JsGameWindow
@@ -15,7 +16,7 @@ private external fun setInterval(cb: dynamic, delay: dynamic, vararg args: dynam
 
 class DenoJsGameWindow : JsGameWindow() {
 
-    override val ag: AG = AGOpengl(DenoKmlGl())
+    override val ag: AG = AGOpengl(FFIKmlGl())
 
     var window: dynamic = null
     var windowWidth = 600
@@ -64,9 +65,9 @@ class DenoJsGameWindow : JsGameWindow() {
 
         // Open library and define exported symbols
 
-        console.log(SDL.SDL_InitSubSystem(0x00000020))
-        val flags = SDL_WINDOW_OPENGL or SDL_WINDOW_RESIZABLE
-        window = SDL.SDL_CreateWindow(null, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags)
+        FFISDLGL.glActiveTexture
+        //console.log(SDL.SDL_InitSubSystem(0x00000020))
+        window = SDL.SDL_CreateOpenGLWindow(windowWidth, windowHeight)
         title = this.title
         val glCtx = SDL.SDL_GL_CreateContext(window)
         //const screenSurface = SDL.SDL_GetWindowSurface(window);
@@ -128,9 +129,9 @@ class DenoJsGameWindow : JsGameWindow() {
             }
             SDL.SDL_GL_MakeCurrent(window, glCtx)
 
-            DenoGL.glViewport(0, 0, windowWidth, windowHeight);
-            DenoGL.glClearColor(1f, 1f, 0f, 1f)
-            DenoGL.glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+            FFISDLGL.glViewport(0, 0, windowWidth, windowHeight);
+            FFISDLGL.glClearColor(1f, 1f, 0f, 1f)
+            FFISDLGL.glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
             updateWindowSize()
 

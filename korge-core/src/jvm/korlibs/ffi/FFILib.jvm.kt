@@ -1,9 +1,11 @@
 package korlibs.ffi
 
 import com.sun.jna.Function
+import com.sun.jna.Memory
 import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
 import korlibs.datastructure.lock.Lock
+import korlibs.io.file.sync.*
 import korlibs.io.serialization.json.Json
 import korlibs.memory.*
 import java.io.Closeable
@@ -20,6 +22,11 @@ actual fun FFILibSym(lib: BaseLib): FFILibSym {
 }
 
 actual typealias FFIPointer = Pointer
+actual typealias FFIMemory = Memory
+
+actual fun CreateFFIMemory(size: Int): FFIMemory = Memory(size.toLong())
+actual fun CreateFFIMemory(bytes: ByteArray): FFIMemory = Memory(bytes.size.toLong()).also { it.write(0L, bytes, 0, bytes.size) }
+actual val FFIMemory.pointer: FFIPointer get() = this
 
 @JvmName("FFIPointerCreation")
 actual fun CreateFFIPointer(ptr: Long): FFIPointer? = if (ptr == 0L) null else Pointer(ptr)
@@ -37,6 +44,13 @@ actual fun FFIPointer.getUnalignedI64(offset: Int): Long = this.getLong(offset.t
 actual fun FFIPointer.getUnalignedF32(offset: Int): Float = this.getFloat(offset.toLong())
 actual fun FFIPointer.getUnalignedF64(offset: Int): Double = this.getDouble(offset.toLong())
 
+actual fun FFIPointer.setUnalignedI8(value: Byte, offset: Int) = this.setByte(offset.toLong(), value)
+actual fun FFIPointer.setUnalignedI16(value: Short, offset: Int) = this.setShort(offset.toLong(), value)
+actual fun FFIPointer.setUnalignedI32(value: Int, offset: Int) = this.setInt(offset.toLong(), value)
+actual fun FFIPointer.setUnalignedI64(value: Long, offset: Int) = this.setLong(offset.toLong(), value)
+actual fun FFIPointer.setUnalignedF32(value: Float, offset: Int) = this.setFloat(offset.toLong(), value)
+actual fun FFIPointer.setUnalignedF64(value: Double, offset: Int) = this.setDouble(offset.toLong(), value)
+
 actual fun <T> FFIPointer.castToFunc(type: KType): T =
     createJNAFunctionToPlainFunc(Function.getFunction(this), type)
 
@@ -47,7 +61,7 @@ fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: 
         FFILibSymJVM::class.java.classLoader,
         arrayOf((type.classifier as KClass<*>).java)
     ) { proxy, method, args ->
-        val targs = args.map {
+        val targs = (args ?: emptyArray()).map {
             when (it) {
                 is FFIPointerArray -> it.data
                 is Buffer -> it.buffer
@@ -92,9 +106,11 @@ inline fun <reified T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: F
     createJNAFunctionToPlainFunc(func, typeOf<T>())
 
 class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
+    @OptIn(SyncIOAPI::class)
     val nlib by lazy {
         lib as FFILib
-        lib.paths.firstNotNullOfOrNull {
+        val resolvedPaths = listOf(LibraryResolver.resolve(*lib.paths.toTypedArray()))
+        resolvedPaths.firstNotNullOfOrNull {
             NativeLibrary.getInstance(it)
         }
     }
@@ -122,7 +138,7 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
         DenoWasmProcessStdin.open(libWasm.content)
     }
 
-    override fun <T> get(name: String): T = functions[name] as T
+    override fun <T> get(name: String, type: KType): T = functions[name] as T
     override fun readBytes(pos: Int, size: Int): ByteArray = wasm.readBytes(pos, size)
     override fun writeBytes(pos: Int, data: ByteArray) = wasm.writeBytes(pos, data)
     override fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)

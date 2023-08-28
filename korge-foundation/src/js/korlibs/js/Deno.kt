@@ -1,8 +1,7 @@
 package korlibs.js
 
 import korlibs.bignumber.BigInt
-import org.khronos.webgl.ArrayBufferView
-import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.*
 import kotlin.js.Date
 import kotlin.js.Promise
 
@@ -58,8 +57,11 @@ external object Deno {
         fun getBigInt64(offset: Int = definedExternally): JsBigInt
         fun getFloat32(offset: Int = definedExternally): Float
         fun getFloat64(offset: Int = definedExternally): Double
+
+        fun getArrayBuffer(byteLength: Int, offset: Int = definedExternally): ArrayBuffer
+
         companion object {
-            fun getCString(pointer: DenoPointer, offset: Int): String
+            fun getCString(pointer: DenoPointer, offset: Int = definedExternally): String
         }
     }
 

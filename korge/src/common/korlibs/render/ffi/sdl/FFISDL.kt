@@ -4,6 +4,7 @@ import korlibs.event.Key
 import korlibs.ffi.FFILib
 import korlibs.ffi.FFIPointer
 
+// https://gist.github.com/m1nuz/5c48ddd6a3fd8fb340c037165edde1fb
 object SDL : FFILib(
     "SDL2",
     //"/Library/Frameworks/SDL2.framework/SDL2",
@@ -17,18 +18,34 @@ object SDL : FFILib(
     val SDL_SetWindowPosition: (FFIPointer?, Int, Int) -> Unit by func()
     val SDL_SetWindowTitle: (FFIPointer?, ByteArray) -> Unit by func()
     val SDL_GL_CreateContext: (FFIPointer?) -> FFIPointer? by func()
+    val SDL_GL_DeleteContext: (FFIPointer?) -> Unit by func()
     val SDL_GL_SwapWindow: (FFIPointer?) -> Unit by func()
     val SDL_GL_MakeCurrent: (FFIPointer?, FFIPointer?) -> Int by func()
     val SDL_InitSubSystem: (Int) -> Int by func()
     val SDL_QuitSubSystem: (Int) -> Int by func()
-    val SDL_CreateWindow: (FFIPointer?, Int, Int, Int, Int, Int) -> FFIPointer? by func()
+    val SDL_CreateWindow: (String?, Int, Int, Int, Int, Int) -> FFIPointer? by func()
+    val SDL_DestroyWindow: (FFIPointer?) -> Unit by func()
     val SDL_GetError: () -> FFIPointer? by func()
     val SDL_Delay: (Int) -> Int by func()
     val SDL_PumpEvents: () -> Unit by func()
     val SDL_PollEvent: (IntArray) -> Boolean by func()
     val SDL_WaitEventTimeout: (IntArray, Int) -> Int by func()
     val SDL_GL_LoadLibrary: (String?) -> Int by func()
+    val SDL_GL_UnloadLibrary: () -> Unit by func()
     val SDL_GL_GetProcAddress: (String) -> FFIPointer? by func()
+    val SDL_GL_SetSwapInterval: (Int) -> Int by func()
+    val SDL_GL_SetAttribute: (Int, Int) -> Int by func()
+
+    fun SDL_CreateOpenGLWindow(width: Int, height: Int, title: String? = null, shown: Boolean = true): FFIPointer? {
+        val windowFlags = SDL_WINDOW_OPENGL or SDL_WINDOW_RESIZABLE or(if (shown) SDL_WINDOW_SHOWN else SDL_WINDOW_HIDDEN)
+        val contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG //or (gl_debug ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
+        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)
+        SDL.SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+        return SDL.SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags)
+    }
 }
 
 const val SDL_WINDOWPOS_CENTERED = 0x2FFF0000
@@ -119,7 +136,43 @@ const val SDL_WINDOW_METAL = 0x20000000
 
 
 /**< Mouse button pressed */
+const val SDL_GL_CONTEXT_DEBUG_FLAG              = 0x0001
+const val SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG = 0x0002
+const val SDL_GL_CONTEXT_ROBUST_ACCESS_FLAG      = 0x0004
+const val SDL_GL_CONTEXT_RESET_ISOLATION_FLAG    = 0x0008
 
+const val SDL_GL_RED_SIZE = 0
+const val SDL_GL_GREEN_SIZE = 1
+const val SDL_GL_BLUE_SIZE = 2
+const val SDL_GL_ALPHA_SIZE = 3
+const val SDL_GL_BUFFER_SIZE = 4
+const val SDL_GL_DOUBLEBUFFER = 5
+const val SDL_GL_DEPTH_SIZE = 6
+const val SDL_GL_STENCIL_SIZE = 7
+const val SDL_GL_ACCUM_RED_SIZE = 8
+const val SDL_GL_ACCUM_GREEN_SIZE = 9
+const val SDL_GL_ACCUM_BLUE_SIZE = 10
+const val SDL_GL_ACCUM_ALPHA_SIZE = 11
+const val SDL_GL_STEREO = 12
+const val SDL_GL_MULTISAMPLEBUFFERS = 13
+const val SDL_GL_MULTISAMPLESAMPLES = 14
+const val SDL_GL_ACCELERATED_VISUAL = 15
+const val SDL_GL_RETAINED_BACKING = 16
+const val SDL_GL_CONTEXT_MAJOR_VERSION = 17
+const val SDL_GL_CONTEXT_MINOR_VERSION = 18
+const val SDL_GL_CONTEXT_FLAGS = 19
+const val SDL_GL_CONTEXT_PROFILE_MASK = 20
+const val SDL_GL_SHARE_WITH_CURRENT_CONTEXT = 21
+const val SDL_GL_FRAMEBUFFER_SRGB_CAPABLE = 22
+const val SDL_GL_CONTEXT_RELEASE_BEHAVIOR = 23
+const val SDL_GL_CONTEXT_RESET_NOTIFICATION = 24
+const val SDL_GL_CONTEXT_NO_ERROR = 25
+const val SDL_GL_FLOATBUFFERS = 26
+const val SDL_GL_EGL_PLATFORM = 27
+
+const val SDL_GL_CONTEXT_PROFILE_CORE           = 0x0001
+const val SDL_GL_CONTEXT_PROFILE_COMPATIBILITY  = 0x0002
+const val SDL_GL_CONTEXT_PROFILE_ES             = 0x0004 /**< GLX_CONTEXT_ES2_PROFILE_BIT_EXT */
 
 object SDL_SCANCODES {
     const val SDL_SCANCODE_UNKNOWN = 0
