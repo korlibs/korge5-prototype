@@ -5,9 +5,7 @@ import com.sun.jna.NativeLibrary
 import com.sun.jna.Pointer
 import korlibs.datastructure.lock.Lock
 import korlibs.io.serialization.json.Json
-import korlibs.memory.readS32LE
-import korlibs.memory.write32LE
-import korlibs.memory.writeBytes
+import korlibs.memory.*
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
@@ -24,12 +22,20 @@ actual fun FFILibSym(lib: BaseLib): FFILibSym {
 actual typealias FFIPointer = Pointer
 
 @JvmName("FFIPointerCreation")
-actual fun CreateFFIPointer(ptr: Long): FFIPointer = Pointer(ptr)
+actual fun CreateFFIPointer(ptr: Long): FFIPointer? = if (ptr == 0L) null else Pointer(ptr)
+actual val FFI_POINTER_SIZE: Int = 8
 
 actual fun FFIPointer.getStringz(): String = this.getString(0L)
 actual val FFIPointer?.address: Long get() = Pointer.nativeValue(this)
 actual val FFIPointer?.str: String get() = this.toString()
-actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray = this.getIntArray(0L, size)
+actual fun FFIPointer.getIntArray(size: Int, offset: Int): IntArray = this.getIntArray(0L, size)
+
+actual fun FFIPointer.getUnalignedI8(offset: Int): Byte = this.getByte(offset.toLong())
+actual fun FFIPointer.getUnalignedI16(offset: Int): Short = this.getShort(offset.toLong())
+actual fun FFIPointer.getUnalignedI32(offset: Int): Int = this.getInt(offset.toLong())
+actual fun FFIPointer.getUnalignedI64(offset: Int): Long = this.getLong(offset.toLong())
+actual fun FFIPointer.getUnalignedF32(offset: Int): Float = this.getFloat(offset.toLong())
+actual fun FFIPointer.getUnalignedF64(offset: Int): Double = this.getDouble(offset.toLong())
 
 actual fun <T> FFIPointer.castToFunc(type: KType): T =
     createJNAFunctionToPlainFunc(Function.getFunction(this), type)
@@ -41,12 +47,19 @@ fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: 
         FFILibSymJVM::class.java.classLoader,
         arrayOf((type.classifier as KClass<*>).java)
     ) { proxy, method, args ->
+        val targs = args.map {
+            when (it) {
+                is FFIPointerArray -> it.data
+                is Buffer -> it.buffer
+                else -> it
+            }
+        }.toTypedArray()
         when (ret) {
-            Unit::class -> func.invokeVoid(args)
-            Int::class -> func.invokeInt(args)
-            Float::class -> func.invokeFloat(args)
-            Double::class -> func.invokeDouble(args)
-            else -> func.invoke((ret as KClass<*>).java, args)
+            Unit::class -> func.invokeVoid(targs)
+            Int::class -> func.invokeInt(targs)
+            Float::class -> func.invokeFloat(targs)
+            Double::class -> func.invokeDouble(targs)
+            else -> func.invoke((ret as KClass<*>).java, targs)
         }
     } as T
 }

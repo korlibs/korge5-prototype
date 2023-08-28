@@ -48,7 +48,7 @@ class DenoSyncIOFD(val path: String, val mode: String) : SyncIOFD {
         set(value) { file.truncateSync(value.toDouble()) }
     override var position: Long
         get() = file.seekSync(0.0, Deno.SeekMode.Current).toLong()
-        set(value) { file.seekSync(value.toDouble()) }
+        set(value) { file.seekSync(value.toDouble(), Deno.SeekMode.Start) }
 
     override fun write(data: ByteArray, offset: Int, size: Int): Int =
         file.writeSync((data.unsafeCast<Uint8Array>()).subarray(offset, size)).toInt()

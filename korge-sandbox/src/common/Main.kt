@@ -65,18 +65,24 @@ object SimpleWASM3 : WASMLib("AGFzbQEAAAABGgRgAn9/AX9gAX8Bf2AEf39/fwBgA39/fwF/Ag
     */
 }
 
-suspend fun main3() {
+suspend fun main() {
     //SDL.SDL_InitSubSystem(0x00000020)
     //SDL.SDL_GL_LoadLibrary(null)
     //println("ADDRESS: " + SDL.SDL_GL_GetProcAddress("glEnable")?.address)
 
-    val funcPtr0 = SimpleWASM4.getFunc(0)
-    val funcPtr1 = SimpleWASM4.getFunc(1)
-    val func0 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr0)
-    val func1 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr1)
-    println("func=$funcPtr0")
-    println(func0(3, 7))
-    println(func1(3, 7))
+    //val bytes = resourcesVfs["Exif5-2x.avif"].readBytes()
+    val bytes = resourcesVfs["bubble-chat.9.png"].readBytes()
+
+    println(nativeImageFormatProvider.decode(bytes))
+    //resourcesVfs["Exif5-2x.avif"].readBitmap()
+
+    //val funcPtr0 = SimpleWASM4.getFunc(0)
+    //val funcPtr1 = SimpleWASM4.getFunc(1)
+    //val func0 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr0)
+    //val func1 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr1)
+    //println("func=$funcPtr0")
+    //println(func0(3, 7))
+    //println(func1(3, 7))
 
     //val lib = LibC.dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", 0)
     //println("lib=${lib.address}")
@@ -86,7 +92,7 @@ suspend fun main3() {
     //println(cos(0.5))
 }
 
-suspend fun main() = Korge {
+suspend fun main4() = Korge {
     //run { val bytes = resourcesVfs["Exif5-2x.webp"].readBytes(); for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) }) }
     //image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
     image(resourcesVfs["Exif5-2x.webp"].readBitmap(WEBP))

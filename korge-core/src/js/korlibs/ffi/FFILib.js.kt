@@ -31,6 +31,8 @@ fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
         FloatArray::class -> "buffer"
         DoubleArray::class -> "buffer"
         BooleanArray::class -> "buffer"
+        FFIPointerArray::class -> "buffer"
+        //LongArray::class -> "buffer"
         Buffer::class -> "buffer"
         DenoPointer::class -> "pointer"
         String::class -> if (ret) "pointer" else "buffer"
@@ -127,7 +129,7 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
                     )
                 ).symbols
             } catch (e: Throwable) {
-                //e.printStackTrace()
+                e.printStackTrace()
                 null
             }
         }.unsafeCast<Any?>().also {
@@ -149,10 +151,14 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
                 if (param == String::class) {
                    v = (v.toString() + "\u0000").encodeToByteArray()
                 }
+                if (v is FFIPointerArray) v = v.data
+                if (v is Buffer) v = v.dataView
+                //console.log("param", n, v)
                 arguments[n] = v
             }
             //console.log("arguments", arguments)
             val result = func.apply(null, arguments)
+            //console.log("result", result)
             when {
                 convertToString -> (result.unsafeCast<DenoPointer>()).getStringz()
                 else -> result
@@ -190,16 +196,24 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
 }
 
 actual typealias FFIPointer = DenoPointer
+actual val FFI_POINTER_SIZE: Int = 8
 
 actual fun FFIPointer.getStringz(): String = this.readStringz()
 actual val FFIPointer?.address: Long get() {
     val res = Deno.UnsafePointer.value(this)
     return if (res is Number) res.toLong() else res.unsafeCast<JsBigInt>().toLong()
 }
-actual fun CreateFFIPointer(ptr: Long): FFIPointer = Deno.UnsafePointer.create(ptr.toJsBigInt())
+actual fun CreateFFIPointer(ptr: Long): FFIPointer? = if (ptr == 0L) null else Deno.UnsafePointer.create(ptr.toJsBigInt())
 actual val FFIPointer?.str: String get() = if (this == null) "Pointer(null)" else "Pointer($value)"
 
-actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
+actual fun FFIPointer.getUnalignedI8(offset: Int): Byte = Deno.UnsafePointerView(this).getInt8(offset)
+actual fun FFIPointer.getUnalignedI16(offset: Int): Short = Deno.UnsafePointerView(this).getInt16(offset)
+actual fun FFIPointer.getUnalignedI32(offset: Int): Int = Deno.UnsafePointerView(this).getInt32(offset)
+actual fun FFIPointer.getUnalignedI64(offset: Int): Long = Deno.UnsafePointerView(this).getBigInt64(offset).toLong()
+actual fun FFIPointer.getUnalignedF32(offset: Int): Float = Deno.UnsafePointerView(this).getFloat32(offset)
+actual fun FFIPointer.getUnalignedF64(offset: Int): Double = Deno.UnsafePointerView(this).getFloat64(offset)
+
+actual fun FFIPointer.getIntArray(size: Int, offset: Int): IntArray {
     val view = Deno.UnsafePointerView(this)
     val out = IntArray(size)
     for (n in 0 until size) {

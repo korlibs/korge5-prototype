@@ -168,13 +168,13 @@ class DenoLocalVfs : Vfs() {
 
 class DenoAsyncStreamBase(val file: DenoFsFile) : AsyncStreamBase() {
     override suspend fun read(position: Long, buffer: ByteArray, offset: Int, len: Int): Int {
-        file.seek(position.toDouble()).await()
+        file.seek(position.toDouble(), Deno.SeekMode.Start).await()
         val read = file.read(Uint8Array(buffer.asUint8Array().buffer, offset, len)).await()
         return read?.toInt() ?: -1
     }
 
     override suspend fun write(position: Long, buffer: ByteArray, offset: Int, len: Int) {
-        file.seek(position.toDouble()).await()
+        file.seek(position.toDouble(), Deno.SeekMode.Start).await()
         file.write(Uint8Array(buffer.asUint8Array().buffer, offset, len)).await()
     }
 

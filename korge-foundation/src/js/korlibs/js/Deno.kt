@@ -51,8 +51,13 @@ external object Deno {
     class UnsafePointerView {
         constructor(pointer: DenoPointer)
         val pointer: DenoPointer
-        fun getBigInt64(): BigInt
-        fun getBigInt64(offset: Int): BigInt
+
+        fun getInt8(offset: Int = definedExternally): Byte
+        fun getInt16(offset: Int = definedExternally): Short
+        fun getInt32(offset: Int = definedExternally): Int
+        fun getBigInt64(offset: Int = definedExternally): JsBigInt
+        fun getFloat32(offset: Int = definedExternally): Float
+        fun getFloat64(offset: Int = definedExternally): Double
         companion object {
             fun getCString(pointer: DenoPointer, offset: Int): String
         }
@@ -89,8 +94,8 @@ external interface DenoFsFile {
     fun truncate(len: Double? = definedExternally): Promise<Unit>
     fun truncateSync(len: Double? = definedExternally): Unit
     fun close()
-    fun seek(pos: Double, whence: Int = definedExternally): Promise<Double>
-    fun seekSync(pos: Double, whence: Int = definedExternally): Double
+    fun seek(pos: Double, whence: Int): Promise<Double>
+    fun seekSync(pos: Double, whence: Int): Double
     fun write(data: Uint8Array): Promise<Double>
     fun writeSync(data: Uint8Array): Double
     fun read(data: Uint8Array): Promise<Double?>

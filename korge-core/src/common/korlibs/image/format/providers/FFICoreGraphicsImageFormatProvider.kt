@@ -7,7 +7,7 @@ import korlibs.image.bitmap.Bitmap32
 import korlibs.image.format.*
 import korlibs.math.geom.SizeInt
 import korlibs.memory.Platform
-import korlibs.ffi.readInts
+import korlibs.ffi.getIntArray
 
 object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
     override val formats: ImageFormat get() = RegisteredImageFormats
@@ -130,7 +130,7 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
         CoreGraphics.CGContextDrawImage(context, rect[0], rect[1], rect[2], rect[3], cgImage)
         CoreGraphics.CGContextFlush(context)
 
-        val pixels = CoreGraphics.CGBitmapContextGetData(context)!!.readInts(width * height)
+        val pixels = CoreGraphics.CGBitmapContextGetData(context)!!.getIntArray(width * height)
 
         CoreGraphics.CGImageRelease(cgImage)
         CoreGraphics.CGContextRelease(context)
