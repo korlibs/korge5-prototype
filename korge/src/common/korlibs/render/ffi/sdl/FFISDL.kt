@@ -1,9 +1,8 @@
 package korlibs.render.ffi.sdl
 
 import korlibs.event.Key
-import korlibs.memory.Platform
-import korlibs.memory.ffi.FFILib
-import korlibs.memory.ffi.FFIPointer
+import korlibs.ffi.FFILib
+import korlibs.ffi.FFIPointer
 
 object SDL : FFILib(
     "SDL2",

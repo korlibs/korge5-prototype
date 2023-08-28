@@ -1,14 +1,15 @@
 package korlibs.audio.sound.backends.ffi
 
+import korlibs.ffi.FFILib
+import korlibs.ffi.FFIPointer
 import korlibs.io.lang.Environment
 import korlibs.logger.Logger
 import korlibs.memory.Buffer
 import korlibs.memory.Platform
-import korlibs.memory.ffi.FFILib
-import korlibs.memory.ffi.FFIPointer
 
 @Suppress("unused")
-object AL : FFILib(nativeOpenALLibraryPath, "/System/Library/Frameworks/OpenAL.framework/OpenAL") {
+//object AL : FFILib(nativeOpenALLibraryPath, "/System/Library/Frameworks/OpenAL.framework/OpenAL") {
+object AL : FFILib(nativeOpenALLibraryPath, "OpenAL", "AL") {
     private val logger = Logger("AL")
 
     val alDopplerFactor: (value: Float) -> Unit by func()

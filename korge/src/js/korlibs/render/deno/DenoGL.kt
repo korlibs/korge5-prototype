@@ -1,15 +1,6 @@
 package korlibs.render.deno
 
-import korlibs.image.bitmap.NativeImage
-import korlibs.image.format.*
-import korlibs.io.runtime.deno.DenoPointer
-import korlibs.io.runtime.deno.readStringz
-import korlibs.io.runtime.deno.value
-import korlibs.io.runtime.deno.Deno
-import korlibs.io.util.BigInt64Array
-import korlibs.io.util.bigInt64ArrayOf
-import korlibs.io.util.set
-import korlibs.io.util.toJsBigInt
+import korlibs.js.*
 import korlibs.kgl.KmlGl
 import korlibs.memory.Buffer
 

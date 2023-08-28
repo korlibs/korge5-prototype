@@ -2,9 +2,9 @@ package korlibs.io.file.sync
 
 import korlibs.io.jsObject
 import korlibs.io.lang.unsupported
-import korlibs.io.runtime.deno.Deno
-import korlibs.io.runtime.deno.DenoFileInfo
-import korlibs.io.runtime.deno.toArray
+import korlibs.js.Deno
+import korlibs.js.DenoFileInfo
+import korlibs.js.toArray
 import korlibs.memory.Platform
 import org.khronos.webgl.Uint8Array
 

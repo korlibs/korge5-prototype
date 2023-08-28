@@ -1,6 +1,7 @@
 package korlibs.image.format
 
 import korlibs.crypto.encoding.fromBase64
+import korlibs.ffi.WASMLib
 import korlibs.image.bitmap.Bitmap32
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
@@ -9,7 +10,6 @@ import korlibs.io.stream.readAll
 import korlibs.io.stream.readBytes
 import korlibs.math.geom.SizeInt
 import korlibs.memory.Buffer
-import korlibs.memory.ffi.WASMLib
 import korlibs.memory.getArrayInt32
 import korlibs.memory.getInt32
 import korlibs.memory.getUnalignedInt32

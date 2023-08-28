@@ -5,7 +5,7 @@ import korlibs.event.KeyEvent
 import korlibs.graphics.AG
 import korlibs.graphics.gl.AGOpengl
 import korlibs.io.async.launchImmediately
-import korlibs.io.runtime.deno.Deno
+import korlibs.js.Deno
 import korlibs.math.geom.SizeInt
 import korlibs.render.GameWindow
 import korlibs.render.JsGameWindow

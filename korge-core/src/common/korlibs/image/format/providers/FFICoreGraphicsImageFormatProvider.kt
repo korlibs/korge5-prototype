@@ -1,15 +1,13 @@
 package korlibs.image.format.providers
 
 import korlibs.datastructure.fastCastTo
+import korlibs.ffi.FFILib
+import korlibs.ffi.FFIPointer
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.format.*
 import korlibs.math.geom.SizeInt
-import korlibs.memory.Buffer
-import korlibs.memory.Int32Buffer
 import korlibs.memory.Platform
-import korlibs.memory.ffi.FFILib
-import korlibs.memory.ffi.FFIPointer
-import korlibs.memory.ffi.readInts
+import korlibs.ffi.readInts
 
 object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
     override val formats: ImageFormat get() = RegisteredImageFormats

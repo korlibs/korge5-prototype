@@ -4,3 +4,4 @@
 /korge/build
 /korge-core/build
 /korge-core/__existing
+hs_err*.log
