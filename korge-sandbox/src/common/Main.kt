@@ -1,6 +1,7 @@
 import korlibs.crypto.encoding.fromBase64
 import korlibs.ffi.*
 import korlibs.image.format.*
+import korlibs.image.format.providers.FFISDLImageNativeImageFormatProvider
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.view.*
@@ -72,7 +73,8 @@ suspend fun main4() {
     //val bytes = resourcesVfs["Exif5-2x.avif"].readBytes()
     //val bytes = resourcesVfs["bubble-chat.9.png"].readBytes()
 
-    println("" + FFISDLGL.glDrawArrays(0, 0, 0))
+    println(FFISDLImageNativeImageFormatProvider.decode(resourcesVfs["bubble-chat.9.png"].readBytes()))
+
     //println(nativeImageFormatProvider.decode(bytes))
     //resourcesVfs["Exif5-2x.avif"].readBitmap()
 

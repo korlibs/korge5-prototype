@@ -7,9 +7,10 @@ val FFINativeImageFormatProviderOpt: BaseNativeImageFormatProvider? by lazy {
     when {
         Platform.isMac -> FFICoreGraphicsImageFormatProvider
         Platform.isWindows -> FFIGdiNativeImageFormatProvider
+        Platform.isLinux -> FFISDLImageNativeImageFormatProvider
         else -> null
     }
 }
 
 val FFINativeImageFormatProvider get() = FFINativeImageFormatProviderOpt
-    ?: error("Unsupported platform decodeHeaderInternal '${Platform.os}'")
+    ?: error("Unsupported platform '${Platform.os}' for FFINativeImageFormatProvider")

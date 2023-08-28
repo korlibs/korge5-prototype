@@ -36,6 +36,7 @@ object SDL : FFILib(
     val SDL_GL_GetProcAddress: (String) -> FFIPointer? by func()
     val SDL_GL_SetSwapInterval: (Int) -> Int by func()
     val SDL_GL_SetAttribute: (Int, Int) -> Int by func()
+    val SDL_RWFromMem: (FFIPointer?,  Int) -> FFIPointer? by func()
 
     fun SDL_CreateOpenGLWindow(width: Int, height: Int, title: String? = null, shown: Boolean = true): FFIPointer? {
         val windowFlags = SDL_WINDOW_OPENGL or SDL_WINDOW_RESIZABLE or(if (shown) SDL_WINDOW_SHOWN else SDL_WINDOW_HIDDEN)

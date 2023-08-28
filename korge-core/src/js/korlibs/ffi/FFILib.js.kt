@@ -6,6 +6,9 @@ import korlibs.io.jsObject
 import korlibs.io.runtime.deno.*
 import korlibs.js.*
 import korlibs.memory.Buffer
+import korlibs.memory._high
+import korlibs.memory._low
+import korlibs.memory.fromLowHigh
 import org.khronos.webgl.*
 import kotlin.reflect.*
 
@@ -257,13 +260,20 @@ fun FFIPointer.getDataView(offset: Int, size: Int): DataView {
 actual fun FFIPointer.getUnalignedI8(offset: Int): Byte = Deno.UnsafePointerView(this).getInt8(offset)
 actual fun FFIPointer.getUnalignedI16(offset: Int): Short = Deno.UnsafePointerView(this).getInt16(offset)
 actual fun FFIPointer.getUnalignedI32(offset: Int): Int = Deno.UnsafePointerView(this).getInt32(offset)
-actual fun FFIPointer.getUnalignedI64(offset: Int): Long = Deno.UnsafePointerView(this).getBigInt64(offset).toLong()
+actual fun FFIPointer.getUnalignedI64(offset: Int): Long {
+    val low = getUnalignedI32(offset)
+    val high = getUnalignedI32(offset + 4)
+    return Long.fromLowHigh(low, high)
+}
 actual fun FFIPointer.getUnalignedF32(offset: Int): Float = Deno.UnsafePointerView(this).getFloat32(offset)
 actual fun FFIPointer.getUnalignedF64(offset: Int): Double = Deno.UnsafePointerView(this).getFloat64(offset)
 actual fun FFIPointer.setUnalignedI8(value: Byte, offset: Int) = getDataView(offset, 1).setInt8(0, value)
 actual fun FFIPointer.setUnalignedI16(value: Short, offset: Int) = getDataView(offset, 2).setInt16(0, value, true)
 actual fun FFIPointer.setUnalignedI32(value: Int, offset: Int) = getDataView(offset, 4).setInt32(0, value, true)
-actual fun FFIPointer.setUnalignedI64(value: Long, offset: Int) = getDataView(offset, 8).asDynamic().setBigInt64(0, value.toJsBigInt(), true)
+actual fun FFIPointer.setUnalignedI64(value: Long, offset: Int) {
+    setUnalignedI32(value._low, offset)
+    setUnalignedI32(value._high, offset + 4)
+}
 actual fun FFIPointer.setUnalignedF32(value: Float, offset: Int) = getDataView(offset, 4).setFloat32(0, value, true)
 actual fun FFIPointer.setUnalignedF64(value: Double, offset: Int) = getDataView(offset, 8).setFloat64(0, value, true)
 

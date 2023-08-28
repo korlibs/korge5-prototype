@@ -24,7 +24,7 @@ object DenoSyncIO : SyncIO {
     override fun mkdir(path: String): Boolean = runCatching { Deno.mkdirSync(path) }.isSuccess
     override fun rmdir(path: String): Boolean = runCatching { Deno.removeSync(path) }.isSuccess
     override fun delete(path: String): Boolean = runCatching { Deno.removeSync(path) }.isSuccess
-    override fun list(path: String): List<String> = Deno.readDirSync(path).toArray().toList().map { it.name }
+    override fun list(path: String): List<String> = Deno.readDirSync(path).toArray().map { it.name }
     override fun readAllBytes(path: String): ByteArray = Deno.readFileSync(path)
     override fun writeAllBytes(path: String, data: ByteArray) = Deno.writeFileSync(path, data)
 
