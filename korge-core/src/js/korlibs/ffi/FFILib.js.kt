@@ -9,7 +9,15 @@ import korlibs.js.readStringz
 import korlibs.js.value
 import korlibs.memory.Buffer
 import org.khronos.webgl.*
-import kotlin.reflect.KClassifier
+import kotlin.reflect.*
+
+fun KType.toDenoDef(): dynamic {
+    val (params, ret) = BaseLib.extractTypeFunc(this)
+    return def(
+        ret?.toDenoFFI(ret = true),
+        *params.map { it?.toDenoFFI(ret = false) }.toTypedArray()
+    )
+}
 
 fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
     return when (this) {
@@ -110,10 +118,7 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
                 Deno.dlopen<dynamic>(
                     path, jsObject(
                         *lib.functions.map {
-                            it.name to def(
-                                it.ret?.toDenoFFI(ret = true),
-                                *it.params.map { it?.toDenoFFI(ret = false) }.toTypedArray()
-                            )
+                            it.name to it.type.toDenoDef()
                         }.toTypedArray()
                     )
                 ).symbols
@@ -156,6 +161,10 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
 
     override fun close() {
         super.close()
+    }
+
+    override fun <T> castToFunc(ptr: FFIPointer?, funcInfo: BaseLib.FuncInfo<T>): T {
+        return Deno.UnsafeFnPointer(ptr, funcInfo.type.toDenoDef()).asDynamic()//.call
     }
 }
 

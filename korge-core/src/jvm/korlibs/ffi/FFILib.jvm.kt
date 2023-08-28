@@ -77,6 +77,10 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
             wasm.close()
         }
     }
+
+    override fun <T> castToFunc(ptr: FFIPointer?, funcInfo: BaseLib.FuncInfo<T>): T {
+        TODO()
+    }
 }
 
 actual typealias FFIPointer = Pointer

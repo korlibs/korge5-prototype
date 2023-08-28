@@ -56,6 +56,10 @@ external object Deno {
             fun getCString(pointer: DenoPointer, offset: Int): String
         }
     }
+
+    class UnsafeFnPointer(pointer: DenoPointer?, definition: dynamic) {
+        val pointer: DenoPointer
+    }
 }
 
 external interface DenoFileInfo {

@@ -4,9 +4,7 @@ import korlibs.datastructure.fastCastTo
 import korlibs.io.file.sync.SyncIOAPI
 import korlibs.io.lang.Closeable
 import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
+import kotlin.reflect.*
 
 expect class FFIPointer {
 }
@@ -23,6 +21,7 @@ interface FFILibSym : Closeable {
     fun freeBytes(vararg ptrs: Int): Unit = TODO()
     fun <T> get(name: String): T = TODO()
     override fun close() {}
+    fun <T> castToFunc(ptr: FFIPointer?, funcInfo: BaseLib.FuncInfo<T>): T = TODO()
 }
 
 abstract class BaseLib {
@@ -30,10 +29,21 @@ abstract class BaseLib {
     var loaded = false
     lateinit var sym: FFILibSym
 
+    companion object {
+        fun extractTypeFunc(type: KType): Pair<List<KClassifier?>, KClassifier?> {
+            val generics = type.arguments.map { it.type?.classifier }
+            val ret = generics.last()
+            val params = generics.dropLast(1)
+            return params to ret
+        }
+
+    }
+
     class FuncDelegate<T>(val base: BaseLib, val name: String, val type: KType) : ReadOnlyProperty<BaseLib, T> {
-        val generics = type.arguments.map { it.type?.classifier }
-        val ret = generics.last()
-        val params = generics.dropLast(1)
+        val parts = extractTypeFunc(type)
+        //val generics = type.arguments.map { it.type?.classifier }
+        val params = parts.first
+        val ret = parts.second
         var cached: T? = null
         override fun getValue(thisRef: BaseLib, property: KProperty<*>): T {
             if (cached == null) cached = base.sym.get(name)
@@ -49,6 +59,8 @@ abstract class BaseLib {
     }
 
     inline fun <reified T : Function<*>> func(name: String? = null): FuncInfo<T> = FuncInfo<T>(typeOf<T>(), name)
+
+    inline fun <reified T : Function<*>> castToFunc(ptr: FFIPointer): T = sym.castToFunc(ptr, FuncInfo(typeOf<T>(), null))
 
     fun finalize() {
         sym = FFILibSym(this)
