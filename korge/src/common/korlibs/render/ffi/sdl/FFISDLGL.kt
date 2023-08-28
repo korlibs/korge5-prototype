@@ -2,10 +2,28 @@ package korlibs.render.ffi.sdl
 
 import korlibs.datastructure.*
 import korlibs.ffi.*
+import korlibs.io.file.sync.SyncIOAPI
 import korlibs.kgl.*
 import korlibs.memory.*
 
-object FFISDLGL : SymbolResolverFFILib({ SDL.SDL_GL_GetProcAddress(it) }) {
+object DLLIBUnix : FFILib("CoreFoundation", "dl") {
+    val dlopen: (String, Int) -> FFIPointer? by func()
+    val dlsym: (FFIPointer?, String) -> FFIPointer? by func()
+    val dlclose: (FFIPointer?) -> Int by func()
+}
+
+private var _OpenGLLibHandle: FFIPointer? = null
+
+@OptIn(SyncIOAPI::class)
+private val OpenGLLibHandle: FFIPointer? get() {
+    if (_OpenGLLibHandle == null) {
+        _OpenGLLibHandle = DLLIBUnix.dlopen(LibraryResolver.resolve("OpenGL", "gl") ?: error("Can't find OpenGL"), 0)
+    }
+    return _OpenGLLibHandle!!
+}
+
+object FFISDLGL : SymbolResolverFFILib({ SDL.SDL_GL_GetProcAddress(it) ?: DLLIBUnix.dlsym(OpenGLLibHandle, it) }) {
+//object FFISDLGL : FFILib("OpenGL", "gl") {
     private var context: FFIPointer? = null
     private var window: FFIPointer? = null
     init { initStart() }
@@ -177,16 +195,12 @@ object FFISDLGL : SymbolResolverFFILib({ SDL.SDL_GL_GetProcAddress(it) }) {
     }
 
     private fun initEnd() {
-        //SDL.SDL_GL_UnloadLibrary()
-        SDL.SDL_GL_DeleteContext(context)
+        SDL.SDL_GL_DeleteContext(context) //SDL.SDL_GL_UnloadLibrary()
         SDL.SDL_DestroyWindow(window)
     }
 }
 
 class FFIKmlGl : KmlGl() {
-    fun String.strBA(): ByteArray = "$this\u0000".encodeToByteArray()
-    fun FFIPointer?.ptrToStr(): String? = this?.getStringz()
-    fun Boolean.toInt(): Int = if (this) 1 else 0
     override fun activeTexture(texture: Int): Unit = FFISDLGL.glActiveTexture(texture)
     override fun attachShader(program: Int, shader: Int): Unit = FFISDLGL.glAttachShader(program, shader)
     override fun bindAttribLocation(program: Int, index: Int, name: String): Unit = FFISDLGL.glBindAttribLocation(program, index, name)
@@ -296,7 +310,7 @@ class FFIKmlGl : KmlGl() {
     override fun scissor(x: Int, y: Int, width: Int, height: Int): Unit = FFISDLGL.glScissor(x, y, width, height)
     override fun shaderBinary(count: Int, shaders: Buffer, binaryformat: Int, binary: Buffer, length: Int): Unit = FFISDLGL.glShaderBinary(count, shaders, binaryformat, binary, length)
     override fun shaderSource(shader: Int, string: String): Unit {
-        val stringBytes = string.strBA()
+        val stringBytes = "$string\u0000".encodeToByteArray()
         FFISDLGL.glShaderSource(shader, 1, ffiPointerArrayOf(CreateFFIMemory(stringBytes).pointer), intArrayOf(stringBytes.size))
     }
     override fun stencilFunc(func: Int, ref: Int, mask: Int): Unit = FFISDLGL.glStencilFunc(func, ref, mask)

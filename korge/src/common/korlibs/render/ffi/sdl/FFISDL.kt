@@ -3,6 +3,7 @@ package korlibs.render.ffi.sdl
 import korlibs.event.Key
 import korlibs.ffi.FFILib
 import korlibs.ffi.FFIPointer
+import korlibs.memory.Platform
 
 // https://gist.github.com/m1nuz/5c48ddd6a3fd8fb340c037165edde1fb
 object SDL : FFILib(
@@ -38,12 +39,14 @@ object SDL : FFILib(
 
     fun SDL_CreateOpenGLWindow(width: Int, height: Int, title: String? = null, shown: Boolean = true): FFIPointer? {
         val windowFlags = SDL_WINDOW_OPENGL or SDL_WINDOW_RESIZABLE or(if (shown) SDL_WINDOW_SHOWN else SDL_WINDOW_HIDDEN)
-        val contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG //or (gl_debug ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
-        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
-        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
-        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
-        SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)
-        SDL.SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+        if (Platform.isWindows) {
+            val contextFlags = SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG //or (gl_debug ? SDL_GL_CONTEXT_DEBUG_FLAG : 0);
+            SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+            SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+            SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+            SDL.SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags)
+            SDL.SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+        }
         return SDL.SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, windowFlags)
     }
 }

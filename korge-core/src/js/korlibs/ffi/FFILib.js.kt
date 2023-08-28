@@ -197,12 +197,6 @@ private fun preprocessFunc(type: KType, func: dynamic, name: String?): dynamic {
                 result == null -> null
                 convertToString -> {
                     val ptr = (result.unsafeCast<DenoPointer>())
-
-                    //console.log("result=", ptr.address)
-                    //Deno.UnsafePointerView.getCString(CreateFFIPointer(ptr.address)!!, 0)
-                    //ptr?.getStringz()
-
-                    // @TODO: Huge opportunity optimization here
                     getCString(ptr)
                 }
                 else -> result
@@ -214,20 +208,24 @@ private fun preprocessFunc(type: KType, func: dynamic, name: String?): dynamic {
     }
 }
 
-fun strlen(ptr: FFIPointer?): Int {
-    if (ptr == null) return 0
-    for (n in 0 until 1000000) {
-        if (ptr.getUnalignedI8(n) == 0.toByte()) return n
-    }
-    error("String too long")
-}
-
+//fun strlen(ptr: FFIPointer?): Int {
+//    if (ptr == null) return 0
+//    for (n in 0 until 1000000) {
+//        if (ptr.getUnalignedI8(n) == 0.toByte()) return n
+//    }
+//    error("String too long")
+//}
+//
+//fun getCString(ptr: FFIPointer?): String? {
+//    if (ptr == null) return null
+//    val len = strlen(ptr)
+//    val ba = ByteArray(len)
+//    for (n in 0 until ba.size) ba[n] = ptr.getUnalignedI8(n)
+//    return ba.decodeToString()
+//}
 fun getCString(ptr: FFIPointer?): String? {
     if (ptr == null) return null
-    val len = strlen(ptr)
-    val ba = ByteArray(len)
-    for (n in 0 until ba.size) ba[n] = ptr.getUnalignedI8(n)
-    return ba.decodeToString()
+    return Deno.UnsafePointerView.getCString(ptr)
 }
 
 
