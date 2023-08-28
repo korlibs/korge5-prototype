@@ -1,7 +1,5 @@
 package korlibs.time
 
-import korlibs.time.wrapped.WDate
-import korlibs.time.wrapped.WDateTime
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
@@ -19,7 +17,5 @@ class SerializableTest {
     fun test() {
         val time = 1_000_000L
         assertTrue { serializeDeserializeObject(DateTimeTz.fromUnixLocal(time)) is DateTimeTz }
-        assertTrue { serializeDeserializeObject(WDateTime(2020, 1, 1)) is WDateTime }
-        assertTrue { serializeDeserializeObject(WDate(2020, 1, 1)) is WDate }
     }
 }
