@@ -67,11 +67,11 @@ subprojects {
         sourceSets {
             val commonMain by getting {
                 kotlin.setSrcDirs(listOf("src/common"))
-                resources.setSrcDirs(listOf("src/resources"))
+                resources.setSrcDirs(listOf("srcresources"))
             }
             val commonTest by getting {
                 kotlin.setSrcDirs(listOf("test/common"))
-                resources.setSrcDirs(listOf("test/resources"))
+                resources.setSrcDirs(listOf("testresources"))
 
                 dependencies {
                     api(kotlin("test"))
