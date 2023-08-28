@@ -3,10 +3,7 @@ package korlibs.ffi
 import korlibs.image.bitmap.NativeImage
 import korlibs.io.jsObject
 import korlibs.io.runtime.deno.*
-import korlibs.js.Deno
-import korlibs.js.DenoPointer
-import korlibs.js.readStringz
-import korlibs.js.value
+import korlibs.js.*
 import korlibs.memory.Buffer
 import org.khronos.webgl.*
 import kotlin.reflect.*
@@ -65,12 +62,16 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
         if (_wasmExports == null) {
             _wasmExports = try {
                 val module = WebAssembly.Module((lib as WASMLib).content!!)
+                val dummyFunc = { console.log("proc_exit", js("(arguments)")) }
                 val imports = jsObject(
+                    "env" to jsObject(
+                        "abort" to dummyFunc,
+                    ),
                     "wasi_snapshot_preview1" to jsObject(
-                        "proc_exit" to { console.log("proc_exit", js("(arguments)")) },
-                        "fd_close" to { console.log("fd_close", js("(arguments)")) },
-                        "fd_write" to { console.log("fd_write", js("(arguments)")) },
-                        "fd_seek" to { console.log("fd_seek", js("(arguments)")) },
+                        "proc_exit" to dummyFunc,
+                        "fd_close" to dummyFunc,
+                        "fd_write" to dummyFunc,
+                        "fd_seek" to dummyFunc,
                     )
                 )
                 WebAssembly.Instance(module, imports).exports
@@ -89,6 +90,9 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
     }
     val u8: Uint8Array by lazy {
         Uint8Array(mem)
+    }
+    val dataView: DataView by lazy {
+        DataView(mem)
     }
 
     override fun readBytes(pos: Int, size: Int): ByteArray {
@@ -133,10 +137,20 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
         }
     }
 
-    fun preprocessFunc(delegate: BaseLib.FuncDelegate<*>, func: dynamic): dynamic {
-        val convertToString = delegate.ret == String::class
+    // @TODO: Optimize this
+    fun preprocessFunc(type: KType, func: dynamic): dynamic {
+        val (params, ret) = BaseLib.extractTypeFunc(type)
+        val convertToString = ret == String::class
         return {
             val arguments = js("(arguments)")
+            for (n in 0 until params.size) {
+                val param = params[n]
+                var v = arguments[n]
+                if (param == String::class) {
+                   v = (v.toString() + "\u0000").encodeToByteArray()
+                }
+                arguments[n] = v
+            }
             //console.log("arguments", arguments)
             val result = func.apply(null, arguments)
             when {
@@ -156,21 +170,33 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
             syms
         }
         //return syms[name]
-        return preprocessFunc(symbolsByName[name]!!, syms[name])
+        return preprocessFunc(symbolsByName[name]!!.type, syms[name])
+    }
+
+    override fun <T> wasmFuncPointer(address: Int, type: KType): T {
+        if (!wasmExports.table && !wasmExports.__indirect_function_table) {
+            console.log("wasmExports", Deno.inspect(wasmExports))
+            error("Table not exported with 'table' name")
+        }
+        val table = wasmExports.__indirect_function_table ?: wasmExports.table
+
+        val func = table.get(address)
+        return preprocessFunc(type, func)
     }
 
     override fun close() {
         super.close()
-    }
-
-    override fun <T> castToFunc(ptr: FFIPointer?, funcInfo: BaseLib.FuncInfo<T>): T {
-        return Deno.UnsafeFnPointer(ptr, funcInfo.type.toDenoDef()).asDynamic()//.call
     }
 }
 
 actual typealias FFIPointer = DenoPointer
 
 actual fun FFIPointer.getStringz(): String = this.readStringz()
+actual val FFIPointer?.address: Long get() {
+    val res = Deno.UnsafePointer.value(this)
+    return if (res is Number) res.toLong() else res.unsafeCast<JsBigInt>().toLong()
+}
+actual fun CreateFFIPointer(ptr: Long): FFIPointer = Deno.UnsafePointer.create(ptr.toJsBigInt())
 actual val FFIPointer?.str: String get() = if (this == null) "Pointer(null)" else "Pointer($value)"
 
 actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
@@ -182,4 +208,16 @@ actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
     //Deno.UnsafePointerView.getCString()
     //TODO("Not yet implemented")
     return out
+}
+
+actual fun <T> FFIPointer.castToFunc(type: KType): T {
+    val def = type.toDenoDef()
+    val res = Deno.UnsafeFnPointer(this, def)
+    //console.log("castToFunc.def=", def, "res=", res)
+    val func: dynamic = {
+        val arguments = js("(arguments)")
+        res.asDynamic().call.apply(res, arguments)
+    }
+    return func
+
 }

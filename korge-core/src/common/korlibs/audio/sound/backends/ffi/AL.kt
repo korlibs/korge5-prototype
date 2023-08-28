@@ -214,23 +214,6 @@ object AL : FFILib(nativeOpenALLibraryPath, "OpenAL", "AL") {
     const val ALC_ENUMERATE_ALL_EXT = 1
     const val ALC_DEFAULT_ALL_DEVICES_SPECIFIER = 0x1012
     const val ALC_ALL_DEVICES_SPECIFIER = 0x1013
-
-    init {
-        /*
-        try {
-            if (nativeOpenALLibraryPath == null) error("Can't get OpenAL library")
-            traceTime("OpenAL Native.register") {
-                Native.register(nativeOpenALLibraryPath)
-            }
-            loaded = true
-        } catch (e: Throwable) {
-            logger.error { "Failed to initialize OpenAL: arch=$arch, OS.rawName=${Platform.rawOsName}, nativeOpenALLibraryPath=$nativeOpenALLibraryPath, message=${e.message}" }
-            //e.printStackTrace()
-        }
-
-         */
-        finalize()
-    }
 }
 
 val nativeOpenALLibraryPath: String? by lazy {

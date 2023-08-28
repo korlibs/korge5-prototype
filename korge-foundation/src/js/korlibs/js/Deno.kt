@@ -7,6 +7,7 @@ import kotlin.js.Date
 import kotlin.js.Promise
 
 external object Deno {
+    fun inspect(value: dynamic): String
     fun exit(exitCode: Int = definedExternally)
     fun cwd(): String
     fun realPathSync(path: String): String
@@ -43,8 +44,8 @@ external object Deno {
         fun create(value: JsBigInt): DenoPointer
         fun equals(a: JsBigInt, b: JsBigInt): Boolean
         fun of(a: ArrayBufferView): DenoPointer
-        fun offset(a: ArrayBufferView, offset: Int): DenoPointer
-        fun value(value: DenoPointer): JsBigInt
+        fun offset(a: ArrayBufferView, offset: Int): DenoPointer?
+        fun value(value: DenoPointer?): dynamic
     }
 
     class UnsafePointerView {

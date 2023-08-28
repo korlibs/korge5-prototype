@@ -17,7 +17,6 @@ class DENOEvalTest {
         }
         val decode: (data: Int, size: Int, widthPtr: Int, heightPtr: Int) -> Int by func()
         val get_info: (data: Int, size: Int) -> Int by func()
-        init { finalize() }
 
         fun decodeWebpBytes(bytes: ByteArray): Bitmap32 {
             val memTemp = malloc(16)

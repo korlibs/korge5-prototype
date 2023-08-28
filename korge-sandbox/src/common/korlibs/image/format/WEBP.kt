@@ -34,7 +34,6 @@ private class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
     constructor() : this(WEBP_WASM_BYTES)
     val decode: (data: Int, size: Int, widthPtr: Int, heightPtr: Int) -> Int by func()
     val get_info: (data: Int, size: Int) -> Int by func()
-    init { finalize() }
 
     fun getInfo(bytes: ByteArray): SizeInt? {
         val dataPtr = allocBytes(bytes)

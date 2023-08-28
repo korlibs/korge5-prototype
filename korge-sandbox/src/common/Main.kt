@@ -1,9 +1,10 @@
 import korlibs.crypto.encoding.fromBase64
-import korlibs.ffi.WASMLib
+import korlibs.ffi.*
 import korlibs.image.format.*
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.view.*
+import korlibs.render.ffi.sdl.SDL
 import korlibs.time.measureTime
 
 //suspend fun main() {
@@ -13,12 +14,82 @@ import korlibs.time.measureTime
 
 object SimpleWASM : WASMLib("AGFzbQEAAAABBwFgAn9/AX8DAgEABAUBcAEBAQUDAQAABhQDfwBBCAt/AUGIgAILfwBBiIACCwcQAgNzdW0AAAZtZW1vcnkCAAkGAQBBAQsACgoBCAAgACABag8L".fromBase64()) {
     val sum: (Int, Int) -> Int by func()
-    init { finalize() }
+}
+
+object LibC : FFILib("CoreFoundation") {
+    val dlopen: (String, Int) -> FFIPointer by func()
+    val dlsym: (FFIPointer, String) -> FFIPointer by func()
+}
+
+object SimpleWASM4 : WASMLib("AGFzbQEAAAABDwNgAn9/AX9gAABgAX8BfwMFBAEAAAIEBQFwAQQEBQYBAYACgAIHSgYGbWVtb3J5AgADYWRkAAIDc3ViAAEHZ2V0RnVuYwADGV9faW5kaXJlY3RfZnVuY3Rpb25fdGFibGUBAAtfaW5pdGlhbGl6ZQAACQkBAEEBCwMBAgAKHgQCAAsHACAAIAFrCwcAIAAgAWoLCQBBAUECIAAbCw==".fromBase64()) {
+    val sum: (a: Int, b: Int) -> Int by func()
+    val sub: (a: Int, b: Int) -> Int by func()
+    val getFunc: (type: Int) -> Int by func()
+    /*
+    // emcc demo.c -Oz -s STANDALONE_WASM --no-entry
+    //#include <stdio.h>
+    #include <emscripten.h>
+    typedef int (*Binop)(int a, int b);
+    EMSCRIPTEN_KEEPALIVE int add(int a, int b) { return a + b; }
+    EMSCRIPTEN_KEEPALIVE int sub(int a, int b) { return a - b; }
+    EMSCRIPTEN_KEEPALIVE Binop getFunc(int type) { return (type == 0) ? add : sub; }
+     */
+}
+
+object SimpleWASM3 : WASMLib("AGFzbQEAAAABGgRgAn9/AX9gAX8Bf2AEf39/fwBgA39/fwF/Ag0BA2VudgVhYm9ydAACAwUEAAABAwQEAXAAAwUDAQABBggBfwFBzIgCCwcvBgNzdW0AAQNzdWIAAgdnZXRGdW5jAAMGbWVtb3J5AgAFdGFibGUBAARleGVjAAQJCAEAQQELAgECDAEECl0EBwAgACABagsHACAAIAFrCwsAQcAIQaAIIAAbCz8AIwBBBGskACMAQcwISARAQeCIAkGQiQJBAUEBEAAACyMAIAA2AgAgASACIAAoAgARAAAhACMAQQRqJAAgAAsLLQQAQYwICwEcAEGYCAsJBAAAAAgAAAABAEGsCAsBHABBuAgLCQQAAAAIAAAAAg==".fromBase64()) {
+    val sum: (a: Int, b: Int) -> Int by func()
+    val sub: (a: Int, b: Int) -> Int by func()
+    val getFunc: (type: Int) -> Int by func()
+    /*
+    // AssemblyScript
+    // sudo npm -g install assemblyscript
+    // asc sum.asc.ts --outFile sum.wasm --optimize
+
+    type Callback = (a: i32, b: i32) => i32;
+
+    export function sum(a: i32, b: i32): i32 {
+      return a + b;
+    }
+
+    export function sub(a: i32, b: i32): i32 {
+        return a - b;
+      }
+
+    export function getFunc(type: i32): Callback {
+        if (type == 0) {
+            return sum
+        } else {
+            return sub
+        }
+    }
+    */
+}
+
+suspend fun main3() {
+    //SDL.SDL_InitSubSystem(0x00000020)
+    //SDL.SDL_GL_LoadLibrary(null)
+    //println("ADDRESS: " + SDL.SDL_GL_GetProcAddress("glEnable")?.address)
+
+    val funcPtr0 = SimpleWASM4.getFunc(0)
+    val funcPtr1 = SimpleWASM4.getFunc(1)
+    val func0 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr0)
+    val func1 = SimpleWASM4.funcPointer<(Int, Int) -> Int>(funcPtr1)
+    println("func=$funcPtr0")
+    println(func0(3, 7))
+    println(func1(3, 7))
+
+    //val lib = LibC.dlopen("/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation", 0)
+    //println("lib=${lib.address}")
+    //val sym = LibC.dlsym(lib, "dlopen")
+    //println("sym=${sym.address}")
+    //val cos = LibC.dlsym(lib, "cos").castToFunc<(Double) -> Double>()
+    //println(cos(0.5))
 }
 
 suspend fun main() = Korge {
     //run { val bytes = resourcesVfs["Exif5-2x.webp"].readBytes(); for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) }) }
-    image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
+    //image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
+    image(resourcesVfs["Exif5-2x.webp"].readBitmap(WEBP))
     image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(100, 100)
 
     /*

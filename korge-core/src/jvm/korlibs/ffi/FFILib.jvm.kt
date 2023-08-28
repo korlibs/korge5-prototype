@@ -12,16 +12,71 @@ import java.io.Closeable
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
 import java.lang.reflect.Proxy
-import java.nio.ByteBuffer
-import java.nio.channels.SocketChannel
 import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 actual fun FFILibSym(lib: BaseLib): FFILibSym {
     return FFILibSymJVM(lib)
 }
+
+actual typealias FFIPointer = Pointer
+
+@JvmName("FFIPointerCreation")
+actual fun CreateFFIPointer(ptr: Long): FFIPointer = Pointer(ptr)
+
+actual fun FFIPointer.getStringz(): String = this.getString(0L)
+actual val FFIPointer?.address: Long get() = Pointer.nativeValue(this)
+actual val FFIPointer?.str: String get() = this.toString()
+actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray = this.getIntArray(0L, size)
+
+actual fun <T> FFIPointer.castToFunc(type: KType): T =
+    createJNAFunctionToPlainFunc(Function.getFunction(this), type)
+
+fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: KType): T {
+    val (params, ret) = BaseLib.extractTypeFunc(type)
+
+    return Proxy.newProxyInstance(
+        FFILibSymJVM::class.java.classLoader,
+        arrayOf((type.classifier as KClass<*>).java)
+    ) { proxy, method, args ->
+        when (ret) {
+            Unit::class -> func.invokeVoid(args)
+            Int::class -> func.invokeInt(args)
+            Float::class -> func.invokeFloat(args)
+            Double::class -> func.invokeDouble(args)
+            else -> func.invoke((ret as KClass<*>).java, args)
+        }
+    } as T
+}
+
+fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunction(wasm: DenoWASM, funcName: String, type: KType): T {
+    val (params, ret) = BaseLib.extractTypeFunc(type)
+    return Proxy.newProxyInstance(
+        FFILibSymJVM::class.java.classLoader,
+        arrayOf((type.classifier as KClass<*>).java)
+    ) { proxy, method, args ->
+        val sargs = args ?: emptyArray()
+        //return wasm.evalWASMFunction(nfunc.name, *sargs)
+        wasm.executeFunction(funcName, *sargs)
+    } as T
+}
+
+fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunctionIndirect(wasm: DenoWASM, address: Int, type: KType): T {
+    val (params, ret) = BaseLib.extractTypeFunc(type)
+    return Proxy.newProxyInstance(
+        FFILibSymJVM::class.java.classLoader,
+        arrayOf((type.classifier as KClass<*>).java)
+    ) { proxy, method, args ->
+        val sargs = args ?: emptyArray()
+        //return wasm.evalWASMFunction(nfunc.name, *sargs)
+        wasm.executeFunctionIndirect(address, *sargs)
+    } as T
+}
+
+inline fun <reified T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function): T =
+    createJNAFunctionToPlainFunc(func, typeOf<T>())
 
 class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
     val nlib by lazy {
@@ -33,31 +88,19 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
 
     val libWasm = lib as? WASMLib?
 
-    val functions by lazy {
+    fun <T : kotlin.Function<*>> createFunction(funcName: String, type: KType): T {
+        return if (libWasm != null) {
+            createWasmFunctionToPlainFunction<T>(wasm, funcName, type)
+        } else {
+            val func: Function = nlib!!.getFunction(funcName) ?: error("Can't find function ${funcName}")
+            createJNAFunctionToPlainFunc<T>(func, type)
+        }
+    }
+
+    val functions: Map<String, kotlin.Function<*>> by lazy {
         lib.functions.associate { nfunc ->
             //val lib = NativeLibrary.getInstance("")
-            nfunc.name to Proxy.newProxyInstance(
-                this::class.java.classLoader,
-                arrayOf((nfunc.type.classifier as KClass<*>).java),
-                object : InvocationHandler {
-                    val func: Function? = if (libWasm == null) nlib?.getFunction(nfunc.name) ?: error("Can't find function ${nfunc.name}") else null
-                    override fun invoke(proxy: Any?, method: Method, args: Array<out Any>?): Any? {
-                        if (libWasm != null) {
-                            val sargs = args ?: emptyArray()
-                            //return wasm.evalWASMFunction(nfunc.name, *sargs)
-                            return wasm.executeFunction(nfunc.name, *sargs)
-                        } else {
-                            //println("INVOKE: ${method.name} : ${func.name} : args=${args?.toList()}, ret=${nfunc.ret}")
-                            return when (nfunc.ret) {
-                                Unit::class -> func?.invokeVoid(args)
-                                Int::class -> func?.invokeInt(args)
-                                Float::class -> func?.invokeFloat(args)
-                                Double::class -> func?.invokeDouble(args)
-                                else -> func?.invoke((nfunc.ret as KClass<*>).java, args)
-                            }
-                        }
-                    }
-                })
+            nfunc.name to createFunction(nfunc.name, nfunc.type)
         }
     }
 
@@ -72,31 +115,17 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
     override fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)
     override fun freeBytes(vararg ptrs: Int) = wasm.free(*ptrs)
 
+    override fun <T> wasmFuncPointer(address: Int, type: KType): T =
+        createWasmFunctionToPlainFunctionIndirect(wasm, address, type)
+
     override fun close() {
         if (libWasm != null) {
             wasm.close()
         }
     }
-
-    override fun <T> castToFunc(ptr: FFIPointer?, funcInfo: BaseLib.FuncInfo<T>): T {
-        TODO()
-    }
-}
-
-actual typealias FFIPointer = Pointer
-
-actual fun FFIPointer.getStringz(): String {
-    return this.getString(0L)
-}
-
-actual val FFIPointer?.str: String get() = this.toString()
-actual fun FFIPointer.readInts(size: Int, offset: Int): IntArray {
-    return this.getIntArray(0L, size)
 }
 
 private val PATHS: List<String> by lazy { System.getenv("PATH").split(File.pathSeparatorChar) }
-
-
 
 object DenoWasmProcessStdin {
     val temp = System.getProperty("java.io.tmpdir")
@@ -136,6 +165,7 @@ class DenoWASM(val io: DenoWasmIO, val streamId: Int, val wasmModuleBytes: ByteA
     fun free(vararg ptrs: Int) { io.free(streamId, *ptrs) }
     fun readBytes(ptr: Int, len: Int): ByteArray = io.readBytes(streamId, ptr, len)
     fun executeFunction(name: String, vararg params: Any?): Any? = io.executeFunction(streamId, name, *params)
+    fun executeFunctionIndirect(address: Int, vararg params: Any?): Any? = io.executeFunctionIndirect(streamId, address, *params)
 
     override fun close() { io.unloadWASM(streamId) }
 }
@@ -193,6 +223,13 @@ class DenoWasmIO(
         val resultBytes = writeReadMessage(1030, streamId, Json.stringify(mapOf("func" to name, "params" to params.toList())).encodeToByteArray())
         val data = resultBytes.decodeToString()
         if (debug) println("CMD:executeFunction:name=$name, params=${params.toList()}")
+        return Json.parse(data)
+    }
+
+    fun executeFunctionIndirect(streamId: Int, address: Int, vararg params: Any?): Any? {
+        val resultBytes = writeReadMessage(1030, streamId, Json.stringify(mapOf("indirect" to address, "params" to params.toList())).encodeToByteArray())
+        val data = resultBytes.decodeToString()
+        if (debug) println("CMD:executeFunctionIndirect:address=$address, params=${params.toList()}")
         return Json.parse(data)
     }
 
@@ -405,7 +442,11 @@ function readAndProcessPacket(
       if (debug) console.error("!!CMD: executeFunction...", json);
       let result = null;
       try {
-        result = wasmModule.exports[json.func](...json.params);
+        if (json.indirect !== undefined) {
+            result = wasmModule.exports.__indirect_function_table.get(json.indirect)(...json.params);
+        } else {
+            result = wasmModule.exports[json.func](...json.params);
+        }
       } catch (e) {
         console.warn(e);
         console.warn(e.stack);

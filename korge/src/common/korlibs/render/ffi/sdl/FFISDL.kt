@@ -27,10 +27,8 @@ object SDL : FFILib(
     val SDL_PumpEvents: () -> Unit by func()
     val SDL_PollEvent: (IntArray) -> Boolean by func()
     val SDL_WaitEventTimeout: (IntArray, Int) -> Int by func()
-
-    init {
-        finalize()
-    }
+    val SDL_GL_LoadLibrary: (String?) -> Int by func()
+    val SDL_GL_GetProcAddress: (String) -> FFIPointer? by func()
 }
 
 const val SDL_WINDOWPOS_CENTERED = 0x2FFF0000

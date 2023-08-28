@@ -58,7 +58,6 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
         val CFDataGetLength: (FFIPointer?) -> Int by func()
         //val memcpy: ("buffer", FFIPointer?, "usize") -> FFIPointer? by func()
         val CFRelease: (FFIPointer?) -> Unit by func()
-        init { finalize() }
     }
 
     private object CoreGraphics : FFILib("CoreGraphics") {
@@ -74,14 +73,12 @@ object FFICoreGraphicsImageFormatProvider : BaseNativeImageFormatProvider() {
         val CGContextFlush: (FFIPointer?) -> Unit by func()
         //val CGContextDrawImage: (FFIPointer?, DoubleArray, FFIPointer?) -> Unit by func()
         val CGContextDrawImage: (FFIPointer?, Double, Double, Double, Double, FFIPointer?) -> Unit by func()
-        init { finalize() }
     }
 
     private object ImageIO : FFILib("ImageIO") {
         val CGImageSourceCreateWithData: (FFIPointer?, FFIPointer?) -> FFIPointer? by func()
         val CGImageSourceCopyPropertiesAtIndex: (FFIPointer?, Int, FFIPointer?) -> FFIPointer? by func()
         val CGImageSourceCreateImageAtIndex: (FFIPointer?, Int, FFIPointer?) -> FFIPointer? by func()
-        init { finalize() }
     }
 
     private fun getIntFromDict(props: FFIPointer?, key: String): Int {
