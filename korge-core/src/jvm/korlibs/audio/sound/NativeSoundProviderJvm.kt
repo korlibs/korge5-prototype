@@ -4,6 +4,7 @@ import korlibs.logger.*
 import korlibs.memory.*
 import korlibs.audio.sound.backend.*
 import korlibs.audio.sound.impl.jna.*
+import korlibs.audio.sound.impl.jna.OpenALException
 import korlibs.io.time.*
 
 private val logger = Logger("NativeSoundProviderJvm")

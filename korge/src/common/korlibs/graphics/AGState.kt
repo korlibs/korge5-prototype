@@ -7,7 +7,6 @@ import korlibs.image.color.*
 import korlibs.io.lang.*
 import korlibs.math.geom.*
 import korlibs.memory.*
-import korlibs.memory.pack.*
 
 inline class AGReadKind(val ordinal: Int) {
     companion object {
@@ -618,7 +617,9 @@ inline class AGSize(val data: Int) {
     }
 }
 
-inline class AGScissor(val data: Short4LongPack) {
+private fun Short4LongPack(x: Short, y: Short, z: Short, w: Short): Long = (x.toUShort().toLong() shl 0) or (y.toUShort().toLong() shl 16) or (z.toUShort().toLong() shl 32) or (w.toUShort().toLong() shl 48)
+
+inline class AGScissor(val data: Long) {
     val isNIL: Boolean get() = this == NIL
     val isNotNIL: Boolean get() = !isNIL
 
@@ -626,10 +627,10 @@ inline class AGScissor(val data: Short4LongPack) {
     constructor(x: Float, y: Float, width: Float, height: Float) : this(x.toIntRound(), y.toIntRound(), width.toIntRound(), height.toIntRound())
     constructor(rect: Rectangle) : this(rect.x.toIntRound(), rect.y.toIntRound(), rect.width.toIntRound(), rect.height.toIntRound())
 
-    val left: Int get() = data.x.toInt()
-    val top: Int get() = data.y.toInt()
-    val right: Int get() = data.z.toInt()
-    val bottom: Int get() = data.w.toInt()
+    val left: Int get() = (data ushr 0).toShort().toInt()
+    val top: Int get() = (data ushr 16).toShort().toInt()
+    val right: Int get() = (data ushr 32).toShort().toInt()
+    val bottom: Int get() = (data ushr 48).toShort().toInt()
 
     val x: Int get() = left
     val y: Int get() = top
