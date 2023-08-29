@@ -1,5 +1,6 @@
 package korlibs.audio.sound
 
+import korlibs.audio.sound.backend.FFIALSANativeSoundProvider
 import korlibs.audio.sound.backend.FFIOpenALNativeSoundProvider
 import korlibs.datastructure.FloatArrayDeque
 import korlibs.io.async.delay
@@ -14,7 +15,12 @@ import kotlin.coroutines.CoroutineContext
 
 actual val nativeSoundProvider: NativeSoundProvider by lazy {
 	when {
-		Platform.isJsDenoJs -> FFIOpenALNativeSoundProvider()
+		Platform.isJsDenoJs -> {
+			when {
+				Platform.isLinux -> FFIALSANativeSoundProvider
+				else -> FFIOpenALNativeSoundProvider()
+			}
+		}
 		Platform.isJsBrowser -> HtmlNativeSoundProvider()
 		else -> DummyNativeSoundProvider
 	}

@@ -133,6 +133,7 @@ open class GameWindowCoroutineDispatcher : CoroutineDispatcher(), Delay, Closeab
         while (!completed) {
             executePending(256.milliseconds)
             if (completed) break
+            @OptIn(ExperimentalStdlibApi::class)
             blockingSleep(1.milliseconds)
         }
         if (finalException != null) {
@@ -929,6 +930,7 @@ open class EventLoopGameWindow : GameWindow() {
         val delay = frameTime - (now % frameTime)
         if (delay > 0.0.milliseconds) {
             //println(delayNanos / 1_000_000)
+            @OptIn(ExperimentalStdlibApi::class)
             blockingSleep(delay)
         }
     }
@@ -943,6 +945,7 @@ open class EventLoopGameWindow : GameWindow() {
 
     protected fun doSmallSleep() {
         if (!vsync) {
+            @OptIn(ExperimentalStdlibApi::class)
             blockingSleep(0.1.milliseconds)
         }
     }

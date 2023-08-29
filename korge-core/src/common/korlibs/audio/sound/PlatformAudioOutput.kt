@@ -68,6 +68,7 @@ abstract class ThreadBasedPlatformAudioOutput(
             }
             if (written == 0) {
                 println("ThreadBasedPlatformAudioOutput.nothingWritten: offset=$offset, pending=$pending, written=$written")
+                @OptIn(ExperimentalStdlibApi::class)
                 blockingSleep(1.milliseconds)
                 nonAdvancingCount++
             }
@@ -88,6 +89,7 @@ abstract class ThreadBasedPlatformAudioOutput(
                 while (running) {
                     val totalRead = readSamples(temp)
                     if (totalRead == 0) {
+                        @OptIn(ExperimentalStdlibApi::class)
                         blockingSleep(1.milliseconds)
                         continue
                     }

@@ -15,7 +15,7 @@ private val nativeSoundProviderDeferred: NativeSoundProvider by lazy {
     try {
         traceTime("SoundProvider") {
             when {
-                Platform.isLinux -> alsaNativeSoundProvider
+                Platform.isLinux -> FFIALSANativeSoundProvider
                 Platform.isApple -> jvmCoreAudioNativeSoundProvider
                 Platform.isWindows -> jvmWaveOutNativeSoundProvider
                 else -> JnaOpenALNativeSoundProvider()
