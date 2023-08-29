@@ -30,7 +30,11 @@ import java.io.*
  * ```
  */
 fun assertEqualsJvmFileReference(path: String, content: String, trim: Boolean = true) {
-    val bases = listOf(File("test/resources"), File("src/jvmTest/resources"))
+    val bases = listOf(
+        File("test/resources"),
+        File("src/jvmTest/resources"),
+        File("testresources"),
+    )
     val base = bases.firstOrNull { it.isDirectory } ?: error("Can't find base from $bases")
     val file = File(base, path).absoluteFile
     if (System.getenv("UPDATE_TEST_REF") == "true") {

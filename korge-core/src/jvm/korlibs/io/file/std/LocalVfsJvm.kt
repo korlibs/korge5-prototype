@@ -97,11 +97,13 @@ class JvmClassLoaderResourcesVfs(val classLoader: ClassLoader) : MergedVfs(name 
                 localCurrentDirVfs["src/commonMain/resources"],
                 localCurrentDirVfs["src/jvmMain/resources"],
                 localCurrentDirVfs["src/resources"],
+                localCurrentDirVfs["srcresources"],
                 localCurrentDirVfs["resources"],
                 localCurrentDirVfs["jvmResources"],
                 localCurrentDirVfs["src/commonTest/resources"],
                 localCurrentDirVfs["src/jvmTest/resources"],
                 localCurrentDirVfs["test/resources"],
+                localCurrentDirVfs["testresources"],
             )) {
                 if (folder.exists() && folder.isDirectory()) {
                     this += folder.jail()
@@ -114,6 +116,8 @@ class JvmClassLoaderResourcesVfs(val classLoader: ClassLoader) : MergedVfs(name 
                     srcDir["jvmMain/resources"],
                     srcDir["commonTest/resources"],
                     srcDir["jvmTest/resources"],
+                    srcDir["srcresources"],
+                    srcDir["testresources"],
                     // Korge
                     srcDir["../build/genMainResources"],
                     srcDir["../build/genTestResources"]
