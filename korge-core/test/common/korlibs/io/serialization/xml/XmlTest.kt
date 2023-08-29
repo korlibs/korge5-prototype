@@ -5,7 +5,7 @@ import korlibs.io.stream.*
 import kotlin.test.*
 
 class XmlTest {
-	@kotlin.test.Test
+	@Test
 	fun name() {
 		val xml = Xml("<hello a=\"10\" Zz='20'><demo c='7' /></hello>")
 		assertEquals(10, xml.int("a"))
@@ -17,17 +17,17 @@ class XmlTest {
 		assertEquals("""<hello a="10" Zz="20"><demo c="7"/></hello>""", xml.toString())
 	}
 
-	@kotlin.test.Test
+	@Test
 	fun name2() {
 		val xml = Xml("<a_b />")
 	}
 
-	@kotlin.test.Test
+	@Test
 	fun name3() {
 		assertEquals("""<test z="1" b="2"/>""", Xml.Tag("test", linkedMapOf("z" to 1, "b" to 2), listOf()).outerXml)
 	}
 
-	@kotlin.test.Test
+	@Test
 	fun name4() {
 		Xml(
 			"""
@@ -152,5 +152,12 @@ class XmlTest {
             """.trimIndent(),
             xml.take(10).toList().joinToString("\n")
         )
+    }
+
+    @Test
+    fun testEntities() {
+        assertEquals("&", Xml.Entities.decode("&amp;"))
+        assertEquals("’", Xml.Entities.decode("&#8217;"))
+        assertEquals("’", Xml.Entities.decode("&#x2019;"))
     }
 }
