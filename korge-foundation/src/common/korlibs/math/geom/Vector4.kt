@@ -1,10 +1,12 @@
 package korlibs.math.geom
 
-import korlibs.memory.pack.*
-import korlibs.math.internal.*
+import korlibs.math.internal.niceStr
 import korlibs.math.isAlmostEquals
-import korlibs.memory.*
-import kotlin.math.*
+import korlibs.memory.clamp
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
 
 //@KormaValueApi
 //inline class Vector4(val data: Float4) {
