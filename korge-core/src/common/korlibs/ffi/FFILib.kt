@@ -126,6 +126,11 @@ interface FFILibSym : Closeable {
     override fun close() {}
 }
 
+class FuncType(val params: List<KType?>, val ret: KType?) {
+    val paramsClass = params.map { it?.classifier }
+    val retClass = ret?.classifier
+}
+
 abstract class BaseLib(val lazyCreate: Boolean = true) {
     val functions = arrayListOf<FuncDelegate<*>>()
     open protected fun createFFILibSym(): FFILibSym =  FFILibSym(this)
@@ -138,11 +143,11 @@ abstract class BaseLib(val lazyCreate: Boolean = true) {
     val loaded: Boolean get() = true
 
     companion object {
-        fun extractTypeFunc(type: KType): Pair<List<KClassifier?>, KClassifier?> {
-            val generics = type.arguments.map { it.type?.classifier }
+        fun extractTypeFunc(type: KType): FuncType {
+            val generics = type.arguments.map { it.type }
             val ret = generics.last()
             val params = generics.dropLast(1)
-            return params to ret
+            return FuncType(params, ret)
         }
 
     }
@@ -150,8 +155,8 @@ abstract class BaseLib(val lazyCreate: Boolean = true) {
     class FuncDelegate<T>(val base: BaseLib, val name: String, val type: KType) : ReadOnlyProperty<BaseLib, T> {
         val parts = extractTypeFunc(type)
         //val generics = type.arguments.map { it.type?.classifier }
-        val params = parts.first
-        val ret = parts.second
+        val params = parts.paramsClass
+        val ret = parts.retClass
         var cached: T? = null
         override fun getValue(thisRef: BaseLib, property: KProperty<*>): T {
             if (cached == null) cached = base.sym.get(name, type)

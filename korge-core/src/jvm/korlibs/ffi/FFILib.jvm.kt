@@ -8,11 +8,14 @@ import korlibs.datastructure.lock.Lock
 import korlibs.io.file.sync.*
 import korlibs.io.serialization.json.Json
 import korlibs.memory.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import java.io.Closeable
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.reflect.Proxy
+import java.util.concurrent.Executors
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
@@ -55,7 +58,7 @@ actual fun <T> FFIPointer.castToFunc(type: KType): T =
     createJNAFunctionToPlainFunc(Function.getFunction(this), type)
 
 fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: KType): T {
-    val (params, ret) = BaseLib.extractTypeFunc(type)
+    val ftype = BaseLib.extractTypeFunc(type)
 
     return Proxy.newProxyInstance(
         FFILibSymJVM::class.java.classLoader,
@@ -68,18 +71,36 @@ fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: 
                 else -> it
             }
         }.toTypedArray()
-        when (ret) {
-            Unit::class -> func.invokeVoid(targs)
-            Int::class -> func.invokeInt(targs)
-            Float::class -> func.invokeFloat(targs)
-            Double::class -> func.invokeDouble(targs)
-            else -> func.invoke((ret as KClass<*>).java, targs)
+
+        var ret = ftype.retClass
+        val isDeferred = ret == Deferred::class
+        if (isDeferred) {
+            ret = ftype.ret?.arguments?.first()?.type?.classifier
+        }
+
+        fun call(): Any? {
+            return when (ret) {
+                Unit::class -> func.invokeVoid(targs)
+                Int::class -> func.invokeInt(targs)
+                Float::class -> func.invokeFloat(targs)
+                Double::class -> func.invokeDouble(targs)
+                else -> func.invoke((ftype.retClass as KClass<*>).java, targs)
+            }
+        }
+
+        if (isDeferred) {
+            CompletableDeferred<Any?>().also { value ->
+                Executors.newCachedThreadPool().execute { value.complete(call()) }
+                //value.complete(call())
+            }
+        } else {
+            call()
         }
     } as T
 }
 
 fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunction(wasm: DenoWASM, funcName: String, type: KType): T {
-    val (params, ret) = BaseLib.extractTypeFunc(type)
+    val ftype = BaseLib.extractTypeFunc(type)
     return Proxy.newProxyInstance(
         FFILibSymJVM::class.java.classLoader,
         arrayOf((type.classifier as KClass<*>).java)
@@ -91,7 +112,7 @@ fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunction(wasm: DenoWASM, f
 }
 
 fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunctionIndirect(wasm: DenoWASM, address: Int, type: KType): T {
-    val (params, ret) = BaseLib.extractTypeFunc(type)
+    val ftype = BaseLib.extractTypeFunc(type)
     return Proxy.newProxyInstance(
         FFILibSymJVM::class.java.classLoader,
         arrayOf((type.classifier as KClass<*>).java)

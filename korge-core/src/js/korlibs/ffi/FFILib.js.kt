@@ -9,15 +9,27 @@ import korlibs.memory.Buffer
 import korlibs.memory._high
 import korlibs.memory._low
 import korlibs.memory.fromLowHigh
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.asDeferred
 import org.khronos.webgl.*
+import kotlin.js.Promise
 import kotlin.reflect.*
 
-fun KType.toDenoDef(): dynamic {
-    val (params, ret) = BaseLib.extractTypeFunc(this)
+fun KType.funcToDenoDef(): dynamic {
+    val ftype = BaseLib.extractTypeFunc(this)
     return def(
-        ret?.toDenoFFI(ret = true),
-        *params.map { it?.toDenoFFI(ret = false) }.toTypedArray()
+        ftype.ret?.toDenoFFI(ret = true),
+        *ftype.params.map { it?.toDenoFFI(ret = false) }.toTypedArray(),
+        nonblocking = ftype.retClass == Deferred::class
     )
+}
+
+fun KType.toDenoFFI(ret: Boolean): dynamic {
+    if (this.classifier == Deferred::class) {
+        return this.arguments.first().type?.classifier?.toDenoFFI(ret)
+    } else {
+        return this?.classifier?.toDenoFFI(ret)
+    }
 }
 
 fun KClassifier.toDenoFFI(ret: Boolean): dynamic {
@@ -131,7 +143,7 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
                 Deno.dlopen<dynamic>(
                     path, jsObject(
                         *lib.functions.map {
-                            it.name to it.type.toDenoDef()
+                            it.name to it.type.funcToDenoDef()
                         }.toTypedArray()
                     )
                 ).symbols
@@ -178,10 +190,11 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
 
 // @TODO: Optimize this
 private fun preprocessFunc(type: KType, func: dynamic, name: String?): dynamic {
-    val (params, ret) = BaseLib.extractTypeFunc(type)
-    val convertToString = ret == String::class
+    val ftype = BaseLib.extractTypeFunc(type)
+    val convertToString = ftype.retClass == String::class
     return {
         val arguments = js("(arguments)")
+        val params = ftype.paramsClass
         for (n in 0 until params.size) {
             val param = params[n]
             var v = arguments[n]
@@ -199,13 +212,18 @@ private fun preprocessFunc(type: KType, func: dynamic, name: String?): dynamic {
         try {
             val result = func.apply(null, arguments)
             //console.log("result", result)
-            when {
+            val res2 = when {
                 result == null -> null
                 convertToString -> {
                     val ptr = (result.unsafeCast<DenoPointer>())
                     getCString(ptr)
                 }
                 else -> result
+            }
+            if (res2 is Promise<*>) {
+                (res2.unsafeCast<Promise<*>>()).asDeferred()
+            } else {
+                res2
             }
         } catch (e: dynamic) {
             println("ERROR calling[$name]: $type : ${JsArray.from(arguments).toList()}")
@@ -292,7 +310,7 @@ actual fun FFIPointer.getIntArray(size: Int, offset: Int): IntArray {
 }
 
 actual fun <T> FFIPointer.castToFunc(type: KType): T {
-    val def = type.toDenoDef()
+    val def = type.funcToDenoDef()
     val res = Deno.UnsafeFnPointer(this, def)
     //console.log("castToFunc.def=", def, "res=", res)
     val func: dynamic = {

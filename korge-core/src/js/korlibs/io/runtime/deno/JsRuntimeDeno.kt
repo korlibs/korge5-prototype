@@ -19,8 +19,8 @@ import org.w3c.dom.url.URL
 import kotlin.js.Promise
 
 
-fun def(result: dynamic, vararg params: dynamic): dynamic =
-    jsObject("parameters" to params, "result" to result)
+fun def(result: dynamic, vararg params: dynamic, nonblocking: Boolean = false): dynamic =
+    jsObject("parameters" to params, "result" to result, "nonblocking" to nonblocking)
 
 /*
 val denoBase = Deno.dlopen<dynamic>(
