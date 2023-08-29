@@ -143,6 +143,10 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
     override fun writeBytes(pos: Int, data: ByteArray) = wasm.writeBytes(pos, data)
     override fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)
     override fun freeBytes(vararg ptrs: Int) = wasm.free(*ptrs)
+    override fun stackSave(): Int = wasm.stackSave()
+    override fun stackRestore(ptr: Int) = wasm.stackRestore(ptr)
+    override fun stackAlloc(size: Int): Int = wasm.stackAlloc(size)
+    override fun stackAllocAndWrite(bytes: ByteArray): Int = wasm.stackAllocAndWrite(bytes)
 
     override fun <T> wasmFuncPointer(address: Int, type: KType): T =
         createWasmFunctionToPlainFunctionIndirect(wasm, address, type)
@@ -189,10 +193,17 @@ class DenoWASM(val io: DenoWasmIO, val streamId: Int, val wasmModuleBytes: ByteA
     }
     //fun open(bytes: ByteArray) { io.loadWASM(streamId, bytes) }
 
-    fun writeBytes(ptr: Int, bytes: ByteArray) { io.writeBytes(streamId, ptr, bytes) }
     fun allocAndWrite(bytes: ByteArray): Int = io.allocAndWrite(streamId, bytes)
     fun free(vararg ptrs: Int) { io.free(streamId, *ptrs) }
+
+    fun stackSave(): Int = io.stackSave(streamId)
+    fun stackRestore(ptr: Int) = io.stackRestore(streamId, ptr)
+    fun stackAlloc(size: Int): Int = io.stackAlloc(streamId, size)
+    fun stackAllocAndWrite(bytes: ByteArray): Int = io.stackAllocAndWrite(streamId, bytes)
+
+    fun writeBytes(ptr: Int, bytes: ByteArray) { io.writeBytes(streamId, ptr, bytes) }
     fun readBytes(ptr: Int, len: Int): ByteArray = io.readBytes(streamId, ptr, len)
+
     fun executeFunction(name: String, vararg params: Any?): Any? = io.executeFunction(streamId, name, *params)
     fun executeFunctionIndirect(address: Int, vararg params: Any?): Any? = io.executeFunctionIndirect(streamId, address, *params)
 
@@ -240,6 +251,23 @@ class DenoWasmIO(
         if (debug) println("CMD:free:ptrs=${ptrs.toList()}")
     }
 
+    fun stackSave(streamId: Int): Int {
+        return writeReadMessage(1013, streamId, ByteArray(0)).readS32LE(0)
+    }
+    fun stackRestore(streamId: Int, ptr: Int) {
+        val payload = ByteArray(4)
+        payload.write32LE(0, ptr)
+        writeReadMessage(1014, streamId, payload)
+    }
+    fun stackAlloc(streamId: Int, size: Int): Int {
+        val payload = ByteArray(4)
+        payload.write32LE(0, size)
+        return writeReadMessage(1015, streamId, payload).readS32LE(0)
+    }
+    fun stackAllocAndWrite(streamId: Int, bytes: ByteArray): Int {
+        return writeReadMessage(1016, streamId, bytes).readS32LE(0)
+    }
+
     fun readBytes(streamId: Int, ptr: Int, len: Int): ByteArray {
         val payload = ByteArray(8)
         payload.write32LE(0, ptr)
@@ -250,9 +278,9 @@ class DenoWasmIO(
 
     fun executeFunction(streamId: Int, name: String, vararg params: Any?): Any? {
         val resultBytes = writeReadMessage(1030, streamId, Json.stringify(mapOf("func" to name, "params" to params.toList())).encodeToByteArray())
-        val data = resultBytes.decodeToString()
         if (debug) println("CMD:executeFunction:name=$name, params=${params.toList()}")
-        return Json.parse(data)
+        //return if (resultBytes.isEmpty()) null else Json.parse(resultBytes.decodeToString())
+        return if (resultBytes.isEmpty()) Unit else Json.parse(resultBytes.decodeToString())
     }
 
     fun executeFunctionIndirect(streamId: Int, address: Int, vararg params: Any?): Any? {
@@ -321,6 +349,7 @@ private val DenoWasmServerStdinCode = /* language: javascript **/"""
 const isDeno = (typeof Deno) !== "undefined";
 const debugEnv = isDeno ? Deno.env.get("DEBUG") : process.env
 const debug = debugEnv == "true";
+//const debug = true
 const fs = (isDeno) ? null : require('fs');
 
 function readSyncExact(reader, size) {
@@ -453,6 +482,33 @@ function readAndProcessPacket(
       writePacket(writer, new Uint8Array(0));
       break;
     }
+    case 1013: { // stackSave
+      const result = wasmModule.exports.stackSave();
+      if (debug) console.error("!!CMD: stackSave...", "->", result);
+      writePacket(writer, new Uint8Array(new Int32Array([result]).buffer));
+      break;
+    }
+    case 1014: { // stackRestore
+      const [ptr] = new Int32Array(payload.buffer, 0, 1);
+      wasmModule.exports.stackRestore(ptr);
+      if (debug) console.error("!!CMD: stackRestore...", ptr);
+      writePacket(writer, new Uint8Array(0));
+      break;
+    }
+    case 1015: { // stackAlloc
+      const [size] = new Int32Array(payload.buffer, 0, 1);
+      const result = wasmModule.exports.stackAlloc(size);
+      if (debug) console.error("!!CMD: stackAlloc...", size, "->", result);
+      writePacket(writer, new Uint8Array(new Int32Array([result]).buffer));
+      break;
+    }
+    case 1016: { // stackAllocWrite
+      const ptr = wasmModule.exports.stackAlloc(payload.length);
+      wasmModule?.u8?.set(payload, ptr);
+      if (debug) console.error("!!CMD: stackAllocWrite...", payload.length, "->", ptr);
+      writePacket(writer, new Uint8Array(new Int32Array([ptr]).buffer));
+      break;
+    }
     case 1020: { // readBytes
       const info = new Int32Array(payload.buffer);
       const offset = info[0];
@@ -477,10 +533,11 @@ function readAndProcessPacket(
             result = wasmModule.exports[json.func](...json.params);
         }
       } catch (e) {
-        console.warn(e);
-        console.warn(e.stack);
+        console.error(e);
+        console.error(e.stack);
       }
       const resultPayload = new TextEncoder().encode(JSON.stringify(result));
+      if (debug) console.error("    -->", result, resultPayload);
       writePacket(writer, resultPayload);
       break;
     }
@@ -490,8 +547,8 @@ function readAndProcessPacket(
 }
 
 function unhandledrejection(event) {
-  console.warn(`UNHANDLED PROMISE REJECTION: ${'$'}{event.reason}`);
-  console.warn(event.reason.stack);
+  console.error(`UNHANDLED PROMISE REJECTION: ${'$'}{event.reason}`);
+  console.error(event.reason.stack);
   event.preventDefault();
 }
 

@@ -4,8 +4,6 @@ import korlibs.datastructure.FloatArrayDeque
 import korlibs.time.milliseconds
 import korlibs.time.seconds
 import korlibs.memory.*
-import korlibs.audio.internal.SampleConvert
-import korlibs.audio.internal.write
 import korlibs.io.async.delay
 import korlibs.io.lang.Cancellable
 import korlibs.io.lang.cancel
@@ -117,7 +115,7 @@ class JsPlatformAudioOutput(coroutineContext: CoroutineContext, val freq: Int) :
 				val sample = samples[channel % schannels]
 				val deque = deques[channel]
 				for (n in 0 until size) {
-					deque.write(SampleConvert.shortToFloat(sample[offset + n]))
+					deque.writeOne(SampleConvert.shortToFloat(sample[offset + n]))
 				}
 			}
 

@@ -20,7 +20,7 @@ class KorauTest {
     //fun decodeMp3() = suspendTest {
     //    println("[a]")
     //    //val data = Mp3DecodeAudioFormat.decode(resourcesVfs["mp31.mp3"].open())
-    //    val data = MP3Decoder.decode(resourcesVfs["mp31.mp3"].open())
+    //    val data = MP3.decode(resourcesVfs["mp31.mp3"].open())
     //    println("[b]")
     //    localCurrentDirVfs["mp31.mp3.raw"].writeBytes(data!!.samples.toByteArrayLE())
     //    println("[c]")

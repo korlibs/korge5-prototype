@@ -115,6 +115,12 @@ interface FFILibSym : Closeable {
     fun writeBytes(pos: Int, data: ByteArray): Unit = TODO()
     fun allocBytes(bytes: ByteArray): Int = TODO()
     fun freeBytes(vararg ptrs: Int): Unit = TODO()
+
+    fun stackSave(): Int = TODO()
+    fun stackRestore(ptr: Int): Unit = TODO()
+    fun stackAlloc(size: Int): Int = TODO()
+    fun stackAllocAndWrite(bytes: ByteArray): Int = stackAlloc(bytes.size).also { writeBytes(it, bytes) }
+
     fun <T> wasmFuncPointer(address: Int, type: KType): T = TODO()
     fun <T> get(name: String, type: KType): T = TODO()
     override fun close() {}
@@ -177,8 +183,39 @@ open class WASMLib(val content: ByteArray) : BaseLib() {
     val malloc: (Int) -> Int by func()
     val free: (Int) -> Unit by func()
 
-    fun readBytes(pos: Int, size: Int): ByteArray = sym.readBytes(pos, size)
+    inline fun <T> stackKeep(block: () -> T): T {
+        val ptr = stackSave()
+        try {
+            return block()
+        } finally {
+            stackRestore(ptr)
+        }
+    }
+
+    fun readBytes(pos: Int, size: Int): ByteArray {
+        val out = sym.readBytes(pos, size)
+        check(out.size == size) { "${out.size} == $size" }
+        return out
+    }
+    fun readShorts(pos: Int, size: Int): ShortArray {
+        val bytes = readBytes(pos, size * 2)
+        return ShortArray(size) { bytes.readS16LE(it * 2).toShort() }
+    }
+    fun readInts(pos: Int, size: Int): IntArray {
+        val bytes = readBytes(pos, size * 4)
+        return IntArray(size) { bytes.readS32LE(it * 4) }
+    }
+
     fun writeBytes(pos: Int, data: ByteArray) = sym.writeBytes(pos, data)
+    fun writeShorts(pos: Int, data: ShortArray) = writeBytes(pos, data.toByteArray())
+    fun writeInts(pos: Int, data: IntArray) = writeBytes(pos, data.toByteArray())
+
+    fun ShortArray.toByteArray(): ByteArray = ByteArray(this.size * 2).also { out ->
+        for (n in 0 until this.size) out.write16LE(n * 2, this[n].toInt())
+    }
+    fun IntArray.toByteArray(): ByteArray = ByteArray(this.size * 4).also { out ->
+        for (n in 0 until this.size) out.write16LE(n * 4, this[n].toInt())
+    }
 
     fun allocBytes(bytes: ByteArray): Int {
         return sym.allocBytes(bytes)
@@ -190,6 +227,17 @@ open class WASMLib(val content: ByteArray) : BaseLib() {
     fun freeBytes(vararg ptrs: Int) {
         sym.freeBytes(*ptrs)
     }
+
+    //val stackSave: () -> Int by func()
+    //val stackRestore: (ptr: Int) -> Unit by func()
+    //val stackAlloc: (size: Int) -> Int by func()
+
+    fun stackSave(): Int = sym.stackSave()
+    fun stackRestore(ptr: Int): Unit = sym.stackRestore(ptr)
+    fun stackAlloc(size: Int): Int = sym.stackAlloc(size)
+    fun stackAllocAndWrite(bytes: ByteArray): Int = sym.stackAllocAndWrite(bytes)
+    fun stackAllocAndWrite(data: ShortArray): Int = sym.stackAllocAndWrite(data.toByteArray())
+    fun stackAllocAndWrite(data: IntArray): Int = sym.stackAllocAndWrite(data.toByteArray())
 
     fun <T : Function<*>> funcPointer(address: Int, type: KType): T {
         return sym.wasmFuncPointer(address, type)

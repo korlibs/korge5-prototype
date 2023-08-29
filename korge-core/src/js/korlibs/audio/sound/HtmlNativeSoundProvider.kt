@@ -3,7 +3,6 @@ package korlibs.audio.sound
 import korlibs.time.TimeSpan
 import korlibs.time.seconds
 import korlibs.audio.format.AudioDecodingProps
-import korlibs.audio.internal.SampleConvert
 import korlibs.io.file.Vfs
 import korlibs.io.file.std.LocalVfs
 import korlibs.io.file.std.UrlVfs

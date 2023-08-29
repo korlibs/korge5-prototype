@@ -120,6 +120,9 @@ class FFILibSymJS(val lib: BaseLib) : FFILibSym {
     override fun freeBytes(vararg ptrs: Int) {
         for (ptr in ptrs) if (ptr != 0) wasmExports["free"](ptr)
     }
+    override fun stackSave(): Int = wasmExports.stackSave()
+    override fun stackRestore(ptr: Int): Unit = wasmExports.stackRestore(ptr)
+    override fun stackAlloc(size: Int): Int = wasmExports.stackAlloc(size)
 
     val syms: dynamic by lazy {
         lib as FFILib

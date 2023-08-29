@@ -1,7 +1,9 @@
+import korlibs.audio.format.MP3
+import korlibs.audio.sound.readSound
+import korlibs.audio.sound.toSound
 import korlibs.crypto.encoding.fromBase64
 import korlibs.ffi.*
 import korlibs.image.format.*
-import korlibs.image.format.providers.FFISDLImageNativeImageFormatProvider
 import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.view.*
@@ -65,14 +67,15 @@ object SimpleWASM3 : WASMLib("AGFzbQEAAAABGgRgAn9/AX9gAX8Bf2AEf39/fwBgA39/fwF/Ag
 }
 
 suspend fun main4() {
+    val data = MP3.decode(resourcesVfs["demo.mp3"].readBytes())
+    data?.toSound()?.play()
+    println("data=$data")
     //SDL.SDL_InitSubSystem(0x00000020)
     //SDL.SDL_GL_LoadLibrary(null)
     //println("ADDRESS: " + SDL.SDL_GL_GetProcAddress("glEnable")?.address)
 
     //val bytes = resourcesVfs["Exif5-2x.avif"].readBytes()
     //val bytes = resourcesVfs["bubble-chat.9.png"].readBytes()
-
-    println(FFISDLImageNativeImageFormatProvider.decode(resourcesVfs["bubble-chat.9.png"].readBytes()))
 
     //println(nativeImageFormatProvider.decode(bytes))
     //resourcesVfs["Exif5-2x.avif"].readBitmap()
@@ -97,7 +100,13 @@ suspend fun main() = Korge {
     //run { val bytes = resourcesVfs["Exif5-2x.webp"].readBytes(); for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) }) }
     //image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
     image(resourcesVfs["Exif5-2x.webp"].readBitmap(WEBP))
-    image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(100, 100)
+    println(runCatching {
+        image(resourcesVfs["Exif5-2x.avif"].readBitmap()).xy(100, 100)
+    }.exceptionOrNull())
+    //val data = MP3.decode(resourcesVfs["demo.mp3"].readBytes())
+    val sound = resourcesVfs["demo.mp3"].readSound()
+    sound?.play()
+    //data?.toSound()?.play()
 
     /*
     //val WEBP = WEBPImageFormat(resourcesVfs["webp.wasm"])

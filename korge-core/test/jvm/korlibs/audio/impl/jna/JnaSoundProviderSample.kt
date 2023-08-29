@@ -2,7 +2,7 @@ package korlibs.audio.impl.jna
 
 import korlibs.time.seconds
 import korlibs.audio.format.AudioDecodingProps
-import korlibs.audio.format.mp3.MP3Decoder
+import korlibs.audio.format.MP3
 import korlibs.audio.format.readSoundInfo
 import korlibs.audio.sound.SoundChannelGroup
 import korlibs.audio.sound.attachTo
@@ -30,8 +30,8 @@ object JnaSoundProviderSample {
             println(resourcesVfs["monkey_drama.mp3"].cachedToMemory().readSoundInfo(props = AudioDecodingProps(exactTimings = true))?.decodingTime)
             //val data = resourcesVfs["mp31_joint_stereo_vbr.mp3"].readNativeMusic()
             //val data = resourcesVfs["mp31_joint_stereo_vbr.mp3"].readNativeMusic()
-            val stream = resourcesVfs["monkey_drama.mp3"].readAudioStream(MP3Decoder)
-            println(resourcesVfs["monkey_drama.mp3"].readAll().asMemoryVfsFile("temp.mp3").readSoundInfo(MP3Decoder)!!.duration)
+            val stream = resourcesVfs["monkey_drama.mp3"].readAudioStream(MP3)
+            println(resourcesVfs["monkey_drama.mp3"].readAll().asMemoryVfsFile("temp.mp3").readSoundInfo(MP3)!!.duration)
             //val data = resourcesVfs["mp31_joint_stereo_vbr.mp3"].readNativeMusic()
             //val data = resourcesVfs["click.wav"].readNativeMusic()
             //val data = resourcesVfs["click.wav"].readMusic()

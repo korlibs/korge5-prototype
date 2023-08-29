@@ -2,18 +2,23 @@
 
 package korlibs.audio.format
 
-import korlibs.audio.format.mp3.*
-import korlibs.audio.internal.*
-import korlibs.audio.sound.*
-import korlibs.crypto.encoding.*
-import korlibs.datastructure.*
-import korlibs.io.file.*
-import korlibs.io.lang.*
+import korlibs.audio.sound.AudioData
+import korlibs.audio.sound.AudioStream
+import korlibs.audio.sound.toData
+import korlibs.crypto.encoding.hex
+import korlibs.datastructure.Extra
+import korlibs.io.file.PathInfo
+import korlibs.io.file.VfsFile
+import korlibs.io.file.extensionLC
+import korlibs.io.lang.unsupported
 import korlibs.io.stream.*
-import korlibs.time.*
-import kotlinx.coroutines.*
+import korlibs.io.util.niceStr
+import korlibs.time.TimeSpan
+import korlibs.time.seconds
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.native.concurrent.*
+import kotlin.native.concurrent.ThreadLocal
 
 open class AudioFormat(vararg exts: String) {
 	open val extensions: Set<String> = exts.map { it.lowercase().trim() }.toSet()
@@ -156,4 +161,4 @@ class AudioFormats : AudioFormat() {
 suspend fun VfsFile.readSoundInfo(formats: AudioFormat = defaultAudioFormats, props: AudioDecodingProps = AudioDecodingProps.DEFAULT) =
 	this.openUse { formats.tryReadInfo(this, props) }
 
-fun standardAudioFormats(): AudioFormats = AudioFormats(WAV, FastMP3Decoder)
+fun standardAudioFormats(): AudioFormats = AudioFormats(WAV, MP3)

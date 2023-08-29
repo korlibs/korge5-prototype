@@ -1,27 +1,20 @@
 package korlibs.audio.sound
 
-import korlibs.time.measureTime
-import korlibs.time.measureTimeWithResult
-import korlibs.logger.*
-import korlibs.memory.divCeil
-import korlibs.memory.divRound
+import doIOTest
 import korlibs.audio.format.AudioDecodingProps
 import korlibs.audio.format.AudioFormats
-import korlibs.audio.format.mp3.FastMP3Decoder
-import korlibs.audio.format.mp3.MP3Decoder
-import korlibs.audio.format.mp3.javamp3.JavaMp3AudioFormat
-import korlibs.audio.format.mp3.minimp3.Minimp3AudioFormat
-import korlibs.audio.internal.toByteArrayLE
+import korlibs.audio.format.MP3
+import korlibs.crypto.sha1
 import korlibs.io.async.suspendTest
 import korlibs.io.file.std.resourcesVfs
-import korlibs.crypto.sha1
-import doIOTest
-import kotlin.test.Ignore
+import korlibs.logger.*
+import korlibs.memory.divRound
+import korlibs.time.measureTimeWithResult
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SoftMp3DecoderTest {
-    val formats = AudioFormats(FastMP3Decoder)
+    val formats = AudioFormats(MP3)
     val logger = Logger("SoftMp3DecoderTest")
 
     @Test
@@ -29,7 +22,7 @@ class SoftMp3DecoderTest {
         //resourcesVfs["mp31.mp3"].readAudioData(FastMP3Decoder).toSound()
         assertEquals(
             "1,44100,22050,c82a407c8353c9d47c6f499a5195f85809bbbf8a",
-            resourcesVfs["mp31.mp3"].readAudioData(FastMP3Decoder).toFingerprintString()
+            resourcesVfs["mp31.mp3"].readAudioData(MP3).toFingerprintString()
         )
     }
 

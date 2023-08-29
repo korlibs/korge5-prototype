@@ -1,8 +1,11 @@
+//emcc -Oz MiniMp3Program.c -s STANDALONE_WASM --no-entry -s WASM -o MiniMp3Program.wasm
+
 #define MINIMP3_IMPLEMENTATION 1
 #pragma ktcc module MiniMp3Program
 #pragma ktcc package korlibs.audio.format.mp3
 #pragma ktcc visibility internal
 #pragma ktcc runtime common
+#include <emscripten.h>
 
 
 #ifndef MINIMP3_H
@@ -50,7 +53,6 @@ int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, mp3d_s
 #if defined(MINIMP3_IMPLEMENTATION) && !defined(_MINIMP3_IMPLEMENTATION_GUARD)
 #define _MINIMP3_IMPLEMENTATION_GUARD
 
-#include <stdlib.h>
 #include <string.h>
 
 #define MAX_FREE_FORMAT_FRAME_SIZE  2304    /* more than ISO spec's */
@@ -1712,11 +1714,13 @@ static int mp3d_find_frame(const uint8_t *mp3, int mp3_bytes, int *free_format_b
     return mp3_bytes;
 }
 
+EMSCRIPTEN_KEEPALIVE
 void mp3dec_init(mp3dec_t *dec)
 {
     dec->header[0] = 0;
 }
 
+EMSCRIPTEN_KEEPALIVE
 int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, mp3d_sample_t *pcm, mp3dec_frame_info_t *info)
 {
     int i = 0, igr, frame_size = 0, success = 1;

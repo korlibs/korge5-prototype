@@ -1,16 +1,13 @@
 package korlibs.audio.sound
 
-import korlibs.time.milliseconds
-import korlibs.logger.*
-import korlibs.audio.format.AudioFormats
-import korlibs.audio.format.WAV
-import korlibs.audio.format.mp3.FastMP3Decoder
+import doIOTest
 import korlibs.io.async.delay
 import korlibs.io.async.suspendTest
 import korlibs.io.file.std.resourcesVfs
 import korlibs.io.lang.currentThreadId
-import doIOTest
-import korlibs.memory.*
+import korlibs.logger.Logger
+import korlibs.memory.Platform
+import korlibs.time.milliseconds
 import kotlinx.coroutines.CompletableDeferred
 import kotlin.test.Test
 import kotlin.test.assertEquals
