@@ -3,13 +3,16 @@ package korlibs.memory.dyn
 import korlibs.memory.atomic.KmemAtomicRef
 import kotlin.reflect.KProperty
 
+@Deprecated("")
 public abstract class DynamicLibrary(vararg names: String?) : DynamicLibraryBase(names.filterNotNull()) {
 }
 
+@Deprecated("")
 public fun interface DynamicSymbolResolver {
     public fun getSymbol(name: String): KPointer?
 }
 
+@Deprecated("")
 public abstract class DynamicFunBase<T : Function<*>>(public val name: String? = null) {
     private var _set = KmemAtomicRef(false)
     private var _value = KmemAtomicRef<KPointer?>(null)

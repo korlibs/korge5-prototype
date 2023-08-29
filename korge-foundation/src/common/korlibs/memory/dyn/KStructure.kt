@@ -4,11 +4,13 @@ import korlibs.memory.annotations.*
 import kotlin.math.max
 import kotlin.reflect.KProperty
 
+@Deprecated("")
 expect class KArena() {
     fun allocBytes(size: Int): KPointer
     fun clear(): Unit
 }
 
+@Deprecated("")
 inline fun <T> kmemScoped(block: KArena.() -> T): T {
     val arena = KArena()
     try {
@@ -18,14 +20,18 @@ inline fun <T> kmemScoped(block: KArena.() -> T): T {
     }
 }
 
+@Deprecated("")
 expect val POINTER_SIZE: Int
 expect val LONG_SIZE: Int
 
 typealias KNativeLong = KPointer
+@Deprecated("")
 typealias KPointer = KPointerTT<out KPointed>
 //expect class KPointer
 expect abstract class KPointed
+@Deprecated("")
 expect class KPointerTT<T : KPointed>
+@Deprecated("")
 expect class KFunctionTT<T : Function<*>> : KPointed
 //expect class NativeLong
 

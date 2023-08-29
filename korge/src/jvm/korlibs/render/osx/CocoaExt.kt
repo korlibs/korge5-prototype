@@ -2,6 +2,7 @@ package korlibs.render.osx
 
 import korlibs.memory.dyn.*
 
+@Deprecated("")
 class MyNSRect(pointer: KPointer? = null) : KStructure(pointer) {
     var x by nativeFloat()
     var y by nativeFloat()

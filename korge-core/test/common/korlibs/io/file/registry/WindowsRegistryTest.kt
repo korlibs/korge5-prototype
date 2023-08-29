@@ -14,7 +14,7 @@ class WindowsRegistryTest {
     @Test
     @Ignore
     fun testRegistry() = suspendTest({ WindowsRegistry.isSupported }) {
-        assertEquals(WindowsRegistryBase.KEY_MAP.keys.toList().sorted(), WindowsRegistryVfs.root.listNames().sorted())
+        assertEquals(WindowsRegistry.KEY_MAP.keys.toList().sorted(), WindowsRegistryVfs.root.listNames().sorted())
 
         assertTrue { WindowsRegistryVfs["HKEY_CURRENT_USER"].listNames().map { it.lowercase() }.contains("software") }
         assertTrue { WindowsRegistryVfs["HKEY_LOCAL_MACHINE/Software"].listNames().map { it.lowercase() }.contains("windows") }
