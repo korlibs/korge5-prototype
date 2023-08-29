@@ -12,3 +12,4 @@ KorGE Reboot! New features and changes:
 * JS target is isomorphic: generates a single executable that runs in the browser and via cli with Deno executable.
 * Korlibs split rework: `korge-foundation` (kbignum, krypto, kds, korinject, klogger, korma, kmem, klock), `korge-core` (korio, korim, korau, korte & ffi) and `korge` (korev, kgl, korgw, korge)
 * `AsyncInjector` is now a sync `Injector`. Not asynchronous anymore, and thus simpler and faster.
+* Old Korlib artifacts are going to be preserved in the `korlibs4` repository (except for korgw and korge that will be dropped). They will be maintained by the community. Will be kept up to date with Kotlin versions and targets and open to bugfixes, but won't include new features or backports from KorGE 5.
