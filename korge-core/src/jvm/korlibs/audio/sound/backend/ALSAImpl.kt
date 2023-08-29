@@ -1,9 +1,7 @@
-package korlibs.audio.sound.backends
+package korlibs.audio.sound.backend
 
 import korlibs.memory.dyn.*
 import com.sun.jna.*
-import java.util.concurrent.*
-import kotlin.collections.set
 
 actual object ASoundImpl : ASound2 {
     fun Long.toCPointer(): Pointer = Pointer.createConstant(this)

@@ -1,14 +1,11 @@
-package korlibs.image.format.providers
+package korlibs.image.format.provider
 
-import korlibs.image.bitmap.Bitmap
-import korlibs.image.bitmap.NativeImage
 import korlibs.ffi.*
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.format.BaseNativeImageFormatProvider
 import korlibs.image.format.BitmapNativeImage
 import korlibs.image.format.ImageDecodingProps
 import korlibs.image.format.NativeImageResult
-import korlibs.memory.dyn.KStructure
 
 object FFISDLImageNativeImageFormatProvider : BaseNativeImageFormatProvider() {
     private object SDL : FFILib(

@@ -5,7 +5,7 @@ import korlibs.datastructure.*
 import korlibs.image.bitmap.*
 import korlibs.image.color.*
 import korlibs.image.font.*
-import korlibs.image.format.providers.*
+import korlibs.image.format.provider.*
 import korlibs.image.paint.*
 import korlibs.image.vector.*
 import korlibs.image.vector.renderer.*

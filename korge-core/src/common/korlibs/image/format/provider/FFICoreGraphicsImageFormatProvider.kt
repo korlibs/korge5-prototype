@@ -1,4 +1,4 @@
-package korlibs.image.format.providers
+package korlibs.image.format.provider
 
 import korlibs.datastructure.fastCastTo
 import korlibs.ffi.FFILib

@@ -1,4 +1,4 @@
-package korlibs.audio.sound.backends
+package korlibs.audio.sound.backend
 
 import korlibs.memory.dyn.*
 import korlibs.audio.sound.*

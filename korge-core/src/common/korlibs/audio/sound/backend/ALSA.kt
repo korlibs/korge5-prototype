@@ -1,9 +1,7 @@
-package korlibs.audio.sound.backends
+package korlibs.audio.sound.backend
 
-import korlibs.datastructure.lock.*
 import korlibs.datastructure.thread.*
 import korlibs.time.*
-import korlibs.memory.*
 import korlibs.audio.sound.*
 import korlibs.io.async.*
 import kotlin.coroutines.*

@@ -1,6 +1,6 @@
 package korlibs.audio.sound
 
-import korlibs.audio.sound.backends.ffi.FFIOpenALNativeSoundProvider
+import korlibs.audio.sound.backend.FFIOpenALNativeSoundProvider
 import korlibs.datastructure.FloatArrayDeque
 import korlibs.io.async.delay
 import korlibs.io.lang.Cancellable

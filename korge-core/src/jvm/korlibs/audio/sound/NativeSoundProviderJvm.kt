@@ -2,7 +2,7 @@ package korlibs.audio.sound
 
 import korlibs.logger.*
 import korlibs.memory.*
-import korlibs.audio.sound.backends.*
+import korlibs.audio.sound.backend.*
 import korlibs.audio.sound.impl.jna.*
 import korlibs.io.time.*
 
