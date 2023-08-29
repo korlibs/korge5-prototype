@@ -25,7 +25,7 @@ data class KorgeScreenshotTestingContext(
     val testClassName: String,
     val testMethodName: String,
 ) {
-    val testGoldensVfs = localCurrentDirVfs["testGoldens/${testClassName}"]
+    val testGoldensVfs = localCurrentDirVfs["testresources/testGoldens/${testClassName}"]
     private val localTestTime = DateTime.nowLocal()
     val tempGoldensVfs =
         localCurrentDirVfs["build/tmp/testGoldens/${testClassName}/${
