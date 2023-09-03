@@ -1,6 +1,6 @@
-@file:Suppress("RemoveRedundantCallsOfConversionMethods")
+@file:Suppress("RemoveRedundantCallsOfConversionMethods", "PackageDirectoryMismatch")
 
-package korlibs.memory
+package korlibs.memory.arrays
 
 import korlibs.math.isMultipleOf
 

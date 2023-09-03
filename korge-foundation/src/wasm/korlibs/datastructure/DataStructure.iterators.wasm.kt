@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.datastructure.iterators
 
 actual val CONCURRENCY_COUNT: Int = 1

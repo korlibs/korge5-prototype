@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.datastructure.lock
 
 actual class Lock actual constructor() {

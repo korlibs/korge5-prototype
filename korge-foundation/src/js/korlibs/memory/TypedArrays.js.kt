@@ -1,4 +1,6 @@
-package korlibs.memory
+@file:Suppress("PackageDirectoryMismatch")
+
+package korlibs.memory.arrays
 
 actual typealias ArrayBuffer = org.khronos.webgl.ArrayBuffer
 actual typealias ArrayBufferView = org.khronos.webgl.ArrayBufferView

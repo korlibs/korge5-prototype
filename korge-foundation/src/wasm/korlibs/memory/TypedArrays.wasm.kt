@@ -1,4 +1,8 @@
-package korlibs.memory
+@file:Suppress("PackageDirectoryMismatch")
+
+package korlibs.memory.arrays
+
+import korlibs.memory.*
 
 actual class ArrayBuffer(val data: ByteArray, val byteOffset: Int, actual val byteLength: Int) {
     actual constructor(length: Int) : this(ByteArray(length), 0, length)

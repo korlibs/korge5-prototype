@@ -1,5 +1,8 @@
-package korlibs.memory
+@file:Suppress("PackageDirectoryMismatch")
 
+package korlibs.memory.arrays
+
+import korlibs.number.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

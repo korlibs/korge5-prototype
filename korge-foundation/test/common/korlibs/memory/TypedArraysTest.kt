@@ -1,4 +1,6 @@
-package korlibs.memory
+@file:Suppress("PackageDirectoryMismatch")
+
+package korlibs.memory.arrays
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
