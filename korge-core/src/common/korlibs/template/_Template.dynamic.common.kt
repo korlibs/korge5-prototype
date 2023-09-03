@@ -1,7 +1,8 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.template.dynamic
 
 import korlibs.io.util.*
-import korlibs.template.internal.*
 import kotlin.math.*
 import kotlin.reflect.*
 
@@ -14,7 +15,7 @@ import kotlin.reflect.*
 //	fun dynamicSet(obj: Any?, name: String, value: Any?): Unit
 //}
 
-object Dynamic2 {
+object KorteDynamic2 {
     fun binop(l: Any?, r: Any?, op: String): Any? = when (op) {
         "+" -> {
             when (l) {
@@ -154,12 +155,12 @@ object Dynamic2 {
         else -> listOf<Any?>()
     }
 
-    suspend fun accessAny(instance: Any?, key: Any?, mapper: ObjectMapper2): Any? = mapper.accessAny(instance, key)
+    suspend fun accessAny(instance: Any?, key: Any?, mapper: KorteObjectMapper2): Any? = mapper.accessAny(instance, key)
 
-    suspend fun setAny(instance: Any?, key: Any?, value: Any?, mapper: ObjectMapper2): Unit {
+    suspend fun setAny(instance: Any?, key: Any?, value: Any?, mapper: KorteObjectMapper2): Unit {
         when (instance) {
             null -> Unit
-            is Dynamic2Settable -> {
+            is KorteDynamic2Settable -> {
                 instance.dynamic2Set(key, value)
                 Unit
             }
@@ -172,7 +173,7 @@ object Dynamic2 {
                 Unit
             }
             else -> {
-                DynamicContext {
+                KorteDynamicContext {
                     when {
                         mapper.hasProperty(instance, key.toDynamicString()) -> {
                             mapper.set(instance, key, value)
@@ -195,23 +196,23 @@ object Dynamic2 {
         }
     }
 
-    suspend fun callAny(any: Any?, args: List<Any?>, mapper: ObjectMapper2): Any? =
+    suspend fun callAny(any: Any?, args: List<Any?>, mapper: KorteObjectMapper2): Any? =
         callAny(any, "invoke", args, mapper = mapper)
 
-    suspend fun callAny(any: Any?, methodName: Any?, args: List<Any?>, mapper: ObjectMapper2): Any? = when (any) {
+    suspend fun callAny(any: Any?, methodName: Any?, args: List<Any?>, mapper: KorteObjectMapper2): Any? = when (any) {
         null -> null
-        (any is Dynamic2Callable) -> (any as Dynamic2Callable).dynamic2Call(methodName, args)
-        else -> mapper.invokeAsync(any::class as KClass<Any>, any, DynamicContext { methodName.toDynamicString() }, args)
+        (any is KorteDynamic2Callable) -> (any as KorteDynamic2Callable).dynamic2Call(methodName, args)
+        else -> mapper.invokeAsync(any::class as KClass<Any>, any, KorteDynamicContext { methodName.toDynamicString() }, args)
     }
 
     //fun dynamicCast(any: Any?, target: KClass<*>): Any? = TODO()
 }
 
-interface DynamicContext {
+interface KorteDynamicContext {
     companion object {
-        @PublishedApi internal val Instance = object : DynamicContext { }
+        @PublishedApi internal val Instance = object : KorteDynamicContext { }
 
-        inline operator fun <T> invoke(callback: DynamicContext.() -> T): T = callback(Instance)
+        inline operator fun <T> invoke(callback: KorteDynamicContext.() -> T): T = callback(Instance)
     }
 
     operator fun Number.compareTo(other: Number): Int = this.toDouble().compareTo(other.toDouble())
@@ -237,44 +238,154 @@ interface DynamicContext {
         is String -> this.toDynamicString()
         else -> this
     }
-    fun Any?.toDynamicString() = Dynamic2.toString(this)
-    fun Any?.toDynamicBool() = Dynamic2.toBool(this)
-    fun Any?.toDynamicInt() = Dynamic2.toInt(this)
-    fun Any?.toDynamicLong() = Dynamic2.toLong(this)
-    fun Any?.toDynamicDouble() = Dynamic2.toDouble(this)
-    fun Any?.toDynamicNumber() = Dynamic2.toNumber(this)
-    fun Any?.toDynamicList() = Dynamic2.toList(this)
-    fun Any?.dynamicLength() = Dynamic2.length(this)
+    fun Any?.toDynamicString() = KorteDynamic2.toString(this)
+    fun Any?.toDynamicBool() = KorteDynamic2.toBool(this)
+    fun Any?.toDynamicInt() = KorteDynamic2.toInt(this)
+    fun Any?.toDynamicLong() = KorteDynamic2.toLong(this)
+    fun Any?.toDynamicDouble() = KorteDynamic2.toDouble(this)
+    fun Any?.toDynamicNumber() = KorteDynamic2.toNumber(this)
+    fun Any?.toDynamicList() = KorteDynamic2.toList(this)
+    fun Any?.dynamicLength() = KorteDynamic2.length(this)
     // @TODO: Bug JVM IR 1.5.0-RC: https://youtrack.jetbrains.com/issue/KT-46223
-    suspend fun Any?.dynamicGet(key: Any?, mapper: ObjectMapper2): Any? = Dynamic2.accessAny(this, key, mapper)
+    suspend fun Any?.dynamicGet(key: Any?, mapper: KorteObjectMapper2): Any? = KorteDynamic2.accessAny(this, key, mapper)
 
     // @TODO: Bug JVM IR 1.5.0-RC: https://youtrack.jetbrains.com/issue/KT-46223
-    suspend fun Any?.dynamicSet(key: Any?, value: Any?, mapper: ObjectMapper2) =
-        Dynamic2.setAny(this, key, value, mapper)
+    suspend fun Any?.dynamicSet(key: Any?, value: Any?, mapper: KorteObjectMapper2) =
+        KorteDynamic2.setAny(this, key, value, mapper)
 
     // @TODO: Bug JVM IR 1.5.0-RC: https://youtrack.jetbrains.com/issue/KT-46223
-    suspend fun Any?.dynamicCall(vararg args: Any?, mapper: ObjectMapper2) =
-        Dynamic2.callAny(this, args.toList(), mapper = mapper)
+    suspend fun Any?.dynamicCall(vararg args: Any?, mapper: KorteObjectMapper2) =
+        KorteDynamic2.callAny(this, args.toList(), mapper = mapper)
 
     // @TODO: Bug JVM IR 1.5.0-RC: https://youtrack.jetbrains.com/issue/KT-46223
-    suspend fun Any?.dynamicCallMethod(methodName: Any?, vararg args: Any?, mapper: ObjectMapper2) =
-        Dynamic2.callAny(this, methodName, args.toList(), mapper = mapper)
+    suspend fun Any?.dynamicCallMethod(methodName: Any?, vararg args: Any?, mapper: KorteObjectMapper2) =
+        KorteDynamic2.callAny(this, methodName, args.toList(), mapper = mapper)
 //suspend internal fun Any?.dynamicCastTo(target: KClass<*>) = Dynamic2.dynamicCast(this, target)
 
 }
 
-interface Dynamic2Gettable {
+interface KorteDynamic2Gettable {
     suspend fun dynamic2Get(key: Any?): Any?
 }
 
-interface Dynamic2Settable {
+interface KorteDynamic2Settable {
     suspend fun dynamic2Set(key: Any?, value: Any?)
 }
 
-interface Dynamic2Callable {
+interface KorteDynamic2Callable {
     suspend fun dynamic2Call(methodName: Any?, params: List<Any?>): Any?
 }
 
 //interface Dynamic2Iterable {
 //    suspend fun dynamic2Iterate(): Iterable<Any?>
 //}
+
+interface KorteDynamicShapeRegister<T> {
+    fun register(prop: KProperty<*>): KorteDynamicShapeRegister<T>
+    fun register(callable: KCallable<*>): KorteDynamicShapeRegister<T>
+    fun register(name: String, callback: suspend T.(args: List<Any?>) -> Any?): KorteDynamicShapeRegister<T>
+    fun register(vararg items: KProperty<*>) = this.apply { for (item in items) register(item) }
+    fun register(vararg items: KCallable<*>, dummy: Unit = Unit) = this.apply { for (item in items) register(item) }
+}
+
+class KorteDynamicShape<T> : KorteDynamicShapeRegister<T> {
+    private val propertiesByName = LinkedHashMap<String, KProperty<*>>()
+    private val methodsByName = LinkedHashMap<String, KCallable<*>>()
+    private val smethodsByName = LinkedHashMap<String, suspend T.(args: List<Any?>) -> Any?>()
+
+    override fun register(prop: KProperty<*>) = this.apply { propertiesByName[prop.name] = prop }
+    override fun register(name: String, callback: suspend T.(args: List<Any?>) -> Any?): KorteDynamicShapeRegister<T> = this.apply { smethodsByName[name] = callback }
+    override fun register(callable: KCallable<*>) = this.apply { methodsByName[callable.name] = callable }
+
+    fun hasProp(key: String): Boolean = key in propertiesByName
+    fun hasMethod(key: String): Boolean = key in methodsByName || key in smethodsByName
+    fun getProp(instance: T, key: Any?): Any? = (propertiesByName[key] as? KProperty1<Any?, Any?>?)?.get(instance)
+    fun setProp(instance: T, key: Any?, value: Any?) { (propertiesByName[key] as? KMutableProperty1<Any?, Any?>?)?.set(instance, value) }
+
+    @Suppress("RedundantSuspendModifier")
+    suspend fun callMethod(instance: T, key: Any?, args: List<Any?>): Any? {
+        val smethod = smethodsByName[key]
+        if (smethod != null) {
+            return smethod(instance, args)
+        }
+
+        val method = methodsByName[key]
+        if (method != null) {
+            //println("METHOD: ${method.name} : $method : ${method::class}")
+            return when (method) {
+                is KFunction0<*> -> method.invoke()
+                is KFunction1<*, *> -> (method as KFunction1<T, Any?>).invoke(instance)
+                is KFunction2<*, *, *> -> (method as KFunction2<T, Any?, Any?>).invoke(instance, args[0])
+                is KFunction3<*, *, *, *> -> (method as KFunction3<T, Any?, Any?, Any?>).invoke(instance, args[0], args[1])
+                is KFunction4<*, *, *, *, *> -> (method as KFunction4<T, Any?, Any?, Any?, Any?>).invoke(instance, args[0], args[1], args[2])
+                else -> error("TYPE not a KFunction")
+            }
+        }
+
+        //println("Can't find method: $key in $instance :: smethods=$smethodsByName, methods=$methodsByName")
+        return null
+    }
+}
+
+object KorteDynamicTypeScope
+
+fun <T> KorteDynamicType(callback: KorteDynamicShapeRegister<T>.() -> Unit): KorteDynamicType<T> = object : KorteDynamicType<T> {
+    val shape = KorteDynamicShape<T>().apply(callback)
+    override val KorteDynamicTypeScope.__dynamicShape: KorteDynamicShape<T> get() = shape
+}
+
+interface KorteDynamicType<T> {
+    val KorteDynamicTypeScope.__dynamicShape: KorteDynamicShape<T>
+}
+
+@Suppress("UNCHECKED_CAST")
+interface KorteObjectMapper2 {
+    val KorteDynamicType<*>.dynamicShape: KorteDynamicShape<Any?> get() = this.run { KorteDynamicTypeScope.run { this.__dynamicShape as KorteDynamicShape<Any?> } }
+
+    fun hasProperty(instance: Any, key: String): Boolean {
+        if (instance is KorteDynamicType<*>) return instance.dynamicShape.hasProp(key)
+        return false
+    }
+    fun hasMethod(instance: Any, key: String): Boolean {
+        if (instance is KorteDynamicType<*>) return instance.dynamicShape.hasMethod(key)
+        return false
+    }
+    suspend fun invokeAsync(type: KClass<Any>, instance: Any?, key: String, args: List<Any?>): Any? {
+        if (instance is KorteDynamicType<*>) return instance.dynamicShape.callMethod(instance, key, args)
+        return null
+    }
+    suspend fun set(instance: Any, key: Any?, value: Any?) {
+        if (instance is KorteDynamicType<*>) return instance.dynamicShape.setProp(instance, key, value)
+    }
+    suspend fun get(instance: Any, key: Any?): Any? {
+        if (instance is KorteDynamicType<*>) return instance.dynamicShape.getProp(instance, key)
+        return null
+    }
+    suspend fun accessAny(instance: Any?, key: Any?): Any? = when (instance) {
+        null -> null
+        is KorteDynamic2Gettable -> instance.dynamic2Get(key)
+        is Map<*, *> -> instance[key]
+        is Iterable<*> -> instance.toList()[KorteDynamic2.toInt(key)]
+        else -> accessAnyObject(instance, key)
+    }
+    suspend fun accessAnyObject(instance: Any?, key: Any?): Any? {
+        if (instance == null) return null
+        val keyStr = KorteDynamicContext { key.toDynamicString() }
+        return when {
+            hasProperty(instance, keyStr) -> {
+                //println("Access dynamic property : $keyStr")
+                get(instance, key)
+            }
+            hasMethod(instance, keyStr) -> {
+                //println("Access dynamic method : $keyStr")
+                invokeAsync(instance::class as KClass<Any>, instance as Any?, keyStr, listOf())
+            }
+            else -> {
+                //println("Access dynamic null : '$keyStr'")
+                null
+            }
+        }
+    }
+}
+
+expect val KorteMapper2: KorteObjectMapper2

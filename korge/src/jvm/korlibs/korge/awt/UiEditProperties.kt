@@ -2,7 +2,6 @@ package korlibs.korge.awt
 
 import korlibs.datastructure.*
 import korlibs.datastructure.iterators.*
-import korlibs.memory.*
 import korlibs.event.*
 import korlibs.korge.view.*
 import korlibs.korge.view.property.*
@@ -595,7 +594,7 @@ internal class UiNumberEditableValue(
         contentText.visible = true
         contentTextField.visible = false
         if (contentTextField.text.isNotEmpty()) {
-            val templateResult = runBlockingNoSuspensions { Template("{{ ${contentTextField.text} }}").invoke(evalContext()) }
+            val templateResult = runBlockingNoSuspensions { KorteTemplate("{{ ${contentTextField.text} }}").invoke(evalContext()) }
             setValue(templateResult.toDoubleOrNull() ?: 0.0)
         }
         super.hideEditor()

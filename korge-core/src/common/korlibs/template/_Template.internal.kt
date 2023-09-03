@@ -4,12 +4,11 @@ package korlibs.template.internal
 
 import korlibs.datastructure.lock.*
 import korlibs.io.util.*
-import korlibs.template.internal.StrReader
 import korlibs.template.util.KorteDeferred
 import kotlin.coroutines.coroutineContext
 import kotlin.reflect.*
 
-internal class AsyncCache {
+internal class KorteAsyncCache {
     private val lock = Lock()
     @PublishedApi
     internal val deferreds = LinkedHashMap<String, KorteDeferred<*>>()
@@ -30,10 +29,10 @@ internal class AsyncCache {
     }
 }
 
-internal val invalidOp: Nothing get() = throw RuntimeException()
-internal fun invalidOp(msg: String): Nothing = throw RuntimeException(msg)
+internal val korteInvalidOp: Nothing get() = throw RuntimeException()
+internal fun korteInvalidOp(msg: String): Nothing = throw RuntimeException(msg)
 
-internal class extraProperty<R, T : Any>(val getExtraMap: R.() -> MutableMap<String, Any>, val name: String? = null, val default: () -> T) {
+internal class korteExtraProperty<R, T : Any>(val getExtraMap: R.() -> MutableMap<String, Any>, val name: String? = null, val default: () -> T) {
     inline operator fun getValue(thisRef: R, property: KProperty<*>): T =
         getExtraMap(thisRef)[name ?: property.name] as T? ?: default()
 
@@ -42,7 +41,7 @@ internal class extraProperty<R, T : Any>(val getExtraMap: R.() -> MutableMap<Str
     }
 }
 
-internal class StrReader(val str: String, var pos: Int = 0) {
+internal class KorteStrReader(val str: String, var pos: Int = 0) {
     val length get() = str.length
     val hasMore get() = pos < length
 
@@ -91,7 +90,7 @@ internal class StrReader(val str: String, var pos: Int = 0) {
     fun readUntil(f: (Char) -> Boolean): String = readBlock { skipUntil(f) }
 }
 
-internal fun StrReader.readStringLit(reportErrors: Boolean = true): String {
+internal fun KorteStrReader.readStringLit(reportErrors: Boolean = true): String {
     val out = StringBuilder()
     val quotec = read()
     when (quotec) {
