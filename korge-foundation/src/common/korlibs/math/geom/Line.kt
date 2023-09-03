@@ -168,5 +168,4 @@ data class Line(val a: Vector2, val b: Vector2) : Shape2D {
         fun getIntersectXY(a: Point, b: Point, c: Point, d: Point): Point? =
             getIntersectXY(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y)
     }
-
 }

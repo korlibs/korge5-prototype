@@ -75,7 +75,7 @@ object LibC2 : FFILib("CoreFoundation", "c") {
     val sleep: (Int) -> Deferred<Unit> by func()
 }
 
-suspend fun main() {
+suspend fun main4() {
     launchImmediately(coroutineContext) {
         println("1")
         delay(10.milliseconds)
@@ -114,7 +114,7 @@ suspend fun main() {
     //println(cos(0.5))
 }
 
-suspend fun main4() = Korge {
+suspend fun main() = Korge {
     //run { val bytes = resourcesVfs["Exif5-2x.webp"].readBytes(); for (n in 0 until 100) println(measureTime { WEBP.decode(bytes) }) }
     //image(WEBP.decode(resourcesVfs["Exif5-2x.webp"]))
     image(resourcesVfs["Exif5-2x.webp"].readBitmap(WEBP))
