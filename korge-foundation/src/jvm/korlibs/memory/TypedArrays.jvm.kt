@@ -71,20 +71,20 @@ actual class DataView actual constructor(override val buffer: ArrayBuffer, overr
     actual fun setFloat64(byteOffset: Int, value: Double, littleEndian: Boolean) { jbuffer(littleEndian).putDouble(byteOffset, value) }
 }
 
-actual operator fun Int8Array.get(index: Int): Byte = jbuffer.get(index)
+actual operator fun Int8Array.get(index: Int): Byte = jbuffer.get(index * 1)
 actual operator fun Int16Array.get(index: Int): Short = jbuffer.getShort(index * 2)
 actual operator fun Int32Array.get(index: Int): Int = jbuffer.getInt(index * 4)
 actual operator fun Float32Array.get(index: Int): Float = jbuffer.getFloat(index * 4)
 actual operator fun Float64Array.get(index: Int): Double = jbuffer.getDouble(index * 8)
-actual operator fun Uint8ClampedArray.get(index: Int): Int = jbuffer.get(index).toInt() and 0xFF
-actual operator fun Uint8Array.get(index: Int): Int = jbuffer.get(index).toInt() and 0xFF
-actual operator fun Uint16Array.get(index: Int): Int = jbuffer.getShort(index).toInt() and 0xFFFF
+actual operator fun Uint8ClampedArray.get(index: Int): Int = jbuffer.get(index * 1).toInt() and 0xFF
+actual operator fun Uint8Array.get(index: Int): Int = jbuffer.get(index * 1).toInt() and 0xFF
+actual operator fun Uint16Array.get(index: Int): Int = jbuffer.getShort(index * 2).toInt() and 0xFFFF
 
-actual operator fun Int8Array.set(index: Int, value: Byte) { jbuffer.put(index, value) }
-actual operator fun Int16Array.set(index: Int, value: Short) { jbuffer.putShort(index, value) }
-actual operator fun Int32Array.set(index: Int, value: Int) { jbuffer.putInt(index, value) }
-actual operator fun Float32Array.set(index: Int, value: Float) { jbuffer.putFloat(index, value) }
-actual operator fun Float64Array.set(index: Int, value: Double) { jbuffer.putDouble(index, value) }
-actual operator fun Uint8ClampedArray.set(index: Int, value: Int) { jbuffer.put(index, value.toByte()) }
-actual operator fun Uint8Array.set(index: Int, value: Int) { jbuffer.put(index, value.toByte()) }
-actual operator fun Uint16Array.set(index: Int, value: Int) { jbuffer.putShort(index, value.toShort()) }
+actual operator fun Int8Array.set(index: Int, value: Byte) { jbuffer.put(index * 1, value) }
+actual operator fun Int16Array.set(index: Int, value: Short) { jbuffer.putShort(index * 2, value) }
+actual operator fun Int32Array.set(index: Int, value: Int) { jbuffer.putInt(index * 4, value) }
+actual operator fun Float32Array.set(index: Int, value: Float) { jbuffer.putFloat(index * 4, value) }
+actual operator fun Float64Array.set(index: Int, value: Double) { jbuffer.putDouble(index * 8, value) }
+actual operator fun Uint8ClampedArray.set(index: Int, value: Int) { jbuffer.put(index * 1, value.clamp(0, 255).toByte()) }
+actual operator fun Uint8Array.set(index: Int, value: Int) { jbuffer.put(index * 1, value.toByte()) }
+actual operator fun Uint16Array.set(index: Int, value: Int) { jbuffer.putShort(index * 2, value.toShort()) }
