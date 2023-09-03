@@ -25,7 +25,7 @@ import korlibs.io.stream.readU16LE
 import korlibs.io.stream.readU32LE
 import korlibs.io.stream.readU8
 import korlibs.math.geom.slice.*
-import korlibs.crypto.encoding.hex
+import korlibs.encoding.*
 import korlibs.math.*
 import korlibs.math.geom.*
 

@@ -1,5 +1,6 @@
 package korlibs.crypto
 
+import korlibs.encoding.*
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.test.Test

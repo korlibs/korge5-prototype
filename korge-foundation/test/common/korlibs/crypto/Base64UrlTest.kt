@@ -1,8 +1,6 @@
 package korlibs.crypto
 
-import korlibs.crypto.encoding.Base64
-import korlibs.crypto.encoding.fromBase64
-import korlibs.crypto.encoding.toBase64
+import korlibs.encoding.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

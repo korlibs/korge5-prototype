@@ -22,7 +22,7 @@ import korlibs.io.stream.write32LE
 import korlibs.io.stream.write8
 import korlibs.io.stream.writeBytes
 import korlibs.io.stream.writeString
-import korlibs.crypto.encoding.hex
+import korlibs.encoding.*
 import korlibs.math.*
 
 // @TODO: We might want to support a raw version without headers?

@@ -2,6 +2,7 @@ package korlibs.image.color
 
 import korlibs.datastructure.GenericListIterator
 import korlibs.datastructure.GenericSubList
+import korlibs.encoding.*
 import korlibs.memory.*
 import korlibs.image.internal.d2i
 import korlibs.image.internal.f2i
@@ -10,7 +11,6 @@ import korlibs.image.internal.packIntUnchecked
 import korlibs.image.internal.sumPacked4MulR
 import korlibs.image.paint.Paint
 import korlibs.math.interpolation.*
-import korlibs.crypto.encoding.appendHexByte
 import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.number.*

@@ -1,5 +1,6 @@
 package korlibs.io.net.ws
 
+import korlibs.encoding.*
 import korlibs.time.DateTime
 import korlibs.time.milliseconds
 import korlibs.memory.*
@@ -19,7 +20,6 @@ import korlibs.io.stream.readLine
 import korlibs.io.stream.writeBytes
 import korlibs.io.util.buildList
 import korlibs.io.util.join
-import korlibs.crypto.encoding.toBase64
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext

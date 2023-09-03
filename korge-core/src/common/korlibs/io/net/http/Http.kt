@@ -1,12 +1,12 @@
 package korlibs.io.net.http
 
+import korlibs.encoding.*
 import korlibs.time.DateFormat
 import korlibs.io.lang.IOException
 import korlibs.io.lang.UTF8
 import korlibs.io.lang.invalidOp
 import korlibs.io.lang.toString
 import korlibs.io.net.QueryString
-import korlibs.crypto.encoding.fromBase64
 
 interface Http {
 	companion object {

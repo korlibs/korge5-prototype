@@ -1,13 +1,9 @@
 package korlibs.crypto
 
 import korlibs.crypto.CipherPadding.Companion.NoPadding
-import korlibs.crypto.encoding.Hex
-import korlibs.crypto.encoding.hexLower
-import korlibs.crypto.encoding.unhex
-import kotlin.random.Random
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import korlibs.encoding.*
+import kotlin.random.*
+import kotlin.test.*
 
 class AESTest {
     @Test
@@ -186,7 +182,7 @@ class AESTest {
             //println("EncryptText= ${encryptedText.contentToString()}")
             //println("DecryptText= ${decryptedText.contentToString()}")
             //println()
-            assertEquals(plainText.toHexStringLower(), decryptedText.toHexStringLower())
+            assertEquals(plainText.hexLower, decryptedText.hexLower)
         }
     }
 

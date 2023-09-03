@@ -5,8 +5,8 @@ package korlibs.audio.format
 import korlibs.audio.sound.AudioData
 import korlibs.audio.sound.AudioStream
 import korlibs.audio.sound.toData
-import korlibs.crypto.encoding.hex
 import korlibs.datastructure.Extra
+import korlibs.encoding.*
 import korlibs.io.file.PathInfo
 import korlibs.io.file.VfsFile
 import korlibs.io.file.extensionLC

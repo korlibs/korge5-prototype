@@ -1,7 +1,7 @@
 import korlibs.audio.format.MP3
 import korlibs.audio.sound.readSound
 import korlibs.audio.sound.toSound
-import korlibs.crypto.encoding.fromBase64
+import korlibs.encoding.fromBase64
 import korlibs.ffi.*
 import korlibs.image.format.*
 import korlibs.io.async.delay

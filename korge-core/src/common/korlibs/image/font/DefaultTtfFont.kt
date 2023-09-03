@@ -1,9 +1,9 @@
 package korlibs.image.font
 
+import korlibs.encoding.*
 import korlibs.time.*
 import korlibs.io.compression.*
 import korlibs.io.compression.deflate.*
-import korlibs.crypto.encoding.*
 import kotlin.native.concurrent.*
 
 // Sani Trixie Sans

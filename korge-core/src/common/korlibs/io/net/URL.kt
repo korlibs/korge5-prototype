@@ -1,5 +1,6 @@
 package korlibs.io.net
 
+import korlibs.encoding.*
 import korlibs.memory.ByteArrayBuilder
 import korlibs.io.file.normalize
 import korlibs.io.file.pathInfo
@@ -11,8 +12,6 @@ import korlibs.io.lang.toString
 import korlibs.io.util.StrReader
 import korlibs.io.util.substringAfterOrNull
 import korlibs.io.util.substringBeforeOrNull
-import korlibs.crypto.encoding.Hex
-import korlibs.crypto.encoding.toBase64
 
 data class URL private constructor(
 	val isOpaque: Boolean,

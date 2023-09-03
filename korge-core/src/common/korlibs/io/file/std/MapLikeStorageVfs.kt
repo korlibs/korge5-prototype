@@ -1,6 +1,7 @@
 package korlibs.io.file.std
 
 import korlibs.datastructure.iterators.fastForEach
+import korlibs.encoding.*
 import korlibs.time.DateTime
 import korlibs.time.TimeProvider
 import korlibs.memory.arraycopy
@@ -18,8 +19,6 @@ import korlibs.io.serialization.json.Json
 import korlibs.io.stream.AsyncStream
 import korlibs.io.stream.AsyncStreamBase
 import korlibs.io.stream.toAsyncStream
-import korlibs.crypto.encoding.hex
-import korlibs.crypto.encoding.unhex
 import korlibs.math.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow

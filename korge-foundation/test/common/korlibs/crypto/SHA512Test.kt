@@ -1,6 +1,6 @@
 package korlibs.crypto
 
-import korlibs.crypto.encoding.ASCII
+import korlibs.encoding.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -43,8 +43,12 @@ class SHA512Test {
 
     @Test
     fun test3() {
-        assertEquals("07e547d9586f6a73f73fbac0435ed76951218fb7d0c8d788a309d785436bbb642e93a252a954f23912547d1e8a3b5ed6e1bfd7097821233fa0538f3db854fee6", SHA512.digest(ASCII("The quick brown fox jumps over the lazy dog")).hex)
-        assertEquals("753c07c6245748d0002359efb1018687880219eb5f10b0015362ba80679589b1679e87dfdba276b2fbcbf8e48377270ddfe99c9ba7b4cbc6763ecd55f9fb1b7d", SHA512.digest(ASCII("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab")).hex)
+        assertEquals("07e547d9586f6a73f73fbac0435ed76951218fb7d0c8d788a309d785436bbb642e93a252a954f23912547d1e8a3b5ed6e1bfd7097821233fa0538f3db854fee6", SHA512.digest(
+            ASCII("The quick brown fox jumps over the lazy dog")
+        ).hex)
+        assertEquals("753c07c6245748d0002359efb1018687880219eb5f10b0015362ba80679589b1679e87dfdba276b2fbcbf8e48377270ddfe99c9ba7b4cbc6763ecd55f9fb1b7d", SHA512.digest(
+            ASCII("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab")
+        ).hex)
     }
 
     @Test

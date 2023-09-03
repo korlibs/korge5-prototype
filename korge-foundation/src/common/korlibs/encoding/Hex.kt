@@ -63,6 +63,9 @@ fun String.fromHex(): ByteArray = Hex.decode(this)
 val ByteArray.hexLower: String get() = Hex.encodeLower(this)
 val ByteArray.hexUpper: String get() = Hex.encodeUpper(this)
 
+fun ByteArray.toHexStringLower(): String = hexLower
+fun ByteArray.toHexStringUpper(): String = hexUpper
+
 fun Char.isHexDigit() = Hex.isHexDigit(this)
 
 val List<String>.unhexIgnoreSpaces get() = joinToString("").unhexIgnoreSpaces

@@ -1,5 +1,6 @@
 package korlibs.image.bitmap
 
+import korlibs.encoding.*
 import korlibs.image.color.RGBA
 import korlibs.image.color.RGBAPremultiplied
 import korlibs.image.color.RgbaArray
@@ -7,7 +8,6 @@ import korlibs.image.color.RgbaPremultipliedArray
 import korlibs.image.format.*
 import korlibs.image.vector.Drawable
 import korlibs.image.vector.SizedDrawable
-import korlibs.crypto.encoding.toBase64
 
 abstract class NativeImage(width: Int, height: Int, val data: Any?, premultiplied: Boolean) : Bitmap(width, height, 32, premultiplied, null) {
 	abstract val name: String

@@ -1,12 +1,12 @@
 package korlibs.image.format
 
+import korlibs.encoding.*
 import korlibs.image.bitmap.*
 import korlibs.io.concurrent.atomic.*
 import korlibs.io.file.*
 import korlibs.io.lang.*
 import korlibs.io.lang.ASCII
 import korlibs.io.stream.*
-import korlibs.crypto.encoding.*
 import kotlin.coroutines.cancellation.*
 
 open class ImageFormats(formats: Iterable<ImageFormat>) : ImageFormat("") {

@@ -2,6 +2,7 @@ package korlibs.image.font
 
 import korlibs.datastructure.*
 import korlibs.datastructure.iterators.*
+import korlibs.encoding.*
 import korlibs.logger.*
 import korlibs.memory.*
 import korlibs.image.annotation.*
@@ -15,7 +16,6 @@ import korlibs.io.lang.*
 import korlibs.io.stream.*
 import korlibs.math.geom.*
 import korlibs.math.geom.vector.*
-import korlibs.crypto.encoding.*
 import korlibs.math.*
 import kotlin.collections.set
 

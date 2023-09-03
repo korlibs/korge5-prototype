@@ -1,11 +1,9 @@
 package korlibs.io.util
 
-import korlibs.memory.UByteArrayInt
-import korlibs.memory.asByteArray
-import korlibs.memory.asUByteArrayInt
-import korlibs.io.lang.invalidArg
-import korlibs.crypto.encoding.Hex
-import kotlin.random.Random
+import korlibs.encoding.*
+import korlibs.io.lang.*
+import korlibs.memory.*
+import kotlin.random.*
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class UUID(val data: UByteArrayInt) {

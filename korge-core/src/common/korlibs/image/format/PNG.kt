@@ -1,5 +1,6 @@
 package korlibs.image.format
 
+import korlibs.encoding.*
 import korlibs.memory.*
 import korlibs.image.bitmap.*
 import korlibs.image.color.RGB
@@ -25,7 +26,6 @@ import korlibs.io.stream.write32BE
 import korlibs.io.stream.write8
 import korlibs.io.stream.writeBytes
 import korlibs.io.util.checksum.CRC32
-import korlibs.crypto.encoding.hex
 import korlibs.math.*
 import kotlin.math.*
 

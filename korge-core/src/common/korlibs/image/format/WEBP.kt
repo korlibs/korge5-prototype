@@ -1,6 +1,6 @@
 package korlibs.image.format
 
-import korlibs.crypto.encoding.fromBase64
+import korlibs.encoding.*
 import korlibs.ffi.WASMLib
 import korlibs.image.bitmap.Bitmap32
 import korlibs.io.compression.deflate.ZLib

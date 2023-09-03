@@ -1,6 +1,6 @@
 package korlibs.ffi
 
-import korlibs.crypto.encoding.fromBase64
+import korlibs.encoding.fromBase64
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -5,10 +5,10 @@ package korlibs.audio.format
 import korlibs.audio.sound.AudioSamples
 import korlibs.audio.sound.AudioSamplesDeque
 import korlibs.audio.sound.AudioStream
-import korlibs.crypto.encoding.fromBase64
 import korlibs.datastructure.ByteArrayDeque
 import korlibs.datastructure.DoubleArrayList
 import korlibs.datastructure.binarySearch
+import korlibs.encoding.*
 import korlibs.ffi.WASMLib
 import korlibs.time.TimeSpan
 import korlibs.time.measureTimeWithResult

@@ -1,7 +1,7 @@
 package korlibs.image.color
 
+import korlibs.encoding.*
 import korlibs.math.interpolation.*
-import korlibs.crypto.encoding.shex
 import korlibs.math.*
 import korlibs.number.*
 
