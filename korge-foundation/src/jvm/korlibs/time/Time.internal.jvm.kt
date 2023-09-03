@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.time.internal
 
 import korlibs.time.DateTime

@@ -1,4 +1,6 @@
-package korlibs.math.geom.range
+@file:Suppress("PackageDirectoryMismatch")
+
+package korlibs.math.geom.range // This should be in korlibs.math.range
 
 import korlibs.math.internal.*
 

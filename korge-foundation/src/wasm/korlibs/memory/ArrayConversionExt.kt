@@ -1,8 +1,8 @@
-package korlibs.memory.wasm
+package korlibs.memory
 
 import org.khronos.webgl.*
 
-internal fun ArrayBuffer.toByteArray(): ByteArray = Int8Array(this).toByteArray()
+internal fun ArrayBuffer.toByteArray2(): ByteArray = Int8Array(this).toByteArray()
 internal fun Uint8Array.toByteArray(): ByteArray {
     return Int8Array(this.buffer).toByteArray()
 }

@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.memory.dyn.osx
 
 import korlibs.memory.dyn.*
@@ -7,7 +9,6 @@ import java.util.*
 import java.util.concurrent.*
 import kotlin.collections.ArrayList
 import kotlin.collections.toString
-import kotlin.reflect.*
 import kotlin.text.Charsets
 import kotlin.text.toCharArray
 

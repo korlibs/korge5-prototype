@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.io.serialization.json
 
 import korlibs.datastructure.DoubleArrayList

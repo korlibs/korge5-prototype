@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package korlibs.math.awt
 
 import korlibs.math.geom.*
@@ -11,8 +13,6 @@ fun RectangleInt.toAwt(out: java.awt.Rectangle = java.awt.Rectangle()): java.awt
 
 fun Size.toAwt(out: java.awt.geom.Dimension2D = java.awt.Dimension()) =
     out.also { out.setSize(this.width.toDouble(), this.height.toDouble()) }
-
-
 
 fun Rectangle2D.Float.toKorma(): Rectangle =
     Rectangle(this.x, this.y, this.width, this.height)
