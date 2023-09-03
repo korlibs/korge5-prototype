@@ -7,6 +7,7 @@ import korlibs.io.async.suspendTest
 import korlibs.io.file.Vfs
 import korlibs.io.file.VfsFile
 import korlibs.io.file.std.MemoryVfsMix
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

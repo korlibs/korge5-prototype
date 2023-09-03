@@ -5,6 +5,7 @@ import korlibs.io.async.AsyncCache
 import korlibs.io.async.AsyncCacheGen
 import korlibs.io.async.delay
 import korlibs.io.async.suspendTest
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

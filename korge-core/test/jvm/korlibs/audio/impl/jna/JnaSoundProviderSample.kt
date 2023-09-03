@@ -15,7 +15,7 @@ import korlibs.io.file.fullName
 import korlibs.io.file.std.MemoryVfs
 import korlibs.io.file.std.resourcesVfs
 import korlibs.io.stream.openAsync
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 
 fun ByteArray.asMemoryVfsFile(name: String = "temp.bin"): VfsFile = MemoryVfs(mapOf(name to openAsync()))[name]
 suspend fun VfsFile.cachedToMemory(): VfsFile = this.readAll().asMemoryVfsFile(this.fullName)
@@ -57,9 +57,9 @@ object JnaSoundProviderSample {
                 //group.panning = -1.0
                 //result.panning = n.toDouble() / 10.0
                 println(group.panning)
-                korlibs.io.async.delay(0.1.seconds)
+                delay(0.1.seconds)
             }
-            korlibs.io.async.delay(2.seconds)
+            delay(2.seconds)
             println("Waiting...")
             group.await()
             println("Stop...")

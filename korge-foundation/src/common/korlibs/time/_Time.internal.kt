@@ -52,6 +52,8 @@ internal const val MILLIS_PER_MINUTE = MILLIS_PER_SECOND * 60 // 60_000
 internal const val MILLIS_PER_HOUR = MILLIS_PER_MINUTE * 60 // 3600_000
 internal const val MILLIS_PER_DAY = MILLIS_PER_HOUR * 24 // 86400_000
 internal const val MILLIS_PER_WEEK = MILLIS_PER_DAY * 7 // 604800_000
+internal const val MILLIS_PER_MICROSECOND = 1.0 / 1000.0
+internal const val MILLIS_PER_NANOSECOND = MILLIS_PER_MICROSECOND / 1000.0
 
 internal fun Int.padded(count: Int): String {
     // @TODO: Handle edge case Int.MIN_VALUE that could not be represented as abs

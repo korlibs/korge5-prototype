@@ -7,6 +7,7 @@ import korlibs.audio.sound.*
 import korlibs.io.async.*
 import korlibs.math.*
 import korlibs.math.interpolation.*
+import kotlinx.coroutines.*
 import kotlin.native.concurrent.*
 
 val DEFAULT_FADE_TIME get() = 0.5.seconds

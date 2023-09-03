@@ -96,7 +96,7 @@ class JvmWaveOutPlatformAudioOutput(
             }
             //println("availableRead=$availableRead, waveOutGetPosition=$currentPositionInSamples, totalEmittedSamples=$totalEmittedSamples")
             if (availableRead <= 0 && currentPositionInSamples >= totalEmittedSamples) break
-            korlibs.io.async.delay(1.milliseconds)
+            delay(1.milliseconds)
         }
         //println("DONE WAITING")
     }

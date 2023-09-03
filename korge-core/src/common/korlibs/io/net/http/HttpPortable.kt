@@ -33,12 +33,7 @@ import korlibs.io.stream.readBytesUpToFirst
 import korlibs.io.stream.readLine
 import korlibs.io.stream.writeString
 import korlibs.crypto.sha1
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.coroutines.coroutineContext
 import kotlin.math.min
 

@@ -8,7 +8,7 @@ import korlibs.io.lang.currentThreadId
 import korlibs.logger.Logger
 import korlibs.memory.Platform
 import korlibs.time.milliseconds
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -53,7 +53,7 @@ class SoundAudioStreamTest {
             }
             logger.debug { "currentThreadId:$currentThreadId" }
             val channel = sound2.play()
-            assertEquals("0ms/58.5ms", "${channel.current}/${channel.total}")
+            assertEquals("0s/58.5ms", "${channel.current}/${channel.total}")
             wait.await()
             delay(20.milliseconds) // @TODO: This is a patch to try to avoid or reduce a flaky test. This shouldn't be needed and we should figure out the real reason for this
             assertEquals("58.5ms/58.5ms", "${channel.current}/${channel.total}")

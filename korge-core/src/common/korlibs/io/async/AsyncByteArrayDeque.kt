@@ -7,6 +7,7 @@ import korlibs.io.lang.OutOfBoundsException
 import korlibs.io.stream.AsyncInputStream
 import korlibs.io.stream.AsyncOutputStream
 import korlibs.math.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 
 interface IAsyncByteArrayDeque : AsyncOutputStream, AsyncInputStream

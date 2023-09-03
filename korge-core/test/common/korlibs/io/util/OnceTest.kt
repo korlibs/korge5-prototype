@@ -3,6 +3,7 @@ package korlibs.io.util
 import korlibs.time.milliseconds
 import korlibs.io.async.delay
 import korlibs.io.async.suspendTest
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

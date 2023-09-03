@@ -52,7 +52,7 @@ class TweenComponent(
         //println("TWEEN UPDATE[$this, $vs]: $elapsed + $dt")
         elapsed += dt
 
-        val ratio: Float = (elapsed / hrtime).clamp(0f, 1f)
+        val ratio: Float = (elapsed divFloat hrtime).clamp(0f, 1f)
         //println("$elapsed/$hrtime : $ratio")
         setTo(elapsed)
         callback(easing(ratio))
@@ -93,7 +93,7 @@ class TweenComponent(
 		vs.fastForEach { v ->
 			val durationInTween = v.duration.coalesce { (hrtime - v.startTime) }
 			val elapsedInTween = (elapsed - v.startTime).clamp(0.0.milliseconds, durationInTween)
-			val ratioInTween = if (durationInTween <= TimeSpan.ZERO || elapsedInTween >= durationInTween) 1f else elapsedInTween / durationInTween
+			val ratioInTween = if (durationInTween <= TimeSpan.ZERO || elapsedInTween >= durationInTween) 1f else elapsedInTween divFloat durationInTween
             val easedRatioInTween = easing(ratioInTween)
             //println("easedRatioInTween: $easedRatioInTween, ratioInTween: $ratioInTween, durationInTween: $durationInTween, elapsedInTween: $elapsedInTween, elapsed: $elapsed")
 			v.set(easedRatioInTween.toRatio())
@@ -125,7 +125,7 @@ suspend fun BaseView?.tween(
 	if (this != null) {
 		var tc: TweenComponent? = null
 		try {
-			withTimeout(if (timeout) time * 2 + 300.milliseconds else TimeSpan.NIL) {
+            withTimeoutOrNil(if (timeout) time * 2 + 300.milliseconds else TimeSpan.NIL) {
 				suspendCancellableCoroutine<Unit> { c ->
 					val view = this@tween
 					//println("STARTED TWEEN at thread $currentThreadId")

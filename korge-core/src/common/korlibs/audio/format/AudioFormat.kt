@@ -13,8 +13,7 @@ import korlibs.io.file.extensionLC
 import korlibs.io.lang.unsupported
 import korlibs.io.stream.*
 import korlibs.number.*
-import korlibs.time.TimeSpan
-import korlibs.time.seconds
+import korlibs.time.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException

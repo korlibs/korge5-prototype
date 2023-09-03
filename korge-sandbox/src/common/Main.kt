@@ -10,7 +10,7 @@ import korlibs.io.file.std.resourcesVfs
 import korlibs.korge.Korge
 import korlibs.korge.view.*
 import korlibs.time.milliseconds
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.*
 import kotlin.coroutines.coroutineContext
 
 //suspend fun main() {

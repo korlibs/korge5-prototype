@@ -12,10 +12,8 @@ import korlibs.logger.Logger
 import korlibs.math.*
 import korlibs.memory.Buffer
 import korlibs.memory.Platform
-import korlibs.time.TimeSpan
+import korlibs.time.*
 import korlibs.time.hr.HRTimeSpan
-import korlibs.time.milliseconds
-import korlibs.time.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlin.coroutines.ContinuationInterceptor

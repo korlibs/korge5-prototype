@@ -4,7 +4,7 @@ import korlibs.io.async.delay
 import korlibs.io.async.launchImmediately
 import korlibs.template.suspendTest
 import korlibs.time.milliseconds
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.*
 import kotlin.test.Test
 
 class FFILibTest {

@@ -314,7 +314,7 @@ open class ViewsForTesting(
 		})
 
         //println("[a0]")
-		withTimeout(timeout ?: TimeSpan.NIL) {
+		withTimeoutOrNil(timeout ?: TimeSpan.NIL) {
             //println("[a1]")
 			while (!completed) {
                 //println("FRAME")

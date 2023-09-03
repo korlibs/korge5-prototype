@@ -1,7 +1,7 @@
 package korlibs.io.async
 
 import korlibs.time.milliseconds
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

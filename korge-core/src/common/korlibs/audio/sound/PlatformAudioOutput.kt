@@ -6,6 +6,7 @@ import korlibs.io.async.delay
 import korlibs.io.lang.Disposable
 import korlibs.math.*
 import korlibs.time.*
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 open class PlatformAudioOutput(

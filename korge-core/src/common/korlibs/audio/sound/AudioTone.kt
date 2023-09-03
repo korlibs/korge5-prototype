@@ -1,6 +1,6 @@
 package korlibs.audio.sound
 
-import korlibs.time.TimeSpan
+import korlibs.time.*
 import kotlin.math.PI
 import kotlin.math.sin
 
