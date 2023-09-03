@@ -1,9 +1,9 @@
 package korlibs.memory.internal
 
 import korlibs.js.Deno
-import korlibs.memory.Arch
-import korlibs.memory.Os
-import korlibs.memory.Runtime
+import korlibs.platform.Arch
+import korlibs.platform.Os
+import korlibs.platform.Runtime
 import org.khronos.webgl.Uint32Array
 import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
@@ -15,7 +15,8 @@ internal val isNodeJs: Boolean by lazy { js("((typeof process !== 'undefined') &
 internal val isShell: Boolean get() = !isWeb && !isNodeJs && !isWorker
 
 // @TODO: Check navigator.userAgent
-internal actual val currentOs: Os get() = when {
+internal actual val currentOs: Os
+    get() = when {
     isDenoJs -> {
         when (Deno.build.os) {
             "darwin" -> Os.MACOSX

@@ -1,4 +1,4 @@
-package korlibs.memory
+package korlibs.platform
 
 import korlibs.memory.internal.currentRuntime
 

@@ -1,8 +1,8 @@
 package korlibs.memory.internal
 
-import korlibs.memory.Arch
-import korlibs.memory.Os
-import korlibs.memory.Runtime
+import korlibs.platform.Arch
+import korlibs.platform.Os
+import korlibs.platform.Runtime
 import org.khronos.webgl.*
 
 @JsFun("() => { return (typeof Deno === 'object' && Deno.statSync) }")

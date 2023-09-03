@@ -3,7 +3,7 @@ package korlibs.memory.ffi
 import korlibs.ffi.LibraryResolver
 import korlibs.io.file.sync.MemorySyncIO
 import korlibs.io.file.sync.file
-import korlibs.memory.Os
+import korlibs.platform.Os
 import korlibs.memory.Platform
 import kotlin.test.Test
 import kotlin.test.assertEquals
