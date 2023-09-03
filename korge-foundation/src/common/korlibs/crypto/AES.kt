@@ -1,10 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.ext8
-import korlibs.crypto.internal.getInt
-import korlibs.crypto.internal.setInt
-import korlibs.crypto.internal.toIntArray
-
 @Suppress("UNUSED_CHANGED_VALUE")
 /**
  * Based on CryptoJS v3.1.2

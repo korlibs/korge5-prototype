@@ -2,7 +2,8 @@
 
 package korlibs.datastructure
 
-import korlibs.datastructure.internal.*
+
+import korlibs.datastructure.internal.ilog2Ceil
 import korlibs.datastructure.iterators.fastForEach
 import kotlin.collections.Collection
 import kotlin.collections.Iterable

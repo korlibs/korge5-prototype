@@ -1,7 +1,5 @@
 package korlibs.platform
 
-import korlibs.memory.internal.*
-
 interface Platform {
     // Endianness
     val endian: Endian

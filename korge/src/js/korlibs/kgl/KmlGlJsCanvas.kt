@@ -11,6 +11,10 @@ import korlibs.image.format.*
 import korlibs.memory.*
 import kotlinx.browser.*
 import org.khronos.webgl.*
+import org.khronos.webgl.ArrayBufferView
+import org.khronos.webgl.Float32Array
+import org.khronos.webgl.get
+import org.khronos.webgl.set
 import org.w3c.dom.*
 import kotlin.math.*
 

@@ -1,7 +1,5 @@
 package korlibs.platform
 
-import korlibs.memory.internal.currentRuntime
-
 enum class Runtime {
     JS, JVM, ANDROID, NATIVE, WASM;
 

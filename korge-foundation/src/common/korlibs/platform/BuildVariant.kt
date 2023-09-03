@@ -1,7 +1,5 @@
 package korlibs.platform
 
-import korlibs.memory.internal.currentBuildVariant
-
 enum class BuildVariant {
     DEBUG, RELEASE;
 

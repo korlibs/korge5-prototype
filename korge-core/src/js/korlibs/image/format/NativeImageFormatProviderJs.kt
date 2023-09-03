@@ -18,7 +18,9 @@ import korlibs.time.*
 import kotlinx.browser.*
 import kotlinx.coroutines.*
 import org.khronos.webgl.*
+import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.set
+import org.khronos.webgl.get
 import org.w3c.dom.*
 import org.w3c.dom.url.*
 import org.w3c.files.*

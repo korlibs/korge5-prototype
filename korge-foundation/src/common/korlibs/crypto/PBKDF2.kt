@@ -1,7 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
-
 class PBKDF2 {
     companion object {
         fun pbkdf2WithHmacSHA1(password: ByteArray, salt: ByteArray, iterationCount: Int, keySizeInBits: Int): Hash =

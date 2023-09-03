@@ -1,6 +1,6 @@
 package korlibs.memory.dyn
 
-import korlibs.memory.atomic.KmemAtomicRef
+import kotlinx.atomicfu.atomic
 import kotlin.reflect.KProperty
 
 @Deprecated("")
@@ -14,8 +14,8 @@ public fun interface DynamicSymbolResolver {
 
 @Deprecated("")
 public abstract class DynamicFunBase<T : Function<*>>(public val name: String? = null) {
-    private var _set = KmemAtomicRef(false)
-    private var _value = KmemAtomicRef<KPointer?>(null)
+    private var _set = atomic(false)
+    private var _value = atomic<KPointer?>(null)
 
     protected fun getFuncName(property: KProperty<*>): String = name ?: property.name.removeSuffix("Ext")
 

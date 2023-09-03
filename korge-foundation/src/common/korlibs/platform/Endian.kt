@@ -1,7 +1,5 @@
 package korlibs.platform
 
-import korlibs.memory.internal.currentIsLittleEndian
-
 public enum class Endian {
     LITTLE_ENDIAN, BIG_ENDIAN;
 

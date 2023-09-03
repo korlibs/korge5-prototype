@@ -1,9 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
-import korlibs.crypto.internal.arrayxor
-import korlibs.crypto.internal.getIV
-
 /**
  * Symmetric Cipher Mode
  */

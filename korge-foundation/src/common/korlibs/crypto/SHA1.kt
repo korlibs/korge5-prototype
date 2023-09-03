@@ -1,9 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
-import korlibs.crypto.internal.readS32_be
-import korlibs.crypto.internal.rotateLeft
-
 class SHA1 : SHA(chunkSize = 64, digestSize = 20, name = "SHA1") {
     companion object : HasherFactory("SHA1", { SHA1() }) {
         private val H = intArrayOf(

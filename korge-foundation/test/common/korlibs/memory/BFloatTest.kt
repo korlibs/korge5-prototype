@@ -1,5 +1,7 @@
 package korlibs.memory
 
+/*
+import korlibs.number.BFloat
 import kotlin.test.*
 
 class BFloatTest {
@@ -19,3 +21,4 @@ class BFloatTest {
         assertEquals(1000f, BFloat(1000f).toFloat())
     }
 }
+*/

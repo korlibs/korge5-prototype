@@ -1,3 +1,5 @@
+@file:Suppress("RemoveRedundantCallsOfConversionMethods")
+
 package korlibs.memory
 
 import korlibs.math.isMultipleOf
@@ -111,15 +113,15 @@ fun DataView.setUint32(byteOffset: Int, value: UInt, littleEndian: Boolean) = se
 
 
 fun DataView.getInt16LE(byteOffset: Int): Short = getInt16(byteOffset, true)
-fun DataView.getUint16LE(byteOffset: Int): Int = getUint16(byteOffset, true)
+fun DataView.getUint16LE(byteOffset: Int): Int = getUint16(byteOffset, true).toInt()
 fun DataView.getInt32LE(byteOffset: Int): Int = getInt32(byteOffset, true)
-fun DataView.getUint32LE(byteOffset: Int): UInt = getUint32(byteOffset, true)
+fun DataView.getUint32LE(byteOffset: Int): UInt = getUint32(byteOffset, true).toUInt()
 fun DataView.getFloat32LE(byteOffset: Int): Float = getFloat32(byteOffset, true)
 fun DataView.getFloat64LE(byteOffset: Int): Double = getFloat64(byteOffset, true)
 fun DataView.getInt16BE(byteOffset: Int): Short = getInt16(byteOffset, false)
-fun DataView.getUint16BE(byteOffset: Int): Int = getUint16(byteOffset, false)
+fun DataView.getUint16BE(byteOffset: Int): Int = getUint16(byteOffset, false).toInt()
 fun DataView.getInt32BE(byteOffset: Int): Int = getInt32(byteOffset, false)
-fun DataView.getUint32BE(byteOffset: Int): UInt = getUint32(byteOffset, false)
+fun DataView.getUint32BE(byteOffset: Int): UInt = getUint32(byteOffset, false).toUInt()
 fun DataView.getFloat32BE(byteOffset: Int): Float = getFloat32(byteOffset, false)
 fun DataView.getFloat64BE(byteOffset: Int): Double = getFloat64(byteOffset, false)
 

@@ -1,6 +1,5 @@
 package korlibs.audio.sound.backend
 
-import korlibs.datastructure.thread.*
 import korlibs.memory.*
 import korlibs.memory.dyn.*
 import korlibs.time.*
@@ -9,6 +8,7 @@ import com.sun.jna.Callback
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.Memory
+import korlibs.datastructure.thread.NativeThread
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 
@@ -108,7 +108,7 @@ class JvmWaveOutPlatformAudioOutput(
         if (running) return
         //println("STARTED")
         running = true
-        nativeThread = korlibs.datastructure.thread.NativeThread {
+        nativeThread = NativeThread {
             val handlePtr = Memory(8L)
             val freq = frequency
             val blockAlign = (nchannels * Short.SIZE_BYTES)

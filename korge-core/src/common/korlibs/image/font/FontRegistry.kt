@@ -1,6 +1,5 @@
 package korlibs.image.font
 
-import korlibs.datastructure.CopyOnWriteFrozenMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.native.concurrent.ThreadLocal
@@ -27,8 +26,8 @@ fun SystemFontRegistry(coroutineContext: CoroutineContext): DefaultFontRegistry 
 suspend fun SystemFontRegistry(): DefaultFontRegistry = SystemFontRegistry(coroutineContext)
 
 open class DefaultFontRegistry(val coroutineContext: CoroutineContext) : FontRegistry {
-    private val registeredFonts = CopyOnWriteFrozenMap<String?, Font>()
-    fun normalizeName(name: String?) = name?.toLowerCase()?.trim()
+    private val registeredFonts = LinkedHashMap<String?, Font>()
+    fun normalizeName(name: String?) = name?.lowercase()?.trim()
     fun register(font: Font, name: String = font.name) = font.also { registeredFonts[normalizeName(name)] = it }
     fun unregister(name: String) = registeredFonts.remove(name)
     inline fun <T> registerTemporarily(font: Font, name: String = font.name, block: () -> T): T {

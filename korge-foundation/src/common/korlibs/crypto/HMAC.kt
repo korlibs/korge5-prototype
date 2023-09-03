@@ -1,9 +1,6 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
-
 class HMAC {
-
     companion object {
         fun hmacSHA1(key: ByteArray, data: ByteArray): Hash = hmac(key, data, SHA1())
 

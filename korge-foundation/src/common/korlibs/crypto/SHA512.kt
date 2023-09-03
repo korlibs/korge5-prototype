@@ -1,7 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
-
 // https://git.suckless.org/sbase/file/libutil/sha512.c.html
 // https://git.suckless.org/sbase/file/sha512.h.html
 /* public domain sha512 implementation based on fips180-3 */

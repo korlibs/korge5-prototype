@@ -1,11 +1,15 @@
 package korlibs.korge.service.storage
 
-import korlibs.datastructure.*
-import korlibs.datastructure.atomic.*
-import korlibs.io.lang.*
-import korlibs.io.serialization.json.*
+import korlibs.datastructure.Extra
+import korlibs.io.serialization.json.fromJson
+import korlibs.io.serialization.json.toJson
 import korlibs.korge.view.Views
 import korlibs.korge.view.ViewsContainer
+import kotlin.collections.LinkedHashMap
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.set
+import kotlin.collections.toList
 import kotlin.native.concurrent.ThreadLocal
 
 /** Cross-platform way of synchronously storing small data */
@@ -35,27 +39,24 @@ abstract class FiledBasedNativeStorage(val views: Views) : IStorageWithKeys {
     protected abstract fun saveStr(data: String)
     protected abstract fun loadStr(): String
 
-    private var map = KdsAtomicRef<CopyOnWriteFrozenMap<String, String>?>(null)
+    private var map = LinkedHashMap<String, String>()
 
     override fun toString(): String = "NativeStorage(${toMap()})"
     override fun keys(): List<String> {
         ensureMap()
-        return map.value?.keys?.toList() ?: emptyList()
+        return map.keys.toList()
     }
 
-    private fun ensureMap(): CopyOnWriteFrozenMap<String, String> {
-        if (map.value == null) {
-            map.value = CopyOnWriteFrozenMap()
-            val str = kotlin.runCatching { loadStr() }.getOrNull()
-            if (str != null && str.isNotEmpty()) {
-                try {
-                    map.value!!.putAll(str.fromJson() as Map<String, String>)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                }
+    private fun ensureMap(): LinkedHashMap<String, String> {
+        val str = kotlin.runCatching { loadStr() }.getOrNull()
+        if (!str.isNullOrEmpty()) {
+            try {
+                map.putAll(str.fromJson() as Map<String, String>)
+            } catch (e: Throwable) {
+                e.printStackTrace()
             }
         }
-        return map.value!!
+        return map
     }
 
     private fun save() {

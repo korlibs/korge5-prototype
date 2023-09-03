@@ -1,6 +1,6 @@
 package korlibs.datastructure
 
-import korlibs.datastructure.iterators.*
+import korlibs.datastructure.iterators.fastForEach
 import kotlin.reflect.*
 
 inline fun IntRange.toIntList(): IntArrayList = IntArrayList((this.endInclusive - this.start).coerceAtLeast(0)).also { for (v in this.start .. this.endInclusive) it.add(v) }

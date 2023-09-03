@@ -1,7 +1,17 @@
 package korlibs.bignumber
 
-import korlibs.bignumber.ranges.*
+import korlibs.bignumber.ranges.ClosedBigNumRange
 import kotlin.math.*
+
+// Big Number
+/** Converts this into a [BigNum] */
+val Double.bn: BigNum get() = BigNum("$this")
+/** Converts this into a [BigNum] */
+val Long.bn: BigNum get() = BigNum(this.bi, 0)
+/** Converts this into a [BigNum] */
+val Int.bn: BigNum get() = BigNum(this.bi, 0)
+/** Converts this into a [BigNum] */
+val String.bn: BigNum get() = BigNum(this)
 
 /**
  * Represents a [BigNum],

@@ -6,3 +6,4 @@
 /korge-core/__existing
 hs_err*.log
 /SDL2.dll
+.DS_Store

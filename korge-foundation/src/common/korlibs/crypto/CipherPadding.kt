@@ -1,6 +1,5 @@
 package korlibs.crypto
 
-import korlibs.crypto.internal.arraycopy
 import kotlin.random.Random
 
 typealias Padding = CipherPadding

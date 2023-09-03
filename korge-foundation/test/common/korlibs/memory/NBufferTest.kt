@@ -1,6 +1,7 @@
 package korlibs.memory
 
 import korlibs.memory.internal.*
+import korlibs.platform.currentIsLittleEndian
 import kotlin.byteArrayOf
 import kotlin.test.*
 

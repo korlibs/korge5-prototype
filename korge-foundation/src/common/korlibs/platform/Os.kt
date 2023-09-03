@@ -1,7 +1,5 @@
 package korlibs.platform
 
-import korlibs.memory.internal.*
-
 enum class Os {
     UNKNOWN, MACOSX, IOS, LINUX, WINDOWS, ANDROID, TVOS, WATCHOS;
 

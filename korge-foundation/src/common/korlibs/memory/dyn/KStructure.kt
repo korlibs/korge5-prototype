@@ -1,6 +1,6 @@
 package korlibs.memory.dyn
 
-import korlibs.memory.annotations.*
+import korlibs.memory.KmemExperimental
 import kotlin.math.max
 import kotlin.reflect.KProperty
 

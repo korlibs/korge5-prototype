@@ -1,4 +1,3 @@
 package korlibs.memory
 
-public actual val KmemGC: KmemGCImpl = object : KmemGCImpl() {
-}
+actual fun gc(full: Boolean): Unit = Unit

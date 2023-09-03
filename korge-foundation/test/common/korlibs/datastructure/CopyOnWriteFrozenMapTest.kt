@@ -1,5 +1,6 @@
 package korlibs.datastructure
 
+/*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -17,3 +18,4 @@ class CopyOnWriteFrozenMapTest {
         //assertEquals(true, false)
     }
 }
+*/

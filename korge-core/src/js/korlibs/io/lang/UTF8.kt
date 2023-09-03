@@ -2,6 +2,7 @@ package korlibs.io.lang
 
 import korlibs.memory.*
 import org.khronos.webgl.*
+import org.khronos.webgl.Int8Array
 
 actual val UTF8: Charset = UTC8CharsetBase("UTF-8")
 

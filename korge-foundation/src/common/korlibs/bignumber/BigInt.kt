@@ -1,6 +1,16 @@
 package korlibs.bignumber
 
-import korlibs.bignumber.ranges.*
+import korlibs.bignumber.ranges.BigIntRange
+
+// Big Integer
+/** Converts this into a [BigInt] */
+val Long.bi: BigInt get() = BigInt(this)
+/** Converts this into a [BigInt] */
+val Int.bi: BigInt get() = BigInt(this)
+/** Converts this into a [BigInt] */
+val String.bi: BigInt get() = BigInt(this)
+/** Converts this into a [BigInt] using a specific [radix], that is the base to use. radix=10 for decimal, radix=16 for hexadecimal */
+fun String.bi(radix: Int): BigInt = BigInt(this, radix)
 
 /**
  * Represents an arbitrary-sized Big Integer.
@@ -162,6 +172,17 @@ fun BigInt(value: Int): BigInt = BigIntNativeFactory.create(value)
 fun BigInt(value: Long): BigInt = BigIntNativeFactory.create(value)
 fun BigInt(value: String, radix: Int): BigInt = BigIntNativeFactory.create(value, radix)
 fun BigInt(value: String): BigInt = BigIntNativeFactory.create(value)
+
+/** A generic [BigInt] exception */
+open class BigIntException(message: String) : Throwable(message)
+/** A [BigInt] exception thrown when an invalid String value is provided while parsing */
+open class BigIntInvalidFormatException(message: String) : BigIntException(message)
+/** A [BigInt] exception thrown when trying to divide by zero */
+open class BigIntDivisionByZeroException() : BigIntException("Division by zero")
+/** A [BigInt] exception thrown when an overflow operation occurs, like for example when trying to convert a too big [BigInt] into an [Int] */
+open class BigIntOverflowException(message: String) : BigIntException(message)
+/** A [BigInt] exception thrown when doing a `pow` operation with a negative exponent */
+open class BigIntNegativeExponentException() : BigIntOverflowException("Negative exponent")
 
 internal fun <T> parseWithNumberPrefix(str: String, gen: (sub: String, radix: Int) -> T): T = when {
     str.startsWith("0x") -> gen(str.substring(2), 16)

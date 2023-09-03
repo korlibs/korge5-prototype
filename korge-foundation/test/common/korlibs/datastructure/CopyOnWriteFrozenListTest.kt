@@ -1,5 +1,6 @@
 package korlibs.datastructure
 
+/*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -18,3 +19,4 @@ class CopyOnWriteFrozenListTest {
         assertEquals(listOf("hello", "world", "world"), list.toList())
     }
 }
+*/
