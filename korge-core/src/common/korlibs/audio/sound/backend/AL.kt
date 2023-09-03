@@ -13,7 +13,6 @@ import korlibs.math.*
 import korlibs.memory.Buffer
 import korlibs.memory.Platform
 import korlibs.time.*
-import korlibs.time.hr.HRTimeSpan
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlin.coroutines.ContinuationInterceptor
@@ -194,7 +193,7 @@ private class MyStopwatch {
     private var running = false
     private var ns = 0L
     //private val now get() = System.nanoTime()
-    private val now get() = HRTimeSpan.now().nanosecondsDouble.toLong()
+    private val now get() = PerformanceCounter.reference.nanoseconds.toLong()
 
     fun resume() {
         if (running) return

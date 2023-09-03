@@ -4,7 +4,6 @@ package korlibs.time.internal
 
 import korlibs.math.*
 import korlibs.time.*
-import korlibs.time.hr.*
 import kotlin.jvm.*
 import kotlin.math.*
 
@@ -111,9 +110,9 @@ internal class Moduler(val value: Double) {
 
 internal expect object KlockInternal {
     val currentTime: Double
-    val hrNow: HRTimeSpan
+    val now: TimeSpan
     fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan
-    fun sleep(time: HRTimeSpan)
+    fun sleep(time: TimeSpan)
 }
 
 expect interface Serializable
@@ -196,9 +195,9 @@ internal class MicroStrReader(val str: String, var offset: Int = 0) {
     }
 }
 
-internal fun spinlock(time: HRTimeSpan) {
-    val start = HRTimeSpan.now()
-    while (HRTimeSpan.now() - start < time) Unit
+internal fun spinlock(time: TimeSpan) {
+    val start = TimeSpan.now()
+    while (TimeSpan.now() - start < time) Unit
 }
 
 internal fun MicroStrReader.readTimeZoneOffset(tzNames: TimezoneNames = TimezoneNames.DEFAULT): TimeSpan? {

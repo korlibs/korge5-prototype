@@ -81,6 +81,15 @@ inline val Double.days get() = toDuration(DurationUnit.DAYS)
 /** [TimeSpan] representing this number as [weeks] or 604_800 [seconds]. */
 inline val Double.weeks get() = (this * 7).days
 
+fun Duration.Companion.fromNanoseconds(value: Double): Duration = value.nanoseconds
+fun Duration.Companion.fromMicroseconds(value: Double): Duration = value.microseconds
+fun Duration.Companion.fromMilliseconds(value: Double): Duration = value.milliseconds
+fun Duration.Companion.fromSeconds(value: Double): Duration = value.seconds
+fun Duration.Companion.fromMinutes(value: Double): Duration = value.minutes
+fun Duration.Companion.fromHours(value: Double): Duration = value.hours
+fun Duration.Companion.fromDays(value: Double): Duration = value.days
+fun Duration.Companion.fromWeeks(value: Double): Duration = value.weeks
+
 
 /**
  * Represents a span of time, with [milliseconds] precision.
@@ -134,8 +143,10 @@ infix fun Duration.divFloat(other: Duration): Float = (this.milliseconds / other
 operator fun Duration.rem(other: Duration): Duration = (this.milliseconds % other.milliseconds).milliseconds
 infix fun Duration.umod(other: Duration): Duration = (this.milliseconds umod other.milliseconds).milliseconds
 
-/** Return true if [TimeSpan.NIL] */
+/** Return true if [Duration.NIL] */
 val Duration.isNil: Boolean get() = this == DURATION_NIL
+
+fun Duration.Companion.now(): Duration = KlockInternal.now
 
 /**
  * Formats this [TimeSpan] into something like `12:30:40.100`.

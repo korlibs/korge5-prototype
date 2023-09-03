@@ -5,23 +5,24 @@ package korlibs.time.internal
 import korlibs.time.*
 import korlibs.time.hr.*
 import kotlinx.browser.*
+import kotlin.time.*
 
 private external val process: dynamic
 
 private val isNode = jsTypeOf(window) == "undefined"
-private val initialHrTime by lazy { process.hrtime() }
+private val initialHrTime: dynamic by lazy { process.hrtime() }
 
 internal actual object KlockInternal {
     actual val currentTime: Double get() = (js("Date.now()").unsafeCast<Double>())
 
-    actual val hrNow: HRTimeSpan
+    actual val now: TimeSpan
         get() = when {
         isNode -> {
             val result: Array<Double> = process.hrtime(initialHrTime).unsafeCast<Array<Double>>()
-            HRTimeSpan.fromSeconds(result[0]) + HRTimeSpan.fromNanoseconds(result[1])
+            Duration.fromSeconds(result[0]) + TimeSpan.fromNanoseconds(result[1])
         }
         else -> {
-            HRTimeSpan.fromMilliseconds(window.performance.now())
+            TimeSpan.fromMilliseconds(window.performance.now())
         }
     }
 
@@ -31,7 +32,7 @@ internal actual object KlockInternal {
         return js("-(new Date(rtime)).getTimezoneOffset()").unsafeCast<Int>().minutes
     }
 
-    actual fun sleep(time: HRTimeSpan) {
+    actual fun sleep(time: TimeSpan) {
         spinlock(time)
     }
 }
