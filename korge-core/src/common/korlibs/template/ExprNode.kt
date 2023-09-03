@@ -228,7 +228,7 @@ interface ExprNode : DynamicContext {
 
         private fun parseFinal(r: ListReader<Token>): ExprNode {
             if (!r.hasMore) r.prevOrContext().exception("Expected expression")
-            val tok = r.peek().text.toUpperCase()
+            val tok = r.peek().text.uppercase()
             var construct: ExprNode = when (tok) {
                 "!", "~", "-", "+", "NOT" -> {
                     val op = tok
@@ -240,6 +240,7 @@ interface ExprNode : DynamicContext {
                         }
                     )
                 }
+
                 "(" -> {
                     r.read()
                     val result = ExprNode.parseExpr(r)
@@ -279,6 +280,7 @@ interface ExprNode : DynamicContext {
                     r.expect("}")
                     OBJECT_LIT(items)
                 }
+
                 else -> {
                     // Number
                     if (r.peek() is ExprNode.Token.TNumber) {
@@ -314,6 +316,7 @@ interface ExprNode : DynamicContext {
                         construct = ACCESS(construct, LIT(id))
                         continue@loop
                     }
+
                     "[" -> {
                         r.read()
                         val expr = ExprNode.parseExpr(r)
@@ -321,6 +324,7 @@ interface ExprNode : DynamicContext {
                         val end = r.read()
                         if (end.text != "]") end.exception("Expected ']' but found $end")
                     }
+
                     "|" -> {
                         val tok = r.read()
                         val name = r.tryRead()?.text ?: ""
@@ -352,6 +356,7 @@ interface ExprNode : DynamicContext {
                         }
                         construct = FILTER(name, construct, args, tok)
                     }
+
                     "(" -> {
                         r.read()
                         val args = arrayListOf<ExprNode>()
@@ -365,6 +370,7 @@ interface ExprNode : DynamicContext {
                         r.expect(")")
                         construct = CALL(construct, args)
                     }
+
                     else -> break@loop
                 }
             }

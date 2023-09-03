@@ -291,7 +291,7 @@ class SVG(val root: Xml, val warningProcessor: ((message: String) -> Unit)? = nu
                     val extra = str.substringAfter(')')
 
                     if (urlPattern.startsWith("#")) {
-                        val idName = urlPattern.substr(1).toLowerCase()
+                        val idName = urlPattern.substr(1).lowercase()
                         val def = defs[idName]
                         if (def == null) {
                             logger.info { defs }

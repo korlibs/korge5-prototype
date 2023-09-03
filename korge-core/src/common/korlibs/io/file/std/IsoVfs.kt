@@ -165,49 +165,50 @@ object ISO {
 		}
 	}
 
-	class IsoFile(val reader: IsoReader, val record: DirectoryRecord, val parent: IsoFile?)  {
-		val name: String get() = record.name
-		val normalizedName = name.normalizeName()
-		val isDirectory: Boolean get() = record.isDirectory
-		val fullname: String = if (parent == null) record.name else "${parent.fullname}/${record.name}".trimStart('/')
-		val children = arrayListOf<IsoFile>()
-		val childrenByName = LinkedHashMap<String, IsoFile>()
-		val size: Long = record.size.toLong()
+    class IsoFile(val reader: IsoReader, val record: DirectoryRecord, val parent: IsoFile?) {
+        val name: String get() = record.name
+        val normalizedName = name.normalizeName()
+        val isDirectory: Boolean get() = record.isDirectory
+        val fullname: String = if (parent == null) record.name else "${parent.fullname}/${record.name}".trimStart('/')
+        val children = arrayListOf<IsoFile>()
+        val childrenByName = LinkedHashMap<String, IsoFile>()
+        val size: Long = record.size.toLong()
 
-		init {
-			parent?.children?.add(this)
-			parent?.childrenByName?.put(normalizedName, this)
-		}
+        init {
+            parent?.children?.add(this)
+            parent?.childrenByName?.put(normalizedName, this)
+        }
 
-		fun dump() {
-			println("$fullname: $record")
-			children.fastForEach { c ->
-				c.dump()
-			}
-		}
+        fun dump() {
+            println("$fullname: $record")
+            children.fastForEach { c ->
+                c.dump()
+            }
+        }
 
-		private fun String.normalizeName() = this.toLowerCase()
+        private fun String.normalizeName() = this.lowercase()
 
-		suspend fun open2(mode: VfsOpenMode) = reader.getSector(record.extent, record.size)
-		operator fun get(name: String): IsoFile {
-			var current = this
-			name.split("/").fastForEach { part ->
-				when (part) {
-					"" -> Unit
-					"." -> Unit
-					".." -> current = current.parent!!
-					// @TODO: kotlin-js bug? It doesn't seems to like this somehow.
-					//else -> current = current.children.firstOrNull { it.name.toUpperCase() == part.toUpperCase() } ?: throw kotlin.IllegalStateException("Can't find part $part for accessing path $name children: ${current.children}")
-					else -> current = current.childrenByName[part.normalizeName()] ?: throw kotlin.IllegalStateException("Can't find part $part for accessing path $name children: ${current.children}")
-				}
-			}
-			return current
-		}
+        suspend fun open2(mode: VfsOpenMode) = reader.getSector(record.extent, record.size)
+        operator fun get(name: String): IsoFile {
+            var current = this
+            name.split("/").fastForEach { part ->
+                when (part) {
+                    "" -> Unit
+                    "." -> Unit
+                    ".." -> current = current.parent!!
+                    // @TODO: kotlin-js bug? It doesn't seems to like this somehow.
+                    //else -> current = current.children.firstOrNull { it.name.toUpperCase() == part.toUpperCase() } ?: throw kotlin.IllegalStateException("Can't find part $part for accessing path $name children: ${current.children}")
+                    else -> current = current.childrenByName[part.normalizeName()]
+                        ?: throw kotlin.IllegalStateException("Can't find part $part for accessing path $name children: ${current.children}")
+                }
+            }
+            return current
+        }
 
-		override fun toString(): String {
-			return "IsoFile(fullname='$fullname', size=$size)"
-		}
-	}
+        override fun toString(): String {
+            return "IsoFile(fullname='$fullname', size=$size)"
+        }
+    }
 
 	fun SyncStream.readLongArrayLE(count: Int): LongArray = (0 until count).map { readS64LE() }.toLongArray()
 

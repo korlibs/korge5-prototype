@@ -11,7 +11,7 @@ import kotlin.math.round
 
 //@Suppress("unused")
 object DefaultFilters {
-    val Capitalize = Filter("capitalize") { subject.toDynamicString().toLowerCase().capitalize() }
+    val Capitalize = Filter("capitalize") { subject.toDynamicString().lowercase().capitalize() }
     val Join = Filter("join") {
         subject.toDynamicList().joinToString(args[0].toDynamicString()) { it.toDynamicString() }
     }
@@ -51,10 +51,10 @@ object DefaultFilters {
     }
     val Trim = Filter("trim") { subject.toDynamicString().trim() }
 
-    val Lower = Filter("lower") { subject.toDynamicString().toLowerCase() }
-    val Upper = Filter("upper") { subject.toDynamicString().toUpperCase() }
-    val Downcase = Filter("downcase") { subject.toDynamicString().toLowerCase() }
-    val Upcase = Filter("upcase") { subject.toDynamicString().toUpperCase() }
+    val Lower = Filter("lower") { subject.toDynamicString().lowercase() }
+    val Upper = Filter("upper") { subject.toDynamicString().uppercase() }
+    val Downcase = Filter("downcase") { subject.toDynamicString().lowercase() }
+    val Upcase = Filter("upcase") { subject.toDynamicString().uppercase() }
 
     val Merge = Filter("merge") {
         val arg = args.getOrNull(0)

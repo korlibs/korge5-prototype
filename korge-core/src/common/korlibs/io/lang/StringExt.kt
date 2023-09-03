@@ -31,12 +31,12 @@ fun String.format(vararg params: Any): String {
 		val str = when (type) {
 			"d" -> (param as Number).toLong().toString()
 			"X", "x" -> {
-				val res = when (param) {
-					is Int -> param.toStringUnsigned(16)
-					else -> (param as Number).toLong().toStringUnsigned(16)
-				}
-				if (type == "X") res.toUpperCase() else res.toLowerCase()
-			}
+                val res = when (param) {
+                    is Int -> param.toStringUnsigned(16)
+                    else -> (param as Number).toLong().toStringUnsigned(16)
+                }
+                if (type == "X") res.uppercase() else res.lowercase()
+            }
 			else -> "$param"
 		}
 		val prefix = if (size.startsWith('0')) '0' else ' '

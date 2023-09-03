@@ -9,15 +9,16 @@ internal fun String.format(vararg params: Any): String {
         //println("param: $param")
         val size = mr.groupValues[1]
         val type = mr.groupValues[2]
-        val str = when (type.toLowerCase()) {
+        val str = when (type.lowercase()) {
             "d" -> (param as Number).toLong().toString()
             "x" -> {
                 val res = when (param) {
                     is Int -> param.toStringUnsigned(16)
                     else -> (param as Number).toLong().toStringUnsigned(16)
                 }
-                if (type == "X") res.toUpperCase() else res.toLowerCase()
+                if (type == "X") res.uppercase() else res.lowercase()
             }
+
             else -> "$param"
         }
         val prefix = if (size.startsWith('0')) '0' else ' '

@@ -318,11 +318,11 @@ data class AtlasInfo(
 
             fun String.keyValue(): Pair<String, String> {
                 val list = this.split(':', limit = 2)
-                return list.first().trim().toLowerCase() to list.last().trim()
+                return list.first().trim().lowercase() to list.last().trim()
             }
 
             fun String.filter(): Boolean {
-                return when (this.toLowerCase()) {
+                return when (this.lowercase()) {
                     "nearest" -> false
                     "linear" -> true
                     "mipmap" -> true
@@ -355,7 +355,7 @@ data class AtlasInfo(
                             "size" -> size = value.size()
                             "format" -> format = value
                             "filter" -> {
-                                val filter = value.split(",").map { it.trim().toLowerCase() }
+                                val filter = value.split(",").map { it.trim().lowercase() }
                                 filterMin = filter.first().filter()
                                 filterMag = filter.last().filter()
                             }

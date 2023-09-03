@@ -35,7 +35,7 @@ class ResourcesRoot : InjectorDependency {
 	}
 
 	suspend fun mapExtensions(vararg maps: Pair<String, String>) {
-		val mapsLC = maps.map { it.first.toLowerCase() to it.second }.toMap()
+		val mapsLC = maps.map { it.first.lowercase() to it.second }.toMap()
 		redirected {
 			val pi = PathInfo(it)
 			val map = mapsLC[pi.extensionLC]

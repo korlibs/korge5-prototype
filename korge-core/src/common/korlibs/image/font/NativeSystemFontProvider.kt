@@ -207,7 +207,7 @@ abstract class TtfNativeSystemFontProvider() : NativeSystemFontProvider() {
     abstract fun loadFontByName(name: String): TtfFont?
     abstract fun defaultFont(): TtfFont
 
-    fun String.normalizeName() = this.toLowerCase().trim()
+    fun String.normalizeName() = this.lowercase().trim()
 
     //private val ttfCache = CopyOnWriteFrozenMap<String, TtfFont?>()
     private val ttfCache = LinkedHashMap<String, TtfFont?>()

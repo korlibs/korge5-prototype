@@ -12,7 +12,7 @@ class CaseInsensitiveStringMap<T> private constructor(
     constructor(data: Map<String, T>) : this() { putAll(data) }
     constructor(vararg items: Pair<String, T>) : this() { putAll(items.toList()) }
 
-    override fun containsKey(key: String): Boolean = mapLC.containsKey(key.toLowerCase())
+    override fun containsKey(key: String): Boolean = mapLC.containsKey(key.lowercase())
 
     override fun clear() {
         mapOrig.clear()
@@ -20,13 +20,13 @@ class CaseInsensitiveStringMap<T> private constructor(
         lcToOrig.clear()
     }
 
-    override fun get(key: String): T? = mapLC[key.toLowerCase()]
+    override fun get(key: String): T? = mapLC[key.lowercase()]
 
     override fun put(key: String, value: T): T? {
         remove(key)
         mapOrig[key] = value
-        lcToOrig[key.toLowerCase()] = key
-        return mapLC.put(key.toLowerCase(), value)
+        lcToOrig[key.lowercase()] = key
+        return mapLC.put(key.lowercase(), value)
     }
 
     override fun putAll(from: Map<out String, T>) {
@@ -34,7 +34,7 @@ class CaseInsensitiveStringMap<T> private constructor(
     }
 
     override fun remove(key: String): T? {
-        val lkey = key.toLowerCase()
+        val lkey = key.lowercase()
         val okey = lcToOrig[lkey]
         mapOrig.remove(okey)
         val res = mapLC.remove(lkey)

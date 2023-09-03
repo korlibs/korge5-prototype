@@ -322,7 +322,7 @@ object Colors {
                     return RGBA(r, g, b, a)
                 }
                 str.startsWith("RGBA(", ignoreCase = true) -> {
-                    val parts = str.toUpperCase().removePrefix("RGBA(").removeSuffix(")").split(",")
+                    val parts = str.uppercase().removePrefix("RGBA(").removeSuffix(")").split(",")
                     val r = parts.getOrElse(0) { "0" }.toIntOrNull() ?: 0
                     val g = parts.getOrElse(1) { "0" }.toIntOrNull() ?: 0
                     val b = parts.getOrElse(2) { "0" }.toIntOrNull() ?: 0
@@ -330,7 +330,7 @@ object Colors {
                     return RGBA(r, g, b, (af * 255).toInt())
                 }
                 else -> {
-                    val col = colorsByName[str.toLowerCase()]
+                    val col = colorsByName[str.lowercase()]
                     //error("Unsupported color '$str'")
                     if (col == null && errorOnDefault) return get("#$str", default)
                     return col ?: default
