@@ -4,127 +4,127 @@ package korlibs.memory
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-private fun ByteArray.u8(o: Int): Int = this[o].toInt() and 0xFF
+private fun ByteArray.u8(offset: Int): Int = this[offset].toInt() and 0xFF
 
-private inline fun ByteArray.read16LE(o: Int): Int = (u8(o + 0) shl 0) or (u8(o + 1) shl 8)
-private inline fun ByteArray.read24LE(o: Int): Int = (u8(o + 0) shl 0) or (u8(o + 1) shl 8) or (u8(o + 2) shl 16)
-private inline fun ByteArray.read32LE(o: Int): Int = (u8(o + 0) shl 0) or (u8(o + 1) shl 8) or (u8(o + 2) shl 16) or (u8(o + 3) shl 24)
-private inline fun ByteArray.read64LE(o: Int): Long = (read32LE(o + 0).unsigned shl 0) or (read32LE(o + 4).unsigned shl 32)
+private inline fun ByteArray.get16LE(offset: Int): Int = (u8(offset + 0) shl 0) or (u8(offset + 1) shl 8)
+private inline fun ByteArray.get24LE(offset: Int): Int = (u8(offset + 0) shl 0) or (u8(offset + 1) shl 8) or (u8(offset + 2) shl 16)
+private inline fun ByteArray.get32LE(offset: Int): Int = (u8(offset + 0) shl 0) or (u8(offset + 1) shl 8) or (u8(offset + 2) shl 16) or (u8(offset + 3) shl 24)
+private inline fun ByteArray.get64LE(offset: Int): Long = (get32LE(offset + 0).unsigned shl 0) or (get32LE(offset + 4).unsigned shl 32)
 
-private inline fun ByteArray.read16BE(o: Int): Int = (u8(o + 1) shl 0) or (u8(o + 0) shl 8)
-private inline fun ByteArray.read24BE(o: Int): Int = (u8(o + 2) shl 0) or (u8(o + 1) shl 8) or (u8(o + 0) shl 16)
-private inline fun ByteArray.read32BE(o: Int): Int = (u8(o + 3) shl 0) or (u8(o + 2) shl 8) or (u8(o + 1) shl 16) or (u8(o + 0) shl 24)
-private inline fun ByteArray.read64BE(o: Int): Long = (read32BE(o + 4).unsigned shl 0) or (read32BE(o + 0).unsigned shl 32)
+private inline fun ByteArray.get16BE(offset: Int): Int = (u8(offset + 1) shl 0) or (u8(offset + 0) shl 8)
+private inline fun ByteArray.get24BE(offset: Int): Int = (u8(offset + 2) shl 0) or (u8(offset + 1) shl 8) or (u8(offset + 0) shl 16)
+private inline fun ByteArray.get32BE(offset: Int): Int = (u8(offset + 3) shl 0) or (u8(offset + 2) shl 8) or (u8(offset + 1) shl 16) or (u8(offset + 0) shl 24)
+private inline fun ByteArray.get64BE(offset: Int): Long = (get32BE(offset + 4).unsigned shl 0) or (get32BE(offset + 0).unsigned shl 32)
 
 // Unsigned
-public fun ByteArray.readU8(o: Int): Int = this[o].toInt() and 0xFF
-public fun ByteArray.readU16LE(o: Int): Int = read16LE(o)
-public fun ByteArray.readU24LE(o: Int): Int = read24LE(o)
-public fun ByteArray.readU32LE(o: Int): Long = read32LE(o).unsigned
-public fun ByteArray.readU16BE(o: Int): Int = read16BE(o)
-public fun ByteArray.readU24BE(o: Int): Int = read24BE(o)
-public fun ByteArray.readU32BE(o: Int): Long = read32BE(o).unsigned
+public fun ByteArray.getU8(offset: Int): Int = this[offset].toInt() and 0xFF
+public fun ByteArray.getU16LE(offset: Int): Int = get16LE(offset)
+public fun ByteArray.getU24LE(offset: Int): Int = get24LE(offset)
+public fun ByteArray.getU32LE(offset: Int): Long = get32LE(offset).unsigned
+public fun ByteArray.getU16BE(offset: Int): Int = get16BE(offset)
+public fun ByteArray.getU24BE(offset: Int): Int = get24BE(offset)
+public fun ByteArray.getU32BE(offset: Int): Long = get32BE(offset).unsigned
 
 // Signed
-public fun ByteArray.readS8(o: Int): Int = this[o].toInt()
-public fun ByteArray.readS16LE(o: Int): Int = read16LE(o).signExtend(16)
-public fun ByteArray.readS24LE(o: Int): Int = read24LE(o).signExtend(24)
-public fun ByteArray.readS32LE(o: Int): Int = read32LE(o)
-public fun ByteArray.readS64LE(o: Int): Long = read64LE(o)
-public fun ByteArray.readF16LE(o: Int): Half = Half.fromBits(read16LE(o))
-public fun ByteArray.readF32LE(o: Int): Float = Float.fromBits(read32LE(o))
-public fun ByteArray.readF64LE(o: Int): Double = Double.fromBits(read64LE(o))
-public fun ByteArray.readS16BE(o: Int): Int = read16BE(o).signExtend(16)
-public fun ByteArray.readS24BE(o: Int): Int = read24BE(o).signExtend(24)
-public fun ByteArray.readS32BE(o: Int): Int = read32BE(o)
-public fun ByteArray.readS64BE(o: Int): Long = read64BE(o)
-public fun ByteArray.readF16BE(o: Int): Half = Half.fromBits(read16BE(o))
-public fun ByteArray.readF32BE(o: Int): Float = Float.fromBits(read32BE(o))
-public fun ByteArray.readF64BE(o: Int): Double = Double.fromBits(read64BE(o))
+public fun ByteArray.getS8(offset: Int): Int = this[offset].toInt()
+public fun ByteArray.getS16LE(offset: Int): Int = get16LE(offset).signExtend(16)
+public fun ByteArray.getS24LE(offset: Int): Int = get24LE(offset).signExtend(24)
+public fun ByteArray.getS32LE(offset: Int): Int = get32LE(offset)
+public fun ByteArray.getS64LE(offset: Int): Long = get64LE(offset)
+public fun ByteArray.getF16LE(offset: Int): Half = Half.fromBits(get16LE(offset))
+public fun ByteArray.getF32LE(offset: Int): Float = Float.fromBits(get32LE(offset))
+public fun ByteArray.getF64LE(offset: Int): Double = Double.fromBits(get64LE(offset))
+public fun ByteArray.getS16BE(offset: Int): Int = get16BE(offset).signExtend(16)
+public fun ByteArray.getS24BE(offset: Int): Int = get24BE(offset).signExtend(24)
+public fun ByteArray.getS32BE(offset: Int): Int = get32BE(offset)
+public fun ByteArray.getS64BE(offset: Int): Long = get64BE(offset)
+public fun ByteArray.getF16BE(offset: Int): Half = Half.fromBits(get16BE(offset))
+public fun ByteArray.getF32BE(offset: Int): Float = Float.fromBits(get32BE(offset))
+public fun ByteArray.getF64BE(offset: Int): Double = Double.fromBits(get64BE(offset))
 
 // Custom Endian
-public fun ByteArray.readU16(o: Int, little: Boolean): Int = if (little) readU16LE(o) else readU16BE(o)
-public fun ByteArray.readU24(o: Int, little: Boolean): Int = if (little) readU24LE(o) else readU24BE(o)
-public fun ByteArray.readU32(o: Int, little: Boolean): Long = if (little) readU32LE(o) else readU32BE(o)
-public fun ByteArray.readS16(o: Int, little: Boolean): Int = if (little) readS16LE(o) else readS16BE(o)
-public fun ByteArray.readS24(o: Int, little: Boolean): Int = if (little) readS24LE(o) else readS24BE(o)
-public fun ByteArray.readS32(o: Int, little: Boolean): Int = if (little) readS32LE(o) else readS32BE(o)
-public fun ByteArray.readS64(o: Int, little: Boolean): Long = if (little) readS64LE(o) else readS64BE(o)
-public fun ByteArray.readF16(o: Int, little: Boolean): Half = if (little) readF16LE(o) else readF16BE(o)
-public fun ByteArray.readF32(o: Int, little: Boolean): Float = if (little) readF32LE(o) else readF32BE(o)
-public fun ByteArray.readF64(o: Int, little: Boolean): Double = if (little) readF64LE(o) else readF64BE(o)
+public fun ByteArray.getU16(offset: Int, little: Boolean): Int = if (little) getU16LE(offset) else getU16BE(offset)
+public fun ByteArray.getU24(offset: Int, little: Boolean): Int = if (little) getU24LE(offset) else getU24BE(offset)
+public fun ByteArray.getU32(offset: Int, little: Boolean): Long = if (little) getU32LE(offset) else getU32BE(offset)
+public fun ByteArray.getS16(offset: Int, little: Boolean): Int = if (little) getS16LE(offset) else getS16BE(offset)
+public fun ByteArray.getS24(offset: Int, little: Boolean): Int = if (little) getS24LE(offset) else getS24BE(offset)
+public fun ByteArray.getS32(offset: Int, little: Boolean): Int = if (little) getS32LE(offset) else getS32BE(offset)
+public fun ByteArray.getS64(offset: Int, little: Boolean): Long = if (little) getS64LE(offset) else getS64BE(offset)
+public fun ByteArray.getF16(offset: Int, little: Boolean): Half = if (little) getF16LE(offset) else getF16BE(offset)
+public fun ByteArray.getF32(offset: Int, little: Boolean): Float = if (little) getF32LE(offset) else getF32BE(offset)
+public fun ByteArray.getF64(offset: Int, little: Boolean): Double = if (little) getF64LE(offset) else getF64BE(offset)
 
-private inline fun <T> ByteArray.readTypedArray(o: Int, count: Int, elementSize: Int, array: T, crossinline read: ByteArray.(array: T, n: Int, pos: Int) -> Unit): T = array.also {
-    for (n in 0 until count) read(this, array, n, o + n * elementSize)
+private inline fun <T> ByteArray.getTypedArray(offset: Int, count: Int, elementSize: Int, array: T, crossinline get: ByteArray.(array: T, n: Int, pos: Int) -> Unit): T = array.also {
+    for (n in 0 until count) get(this, array, n, offset + n * elementSize)
 }
 
-public fun ByteArray.readByteArray(o: Int, count: Int): ByteArray = this.copyOfRange(o, o + count)
-public fun ByteArray.readShortArrayLE(o: Int, count: Int): ShortArray = this.readTypedArray(o, count, 2, ShortArray(count)) { array, n, pos -> array[n] = readS16LE(pos).toShort() }
-public fun ByteArray.readCharArrayLE(o: Int, count: Int): CharArray = this.readTypedArray(o, count, 2, kotlin.CharArray(count)) { array, n, pos -> array[n] = readS16LE(pos).toChar() }
-public fun ByteArray.readIntArrayLE(o: Int, count: Int): IntArray = this.readTypedArray(o, count, 4, IntArray(count)) { array, n, pos -> array[n] = readS32LE(pos) }
-public fun ByteArray.readLongArrayLE(o: Int, count: Int): LongArray = this.readTypedArray(o, count, 8, LongArray(count)) { array, n, pos -> array[n] = readS64LE(pos) }
-public fun ByteArray.readFloatArrayLE(o: Int, count: Int): FloatArray = this.readTypedArray(o, count, 4, FloatArray(count)) { array, n, pos -> array[n] = readF32LE(pos) }
-public fun ByteArray.readDoubleArrayLE(o: Int, count: Int): DoubleArray = this.readTypedArray(o, count, 8, DoubleArray(count)) { array, n, pos -> array[n] = readF64LE(pos) }
-public fun ByteArray.readShortArrayBE(o: Int, count: Int): ShortArray = this.readTypedArray(o, count, 2, ShortArray(count)) { array, n, pos -> array[n] = readS16BE(pos).toShort() }
-public fun ByteArray.readCharArrayBE(o: Int, count: Int): CharArray = this.readTypedArray(o, count, 2, kotlin.CharArray(count)) { array, n, pos -> array[n] = readS16BE(pos).toChar() }
-public fun ByteArray.readIntArrayBE(o: Int, count: Int): IntArray = this.readTypedArray(o, count, 4, IntArray(count)) { array, n, pos -> array[n] = readS32BE(pos) }
-public fun ByteArray.readLongArrayBE(o: Int, count: Int): LongArray = this.readTypedArray(o, count, 8, LongArray(count)) { array, n, pos -> array[n] = readS64BE(pos) }
-public fun ByteArray.readFloatArrayBE(o: Int, count: Int): FloatArray = this.readTypedArray(o, count, 4, FloatArray(count)) { array, n, pos -> array[n] = readF32BE(pos) }
-public fun ByteArray.readDoubleArrayBE(o: Int, count: Int): DoubleArray = this.readTypedArray(o, count, 8, DoubleArray(count)) { array, n, pos -> array[n] = readF64BE(pos) }
+public fun ByteArray.getByteArray(offset: Int, count: Int): ByteArray = this.copyOfRange(offset, offset + count)
+public fun ByteArray.getShortArrayLE(offset: Int, count: Int): ShortArray = this.getTypedArray(offset, count, 2, ShortArray(count)) { array, n, pos -> array[n] = getS16LE(pos).toShort() }
+public fun ByteArray.getCharArrayLE(offset: Int, count: Int): CharArray = this.getTypedArray(offset, count, 2, kotlin.CharArray(count)) { array, n, pos -> array[n] = getS16LE(pos).toChar() }
+public fun ByteArray.getIntArrayLE(offset: Int, count: Int): IntArray = this.getTypedArray(offset, count, 4, IntArray(count)) { array, n, pos -> array[n] = getS32LE(pos) }
+public fun ByteArray.getLongArrayLE(offset: Int, count: Int): LongArray = this.getTypedArray(offset, count, 8, LongArray(count)) { array, n, pos -> array[n] = getS64LE(pos) }
+public fun ByteArray.getFloatArrayLE(offset: Int, count: Int): FloatArray = this.getTypedArray(offset, count, 4, FloatArray(count)) { array, n, pos -> array[n] = getF32LE(pos) }
+public fun ByteArray.getDoubleArrayLE(offset: Int, count: Int): DoubleArray = this.getTypedArray(offset, count, 8, DoubleArray(count)) { array, n, pos -> array[n] = getF64LE(pos) }
+public fun ByteArray.getShortArrayBE(offset: Int, count: Int): ShortArray = this.getTypedArray(offset, count, 2, ShortArray(count)) { array, n, pos -> array[n] = getS16BE(pos).toShort() }
+public fun ByteArray.getCharArrayBE(offset: Int, count: Int): CharArray = this.getTypedArray(offset, count, 2, kotlin.CharArray(count)) { array, n, pos -> array[n] = getS16BE(pos).toChar() }
+public fun ByteArray.getIntArrayBE(offset: Int, count: Int): IntArray = this.getTypedArray(offset, count, 4, IntArray(count)) { array, n, pos -> array[n] = getS32BE(pos) }
+public fun ByteArray.getLongArrayBE(offset: Int, count: Int): LongArray = this.getTypedArray(offset, count, 8, LongArray(count)) { array, n, pos -> array[n] = getS64BE(pos) }
+public fun ByteArray.getFloatArrayBE(offset: Int, count: Int): FloatArray = this.getTypedArray(offset, count, 4, FloatArray(count)) { array, n, pos -> array[n] = getF32BE(pos) }
+public fun ByteArray.getDoubleArrayBE(offset: Int, count: Int): DoubleArray = this.getTypedArray(offset, count, 8, DoubleArray(count)) { array, n, pos -> array[n] = getF64BE(pos) }
 
-public fun ByteArray.readShortArray(o: Int, count: Int, little: Boolean): ShortArray = if (little) readShortArrayLE(o, count) else readShortArrayBE(o, count)
-public fun ByteArray.readCharArray(o: Int, count: Int, little: Boolean): CharArray = if (little) readCharArrayLE(o, count) else readCharArrayBE(o, count)
-public fun ByteArray.readIntArray(o: Int, count: Int, little: Boolean): IntArray = if (little) readIntArrayLE(o, count) else readIntArrayBE(o, count)
-public fun ByteArray.readLongArray(o: Int, count: Int, little: Boolean): LongArray = if (little) readLongArrayLE(o, count) else readLongArrayBE(o, count)
-public fun ByteArray.readFloatArray(o: Int, count: Int, little: Boolean): FloatArray = if (little) readFloatArrayLE(o, count) else readFloatArrayBE(o, count)
-public fun ByteArray.readDoubleArray(o: Int, count: Int, little: Boolean): DoubleArray = if (little) readDoubleArrayLE(o, count) else readDoubleArrayBE(o, count)
+public fun ByteArray.getShortArray(offset: Int, count: Int, little: Boolean): ShortArray = if (little) getShortArrayLE(offset, count) else getShortArrayBE(offset, count)
+public fun ByteArray.getCharArray(offset: Int, count: Int, little: Boolean): CharArray = if (little) getCharArrayLE(offset, count) else getCharArrayBE(offset, count)
+public fun ByteArray.getIntArray(offset: Int, count: Int, little: Boolean): IntArray = if (little) getIntArrayLE(offset, count) else getIntArrayBE(offset, count)
+public fun ByteArray.getLongArray(offset: Int, count: Int, little: Boolean): LongArray = if (little) getLongArrayLE(offset, count) else getLongArrayBE(offset, count)
+public fun ByteArray.getFloatArray(offset: Int, count: Int, little: Boolean): FloatArray = if (little) getFloatArrayLE(offset, count) else getFloatArrayBE(offset, count)
+public fun ByteArray.getDoubleArray(offset: Int, count: Int, little: Boolean): DoubleArray = if (little) getDoubleArrayLE(offset, count) else getDoubleArrayBE(offset, count)
 
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
 
-public fun ByteArray.write8(o: Int, v: Int) { this[o] = v.toByte() }
-public fun ByteArray.write8(o: Int, v: Long) { this[o] = v.toByte() }
-public fun ByteArray.write16(o: Int, v: Int, little: Boolean) { if (little) write16LE(o, v) else write16BE(o, v) }
-public fun ByteArray.write24(o: Int, v: Int, little: Boolean) { if (little) write24LE(o, v) else write24BE(o, v) }
-public fun ByteArray.write32(o: Int, v: Int, little: Boolean) { if (little) write32LE(o, v) else write32BE(o, v) }
-public fun ByteArray.write64(o: Int, v: Long, little: Boolean) { if (little) write64LE(o, v) else write64BE(o, v) }
-public fun ByteArray.writeF16(o: Int, v: Half, little: Boolean) { if (little) writeF16LE(o, v) else writeF16BE(o, v) }
-public fun ByteArray.writeF32(o: Int, v: Float, little: Boolean) { if (little) writeF32LE(o, v) else writeF32BE(o, v) }
-public fun ByteArray.writeF64(o: Int, v: Double, little: Boolean) { if (little) writeF64LE(o, v) else writeF64BE(o, v) }
+public fun ByteArray.set8(offset: Int, value: Int) { this[offset] = value.toByte() }
+public fun ByteArray.set8(offset: Int, value: Long) { this[offset] = value.toByte() }
+public fun ByteArray.set16(offset: Int, value: Int, little: Boolean) { if (little) set16LE(offset, value) else set16BE(offset, value) }
+public fun ByteArray.set24(offset: Int, value: Int, little: Boolean) { if (little) set24LE(offset, value) else set24BE(offset, value) }
+public fun ByteArray.set32(offset: Int, value: Int, little: Boolean) { if (little) set32LE(offset, value) else set32BE(offset, value) }
+public fun ByteArray.set64(offset: Int, value: Long, little: Boolean) { if (little) set64LE(offset, value) else set64BE(offset, value) }
+public fun ByteArray.setF16(offset: Int, value: Half, little: Boolean) { if (little) setF16LE(offset, value) else setF16BE(offset, value) }
+public fun ByteArray.setF32(offset: Int, value: Float, little: Boolean) { if (little) setF32LE(offset, value) else setF32BE(offset, value) }
+public fun ByteArray.setF64(offset: Int, value: Double, little: Boolean) { if (little) setF64LE(offset, value) else setF64BE(offset, value) }
 
-public fun ByteArray.write16LE(o: Int, v: Int) { this[o + 0] = v.extractByte(0); this[o + 1] = v.extractByte(8) }
-public fun ByteArray.write24LE(o: Int, v: Int) { this[o + 0] = v.extractByte(0); this[o + 1] = v.extractByte(8); this[o + 2] = v.extractByte(16) }
-public fun ByteArray.write32LE(o: Int, v: Int) { this[o + 0] = v.extractByte(0); this[o + 1] = v.extractByte(8); this[o + 2] = v.extractByte(16); this[o + 3] = v.extractByte(24) }
-public fun ByteArray.write32LE(o: Int, v: Long) { write32LE(o, v.toInt()) }
-public fun ByteArray.write64LE(o: Int, v: Long) { write32LE(o + 0, (v ushr 0).toInt()); write32LE(o + 4, (v ushr 32).toInt()) }
-public fun ByteArray.writeF16LE(o: Int, v: Half) { write16LE(o + 0, v.toRawBits().toInt()) }
-public fun ByteArray.writeF32LE(o: Int, v: Float) { write32LE(o + 0, v.toRawBits()) }
-public fun ByteArray.writeF64LE(o: Int, v: Double) { write64LE(o + 0, v.toRawBits()) }
+public fun ByteArray.set16LE(offset: Int, value: Int) { this[offset + 0] = value.extractByte(0); this[offset + 1] = value.extractByte(8) }
+public fun ByteArray.set24LE(offset: Int, value: Int) { this[offset + 0] = value.extractByte(0); this[offset + 1] = value.extractByte(8); this[offset + 2] = value.extractByte(16) }
+public fun ByteArray.set32LE(offset: Int, value: Int) { this[offset + 0] = value.extractByte(0); this[offset + 1] = value.extractByte(8); this[offset + 2] = value.extractByte(16); this[offset + 3] = value.extractByte(24) }
+public fun ByteArray.set32LE(offset: Int, value: Long) { set32LE(offset, value.toInt()) }
+public fun ByteArray.set64LE(offset: Int, value: Long) { set32LE(offset + 0, (value ushr 0).toInt()); set32LE(offset + 4, (value ushr 32).toInt()) }
+public fun ByteArray.setF16LE(offset: Int, value: Half) { set16LE(offset + 0, value.toRawBits().toInt()) }
+public fun ByteArray.setF32LE(offset: Int, value: Float) { set32LE(offset + 0, value.toRawBits()) }
+public fun ByteArray.setF64LE(offset: Int, value: Double) { set64LE(offset + 0, value.toRawBits()) }
 
-public fun ByteArray.write16BE(o: Int, v: Int) { this[o + 1] = v.extractByte(0); this[o + 0] = v.extractByte(8) }
-public fun ByteArray.write24BE(o: Int, v: Int) { this[o + 2] = v.extractByte(0); this[o + 1] = v.extractByte(8); this[o + 0] = v.extractByte(16) }
-public fun ByteArray.write32BE(o: Int, v: Int) { this[o + 3] = v.extractByte(0); this[o + 2] = v.extractByte(8); this[o + 1] = v.extractByte(16); this[o + 0] = v.extractByte(24) }
-public fun ByteArray.write32BE(o: Int, v: Long) { write32BE(o, v.toInt()) }
-public fun ByteArray.write64BE(o: Int, v: Long) { write32BE(o + 0, (v ushr 32).toInt()); write32BE(o + 4, (v ushr 0).toInt()) }
-public fun ByteArray.writeF16BE(o: Int, v: Half) { write16BE(o + 0, v.toRawBits().toInt()) }
-public fun ByteArray.writeF32BE(o: Int, v: Float) { write32BE(o + 0, v.toRawBits()) }
-public fun ByteArray.writeF64BE(o: Int, v: Double) { write64BE(o + 0, v.toRawBits()) }
+public fun ByteArray.set16BE(offset: Int, value: Int) { this[offset + 1] = value.extractByte(0); this[offset + 0] = value.extractByte(8) }
+public fun ByteArray.set24BE(offset: Int, value: Int) { this[offset + 2] = value.extractByte(0); this[offset + 1] = value.extractByte(8); this[offset + 0] = value.extractByte(16) }
+public fun ByteArray.set32BE(offset: Int, value: Int) { this[offset + 3] = value.extractByte(0); this[offset + 2] = value.extractByte(8); this[offset + 1] = value.extractByte(16); this[offset + 0] = value.extractByte(24) }
+public fun ByteArray.set32BE(offset: Int, value: Long) { set32BE(offset, value.toInt()) }
+public fun ByteArray.set64BE(offset: Int, value: Long) { set32BE(offset + 0, (value ushr 32).toInt()); set32BE(offset + 4, (value ushr 0).toInt()) }
+public fun ByteArray.setF16BE(offset: Int, value: Half) { set16BE(offset + 0, value.toRawBits().toInt()) }
+public fun ByteArray.setF32BE(offset: Int, value: Float) { set32BE(offset + 0, value.toRawBits()) }
+public fun ByteArray.setF64BE(offset: Int, value: Double) { set64BE(offset + 0, value.toRawBits()) }
 
-public fun ByteArray.writeBytes(o: Int, bytes: ByteArray): Unit = arraycopy(bytes, 0, this, o, bytes.size)
+public fun ByteArray.setBytes(offset: Int, bytes: ByteArray): Unit = arraycopy(bytes, 0, this, offset, bytes.size)
 
-private inline fun wa(o: Int, elementSize: Int, size: Int, write: (p: Int, n: Int) -> Unit) { for (n in 0 until size) write(o + n * elementSize, n) }
+private inline fun wa(offset: Int, elementSize: Int, size: Int, set: (p: Int, n: Int) -> Unit) { for (n in 0 until size) set(offset + n * elementSize, n) }
 
-public fun ByteArray.writeArrayLE(o: Int, array: CharArray): Unit = wa(o, 2, array.size) { p, n -> write16LE(p, array[n].toInt()) }
-public fun ByteArray.writeArrayLE(o: Int, array: ShortArray): Unit = wa(o, 2, array.size) { p, n -> write16LE(p, array[n].toInt()) }
-public fun ByteArray.writeArrayLE(o: Int, array: IntArray): Unit = wa(o, 4, array.size) { p, n -> write32LE(p, array[n]) }
-public fun ByteArray.writeArrayLE(o: Int, array: LongArray): Unit = wa(o, 8, array.size) { p, n -> write64LE(p, array[n]) }
-public fun ByteArray.writeArrayLE(o: Int, array: FloatArray): Unit = wa(o, 4, array.size) { p, n -> writeF32LE(p, array[n]) }
-public fun ByteArray.writeArrayLE(o: Int, array: DoubleArray): Unit = wa(o, 8, array.size) { p, n -> writeF64LE(p, array[n]) }
+public fun ByteArray.setArrayLE(offset: Int, array: CharArray): Unit = wa(offset, 2, array.size) { p, n -> set16LE(p, array[n].toInt()) }
+public fun ByteArray.setArrayLE(offset: Int, array: ShortArray): Unit = wa(offset, 2, array.size) { p, n -> set16LE(p, array[n].toInt()) }
+public fun ByteArray.setArrayLE(offset: Int, array: IntArray): Unit = wa(offset, 4, array.size) { p, n -> set32LE(p, array[n]) }
+public fun ByteArray.setArrayLE(offset: Int, array: LongArray): Unit = wa(offset, 8, array.size) { p, n -> set64LE(p, array[n]) }
+public fun ByteArray.setArrayLE(offset: Int, array: FloatArray): Unit = wa(offset, 4, array.size) { p, n -> setF32LE(p, array[n]) }
+public fun ByteArray.setArrayLE(offset: Int, array: DoubleArray): Unit = wa(offset, 8, array.size) { p, n -> setF64LE(p, array[n]) }
 
-public fun ByteArray.writeArrayBE(o: Int, array: CharArray): Unit = wa(o, 2, array.size) { p, n -> write16BE(p, array[n].toInt()) }
-public fun ByteArray.writeArrayBE(o: Int, array: ShortArray): Unit = wa(o, 2, array.size) { p, n -> write16BE(p, array[n].toInt()) }
-public fun ByteArray.writeArrayBE(o: Int, array: IntArray): Unit = wa(o, 4, array.size) { p, n -> write32BE(p, array[n]) }
-public fun ByteArray.writeArrayBE(o: Int, array: LongArray): Unit = wa(o, 8, array.size) { p, n -> write64BE(p, array[n]) }
-public fun ByteArray.writeArrayBE(o: Int, array: FloatArray): Unit = wa(o, 4, array.size) { p, n -> writeF32BE(p, array[n]) }
-public fun ByteArray.writeArrayBE(o: Int, array: DoubleArray): Unit = wa(o, 8, array.size) { p, n -> writeF64BE(p, array[n]) }
+public fun ByteArray.setArrayBE(offset: Int, array: CharArray): Unit = wa(offset, 2, array.size) { p, n -> set16BE(p, array[n].toInt()) }
+public fun ByteArray.setArrayBE(offset: Int, array: ShortArray): Unit = wa(offset, 2, array.size) { p, n -> set16BE(p, array[n].toInt()) }
+public fun ByteArray.setArrayBE(offset: Int, array: IntArray): Unit = wa(offset, 4, array.size) { p, n -> set32BE(p, array[n]) }
+public fun ByteArray.setArrayBE(offset: Int, array: LongArray): Unit = wa(offset, 8, array.size) { p, n -> set64BE(p, array[n]) }
+public fun ByteArray.setArrayBE(offset: Int, array: FloatArray): Unit = wa(offset, 4, array.size) { p, n -> setF32BE(p, array[n]) }
+public fun ByteArray.setArrayBE(offset: Int, array: DoubleArray): Unit = wa(offset, 8, array.size) { p, n -> setF64BE(p, array[n]) }
