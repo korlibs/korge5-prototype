@@ -1,6 +1,13 @@
 package korlibs.platform
 
-enum class Arch(val bits: Int, val isArm: Boolean = false, val isX86OrX64: Boolean = false, val isMips: Boolean = false, val isWasm: Boolean = false, val isPowerPC: Boolean = false) {
+enum class Arch(
+    val bits: Int,
+    val isArm: Boolean = false,
+    val isX86OrX64: Boolean = false,
+    val isMips: Boolean = false,
+    val isWasm: Boolean = false,
+    val isPowerPC: Boolean = false
+) {
     UNKNOWN(-1),
     X86(32, isX86OrX64 = true),
     X64(64, isX86OrX64 = true),
@@ -11,6 +18,7 @@ enum class Arch(val bits: Int, val isArm: Boolean = false, val isX86OrX64: Boole
     MIPS64(64, isMips = true),
     MIPSEL64(64, isMips = true),
     WASM32(32, isWasm = true),
+    WASM64(64, isWasm = true),
     POWERPC64(64, isPowerPC = true);
 
     val is32Bits: Boolean get() = bits == 32
@@ -28,6 +36,7 @@ enum class Arch(val bits: Int, val isArm: Boolean = false, val isX86OrX64: Boole
     val isMIPSEL64: Boolean get() = this == MIPSEL64
 
     val isWASM32: Boolean get() = this == WASM32
+    val isWASM64: Boolean get() = this == WASM64
     val isPOWERPC64: Boolean get() = this == POWERPC64
 
     companion object {
