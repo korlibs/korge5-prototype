@@ -18,6 +18,7 @@ import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
 import korlibs.io.lang.*
 import korlibs.io.stream.*
+import korlibs.math.*
 import korlibs.memory.*
 
 object MP3 : AudioFormat("mp3") {

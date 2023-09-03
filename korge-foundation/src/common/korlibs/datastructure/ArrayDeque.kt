@@ -1,7 +1,8 @@
 package korlibs.datastructure
 
 import korlibs.datastructure.internal.KdsInternalApi
-import korlibs.datastructure.internal.ilog2
+import korlibs.math.*
+import korlibs.number.*
 import kotlin.jvm.JvmOverloads
 
 class ByteArrayDeque(val initialBits: Int = 10, val allowGrow: Boolean = true) {

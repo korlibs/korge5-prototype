@@ -1,5 +1,6 @@
 package korlibs.time
 
+import korlibs.math.*
 import korlibs.time.DateTime.Companion.EPOCH
 import korlibs.time.internal.*
 import kotlin.jvm.JvmInline

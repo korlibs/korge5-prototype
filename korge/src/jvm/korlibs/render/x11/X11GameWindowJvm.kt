@@ -2,7 +2,6 @@ package korlibs.render.x11
 
 import korlibs.kgl.checkedIf
 import korlibs.memory.dyn.*
-import korlibs.memory.toInt
 import korlibs.memory.write32LE
 import korlibs.graphics.gl.AGOpengl
 import korlibs.event.Key
@@ -14,6 +13,7 @@ import korlibs.render.ZenityDialogs
 import korlibs.image.bitmap.Bitmap
 import com.sun.jna.*
 import com.sun.jna.platform.unix.X11.*
+import korlibs.math.*
 
 class X11GameWindow(checkGl: Boolean) : EventLoopGameWindow() {
     override val dialogInterface: DialogInterface = ZenityDialogs()

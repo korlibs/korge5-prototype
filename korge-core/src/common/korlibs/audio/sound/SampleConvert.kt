@@ -1,6 +1,6 @@
 package korlibs.audio.sound
 
-import korlibs.memory.clamp
+import korlibs.math.*
 
 object SampleConvert {
     // (value.clamp(-1f, +1f) * Short.MAX_VALUE).toShort()

@@ -1,6 +1,6 @@
 package korlibs.io.stream
 
-import korlibs.io.lang.format
+import korlibs.util.*
 import kotlin.test.assertEquals
 
 class FastByteArrayInputStreamTest {

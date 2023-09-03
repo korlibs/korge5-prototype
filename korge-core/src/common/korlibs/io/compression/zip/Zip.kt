@@ -1,9 +1,6 @@
 package korlibs.io.compression.zip
 
 import korlibs.time.DateTime
-import korlibs.memory.extract
-import korlibs.memory.toIntClamp
-import korlibs.memory.unsigned
 import korlibs.io.file.PathInfo
 import korlibs.io.file.baseName
 import korlibs.io.file.getPathFullComponents
@@ -23,6 +20,7 @@ import korlibs.io.stream.readU32LE
 import korlibs.io.stream.sliceStart
 import korlibs.io.stream.sliceWithSize
 import korlibs.crypto.encoding.hex
+import korlibs.math.*
 import kotlin.math.max
 
 class ZipFile private constructor(

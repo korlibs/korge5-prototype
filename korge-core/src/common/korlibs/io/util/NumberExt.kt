@@ -2,7 +2,7 @@
 
 package korlibs.io.util
 
-import korlibs.memory.isNanOrInfinite
+import korlibs.math.*
 import kotlin.math.absoluteValue
 import kotlin.math.min
 import kotlin.math.pow
@@ -10,17 +10,6 @@ import kotlin.math.round
 
 fun Int.toStringUnsigned(radix: Int): String = this.toUInt().toString(radix)
 fun Long.toStringUnsigned(radix: Int): String = this.toULong().toString(radix)
-
-val Double.niceStr: String get() = niceStr(-1, zeroSuffix = false)
-fun Double.niceStr(decimalPlaces: Int): String = niceStr(decimalPlaces, zeroSuffix = false)
-fun Double.niceStr(decimalPlaces: Int, zeroSuffix: Boolean): String = buildString { appendNice(this@niceStr.roundDecimalPlaces(decimalPlaces), zeroSuffix = zeroSuffix) }
-
-val Float.niceStr: String get() = niceStr(-1, zeroSuffix = false)
-fun Float.niceStr(decimalPlaces: Int): String = niceStr(decimalPlaces, zeroSuffix = false)
-fun Float.niceStr(decimalPlaces: Int, zeroSuffix: Boolean): String = buildString { appendNice(this@niceStr.roundDecimalPlaces(decimalPlaces), zeroSuffix = zeroSuffix) }
-
-//val Float.niceStr: String get() = buildString { appendNice(this@niceStr) }
-//fun Float.niceStr(decimalPlaces: Int): String = roundDecimalPlaces(decimalPlaces).niceStr
 
 private fun Double.isAlmostEquals(other: Double, epsilon: Double = 0.000001): Boolean = (this - other).absoluteValue < epsilon
 private fun Float.isAlmostEquals(other: Float, epsilon: Float = 0.000001f): Boolean = (this - other).absoluteValue < epsilon

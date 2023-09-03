@@ -16,6 +16,7 @@ import korlibs.io.stream.*
 import korlibs.math.geom.*
 import korlibs.math.geom.vector.*
 import korlibs.crypto.encoding.*
+import korlibs.math.*
 import kotlin.collections.set
 
 class TtfFont(

@@ -1,8 +1,7 @@
 package korlibs.image.color
 
-import korlibs.memory.clampUByte
-import korlibs.memory.extract8
 import korlibs.image.internal.packIntClamped
+import korlibs.math.*
 
 // https://en.wikipedia.org/wiki/YCbCr
 inline class YCbCr(val value: Int) {

@@ -1,5 +1,6 @@
 package korlibs.graphics.shader.gl
 
+import korlibs.math.*
 import korlibs.memory.*
 import korlibs.platform.Os
 

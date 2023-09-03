@@ -1,9 +1,9 @@
 package korlibs.template
 
+import korlibs.io.serialization.json.*
+import korlibs.io.util.*
 import korlibs.template.dynamic.Dynamic2
-import korlibs.template.internal.Json
-import korlibs.template.internal.format
-import korlibs.template.internal.quote
+import korlibs.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.floor

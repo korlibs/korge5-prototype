@@ -1,7 +1,6 @@
 package korlibs.image.color
 
-import korlibs.memory.extract8
-import korlibs.memory.insert8
+import korlibs.math.*
 
 open class RGB(val rOffset: Int, val gOffset: Int, val bOffset: Int) : ColorFormat24() {
 	override fun getR(v: Int): Int = v.extract8(rOffset)

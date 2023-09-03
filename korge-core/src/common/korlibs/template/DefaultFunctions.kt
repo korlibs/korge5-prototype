@@ -1,6 +1,6 @@
 package korlibs.template
 
-import korlibs.template.internal.umod
+import korlibs.math.*
 
 @Suppress("unused")
 object DefaultFunctions {

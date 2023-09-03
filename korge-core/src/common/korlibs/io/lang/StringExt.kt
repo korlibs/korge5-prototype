@@ -1,9 +1,9 @@
 package korlibs.io.lang
 
 import korlibs.memory.ByteArrayBuilder
-import korlibs.memory.clamp
 import korlibs.io.util.quote
 import korlibs.io.util.toStringUnsigned
+import korlibs.math.*
 
 operator fun String.Companion.invoke(arrays: IntArray, offset: Int = 0, size: Int = arrays.size - offset): String {
 	val sb = StringBuilder()
@@ -18,38 +18,6 @@ fun String_fromCharArray(arrays: CharArray, offset: Int = 0, size: Int = arrays.
 
 ////////////////////////////////////
 ////////////////////////////////////
-
-private val formatRegex = Regex("%([-]?\\d+)?(\\w)")
-
-fun String.format(vararg params: Any): String {
-	var paramIndex = 0
-	return formatRegex.replace(this) { mr ->
-		val param = params[paramIndex++]
-		//println("param: $param")
-		val size = mr.groupValues[1]
-		val type = mr.groupValues[2]
-		val str = when (type) {
-			"d" -> (param as Number).toLong().toString()
-			"X", "x" -> {
-                val res = when (param) {
-                    is Int -> param.toStringUnsigned(16)
-                    else -> (param as Number).toLong().toStringUnsigned(16)
-                }
-                if (type == "X") res.uppercase() else res.lowercase()
-            }
-			else -> "$param"
-		}
-		val prefix = if (size.startsWith('0')) '0' else ' '
-		val asize = size.toIntOrNull()
-		var str2 = str
-		if (asize != null) {
-			while (str2.length < asize) {
-				str2 = prefix + str2
-			}
-		}
-		str2
-	}
-}
 
 fun String.splitKeep(regex: Regex): List<String> {
 	val str = this

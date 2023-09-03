@@ -1,5 +1,6 @@
 package korlibs.image.internal
 
+import korlibs.math.*
 import korlibs.memory.*
 import kotlin.math.ceil
 import kotlin.math.floor

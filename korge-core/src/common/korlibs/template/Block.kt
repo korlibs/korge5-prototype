@@ -1,7 +1,7 @@
 package korlibs.template
 
+import korlibs.io.serialization.yaml.*
 import korlibs.template.dynamic.DynamicContext
-import korlibs.template.internal.Yaml
 import korlibs.template.util.ListReader
 
 interface Block : DynamicContext {

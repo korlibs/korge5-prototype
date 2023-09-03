@@ -1,10 +1,10 @@
 package korlibs.template
 
+import korlibs.datastructure.*
 import korlibs.template.dynamic.Dynamic2
 import korlibs.template.dynamic.DynamicContext
 import korlibs.template.dynamic.Mapper2
 import korlibs.template.dynamic.ObjectMapper2
-import korlibs.template.internal.Pool
 import korlibs.template.util.AsyncTextWriterContainer
 import kotlin.collections.set
 

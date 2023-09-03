@@ -7,6 +7,7 @@ import korlibs.io.util.*
 import korlibs.korge.input.*
 import korlibs.korge.view.*
 import korlibs.korge.view.property.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 

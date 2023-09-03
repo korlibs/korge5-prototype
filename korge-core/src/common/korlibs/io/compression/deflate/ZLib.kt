@@ -1,6 +1,5 @@
 package korlibs.io.compression.deflate
 
-import korlibs.memory.extract
 import korlibs.io.compression.CompressionContext
 import korlibs.io.compression.CompressionMethod
 import korlibs.io.compression.compress
@@ -13,6 +12,7 @@ import korlibs.io.stream.write32BE
 import korlibs.io.stream.write8
 import korlibs.io.util.checksum.Adler32
 import korlibs.crypto.encoding.hex
+import korlibs.math.*
 
 @OptIn(KorioExperimentalApi::class)
 open class ZLib(val deflater: (windowBits: Int) -> CompressionMethod) : CompressionMethod {

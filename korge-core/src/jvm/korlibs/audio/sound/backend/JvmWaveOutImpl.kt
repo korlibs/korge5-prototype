@@ -9,6 +9,7 @@ import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.Memory
 import korlibs.datastructure.thread.NativeThread
+import korlibs.math.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 

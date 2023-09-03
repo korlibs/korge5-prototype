@@ -3,6 +3,7 @@ package korlibs.image.bitmap
 import korlibs.datastructure.*
 import korlibs.memory.*
 import korlibs.image.color.*
+import korlibs.math.*
 import kotlin.math.*
 
 inline fun FloatArray2.forEachValue(block: (x: Int, y: Int, v: Float) -> Unit) {

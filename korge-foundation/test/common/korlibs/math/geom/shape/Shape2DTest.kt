@@ -3,7 +3,7 @@ package korlibs.math.geom.shape
 import assertEqualsFloat
 import korlibs.math.geom.*
 import korlibs.math.geom.vector.*
-import korlibs.math.internal.*
+import korlibs.number.*
 import kotlin.test.*
 
 class Shape2DTest {

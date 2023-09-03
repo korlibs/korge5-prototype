@@ -2,10 +2,10 @@
 
 package korlibs.time.internal
 
+import korlibs.math.*
 import korlibs.time.*
-import korlibs.time.hr.HRTimeSpan
-import korlibs.time.internal.clamp
-import kotlin.jvm.JvmInline
+import korlibs.time.hr.*
+import kotlin.jvm.*
 import kotlin.math.*
 
 internal inline fun Int.chainComparison(comparer: () -> Int): Int = if (this == 0) comparer() else this
@@ -70,10 +70,6 @@ internal fun String.substr(start: Int, length: Int = this.length): String {
     return if (high < low) "" else this.substring(low, high)
 }
 
-internal fun Int.clamp(min: Int, max: Int): Int = if (this < min) min else if (this > max) max else this
-internal fun Int.cycle(min: Int, max: Int): Int = ((this - min) umod (max - min + 1)) + min
-internal fun Int.cycleSteps(min: Int, max: Int): Int = (this - min) / (max - min + 1)
-
 internal fun String.splitKeep(regex: Regex): List<String> {
     val str = this
     val out = arrayListOf<String>()
@@ -92,29 +88,7 @@ internal fun String.splitKeep(regex: Regex): List<String> {
     return out
 }
 
-internal infix fun Int.umod(that: Int): Int {
-    val remainder = this % that
-    return when {
-        remainder < 0 -> remainder + that
-        else -> remainder
-    }
-}
 
-internal infix fun Double.umod(that: Double): Double {
-    val remainder = this % that
-    return when {
-        remainder < 0 -> remainder + that
-        else -> remainder
-    }
-}
-
-internal fun Double.toInt2(): Int = if (this < 0.0) floor(this).toInt() else this.toInt()
-internal fun Double.toIntMod(mod: Int): Int = (this umod mod.toDouble()).toInt2()
-
-internal infix fun Int.div2(other: Int): Int = when {
-    this < 0 || this % other == 0 -> this / other
-    else -> (this / other) - 1
-}
 
 internal class Moduler(val value: Double) {
     private var avalue = abs(value)
@@ -132,8 +106,6 @@ internal class Moduler(val value: Double) {
     fun int(count: Int): Int = int(count.toDouble())
     fun int(count: Float): Int = int(count.toDouble())
 }
-
-internal infix fun Double.intDiv(other: Double) = floor(this / other)
 
 internal expect object KlockInternal {
     val currentTime: Double
@@ -221,8 +193,6 @@ internal class MicroStrReader(val str: String, var offset: Int = 0) {
         return num.toDouble() + (den.toDouble() * 10.0.pow(-denCount))
     }
 }
-
-internal val Double.niceStr: String get() = if (floor(this) == this) "${this.toInt()}" else "$this"
 
 internal fun spinlock(time: HRTimeSpan) {
     val start = HRTimeSpan.now()

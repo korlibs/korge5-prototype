@@ -6,6 +6,7 @@ import korlibs.time.*
 import korlibs.memory.*
 import korlibs.korge.view.*
 import korlibs.io.lang.*
+import korlibs.math.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 

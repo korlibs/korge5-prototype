@@ -2,6 +2,7 @@
 
 package korlibs.memory.arrays
 
+import korlibs.math.*
 import korlibs.memory.*
 
 actual class ArrayBuffer(val data: ByteArray, val byteOffset: Int, actual val byteLength: Int) {

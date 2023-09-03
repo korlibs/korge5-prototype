@@ -1,5 +1,7 @@
 package korlibs.memory
 
+import korlibs.math.*
+
 private inline fun _arraycmp(srcPos: Int, dstPos: Int, size: Int, cmp: (Int, Int) -> Int): Int {
     for (n in 0 until size) {
         cmp(srcPos + n, dstPos + n).also { if (it != 0) return it }

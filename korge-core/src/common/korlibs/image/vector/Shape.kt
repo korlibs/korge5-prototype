@@ -8,10 +8,10 @@ import korlibs.image.paint.*
 import korlibs.image.text.*
 import korlibs.image.vector.format.*
 import korlibs.io.serialization.xml.*
-import korlibs.io.util.niceStr
 import korlibs.math.geom.*
 import korlibs.math.geom.bezier.*
 import korlibs.math.geom.vector.*
+import korlibs.number.*
 import kotlin.collections.List
 import kotlin.collections.Map
 import kotlin.collections.any

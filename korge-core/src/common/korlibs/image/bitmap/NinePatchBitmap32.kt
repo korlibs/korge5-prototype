@@ -6,6 +6,7 @@ import korlibs.image.color.*
 import korlibs.image.format.*
 import korlibs.io.file.*
 import korlibs.io.util.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 import kotlin.math.*

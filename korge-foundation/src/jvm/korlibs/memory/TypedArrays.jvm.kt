@@ -2,9 +2,8 @@
 
 package korlibs.memory.arrays
 
-import korlibs.number.*
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import korlibs.math.*
+import java.nio.*
 
 // Invariants: mark <= position <= limit <= capacity
 actual class ArrayBuffer(val buffer: ByteBuffer) {

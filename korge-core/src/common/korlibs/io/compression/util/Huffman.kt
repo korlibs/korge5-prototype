@@ -1,7 +1,7 @@
 package korlibs.io.compression.util
 
-import korlibs.memory.extractBool
 import korlibs.io.experimental.KorioExperimentalApi
+import korlibs.math.*
 
 @OptIn(KorioExperimentalApi::class)
 internal class HuffmanTree {

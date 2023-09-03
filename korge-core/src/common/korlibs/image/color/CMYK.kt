@@ -1,7 +1,6 @@
 package korlibs.image.color
 
-import korlibs.memory.clampUByte
-import korlibs.memory.extract8
+import korlibs.math.*
 import kotlin.math.max
 
 // https://en.wikipedia.org/wiki/CMYK_color_model

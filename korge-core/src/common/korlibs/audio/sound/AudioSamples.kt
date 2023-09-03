@@ -2,10 +2,10 @@ package korlibs.audio.sound
 
 import korlibs.memory.arraycopy
 import korlibs.memory.arrayinterleave
-import korlibs.memory.clamp01
 import korlibs.audio.internal.coerceToShort
 import korlibs.datastructure.iterators.*
 import korlibs.io.lang.assert
+import korlibs.math.*
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min

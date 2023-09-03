@@ -5,6 +5,7 @@ import korlibs.logger.*
 import korlibs.memory.*
 import korlibs.io.lang.*
 import korlibs.io.stream.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.math.geom.vector.*
 import kotlin.collections.*

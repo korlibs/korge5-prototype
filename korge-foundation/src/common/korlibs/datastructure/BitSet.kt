@@ -1,7 +1,7 @@
 package korlibs.datastructure
 
 
-import korlibs.datastructure.internal.divCeil
+import korlibs.math.*
 import kotlin.collections.Collection
 import kotlin.collections.Iterator
 import kotlin.collections.any

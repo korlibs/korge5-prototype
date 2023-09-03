@@ -2,7 +2,6 @@ package korlibs.korge.animate
 
 import korlibs.time.milliseconds
 import korlibs.time.seconds
-import korlibs.memory.toIntRound
 import korlibs.korge.tests.ViewsForTesting
 import korlibs.korge.tween._interpolateAngle
 import korlibs.korge.tween.denormalized
@@ -10,6 +9,7 @@ import korlibs.korge.tween.get
 import korlibs.korge.tween.tween
 import korlibs.korge.view.*
 import korlibs.image.color.Colors
+import korlibs.math.*
 import korlibs.math.geom.degrees
 import korlibs.math.interpolation.*
 import kotlin.test.Test

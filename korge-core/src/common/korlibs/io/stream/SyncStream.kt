@@ -4,8 +4,6 @@ import korlibs.datastructure.ByteArrayDeque
 import korlibs.datastructure.Extra
 import korlibs.memory.ByteArrayBuilder
 import korlibs.memory.arraycopy
-import korlibs.memory.clamp
-import korlibs.memory.nextAlignedTo
 import korlibs.memory.readCharArrayBE
 import korlibs.memory.readCharArrayLE
 import korlibs.memory.readDoubleArrayBE
@@ -18,13 +16,6 @@ import korlibs.memory.readLongArrayBE
 import korlibs.memory.readLongArrayLE
 import korlibs.memory.readShortArrayBE
 import korlibs.memory.readShortArrayLE
-import korlibs.memory.reinterpretAsDouble
-import korlibs.memory.reinterpretAsFloat
-import korlibs.memory.reinterpretAsInt
-import korlibs.memory.reinterpretAsLong
-import korlibs.memory.signExtend
-import korlibs.memory.toIntSafe
-import korlibs.memory.unsigned
 import korlibs.memory.writeArrayBE
 import korlibs.memory.writeArrayLE
 import korlibs.io.internal.bytesTempPool
@@ -38,6 +29,7 @@ import korlibs.io.lang.toByteArray
 import korlibs.io.lang.toBytez
 import korlibs.io.lang.toString
 import korlibs.io.lang.unsupported
+import korlibs.math.*
 import kotlin.math.max
 import kotlin.math.min
 

@@ -2,8 +2,6 @@ package korlibs.io.compression.util
 
 import korlibs.datastructure.RingBuffer
 import korlibs.datastructure.internal.KdsInternalApi
-import korlibs.memory.ilog2
-import korlibs.memory.nextPowerOfTwo
 import korlibs.memory.readS32BE
 import korlibs.memory.readS32LE
 import korlibs.memory.readU16LE
@@ -17,6 +15,7 @@ import korlibs.io.stream.AsyncOutputStream
 import korlibs.io.stream.MemorySyncStreamToByteArray
 import korlibs.io.stream.write8
 import korlibs.io.stream.writeBytes
+import korlibs.math.*
 import kotlin.math.max
 import kotlin.math.min
 

@@ -1,8 +1,8 @@
 package korlibs.image.color
 
-import korlibs.memory.clamp01
-import korlibs.io.util.niceStr
+import korlibs.math.*
 import korlibs.math.geom.*
+import korlibs.number.*
 
 //inline class RGBAf private constructor(
 inline class RGBAf(val data: FloatArray) {

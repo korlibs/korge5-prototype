@@ -9,9 +9,9 @@ import korlibs.io.async.delay
 import korlibs.io.async.launchImmediately
 import korlibs.io.lang.Environment
 import korlibs.logger.Logger
+import korlibs.math.*
 import korlibs.memory.Buffer
 import korlibs.memory.Platform
-import korlibs.memory.clamp01
 import korlibs.time.TimeSpan
 import korlibs.time.hr.HRTimeSpan
 import korlibs.time.milliseconds

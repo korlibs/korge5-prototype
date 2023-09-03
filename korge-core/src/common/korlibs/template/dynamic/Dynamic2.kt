@@ -1,5 +1,6 @@
 package korlibs.template.dynamic
 
+import korlibs.io.util.*
 import korlibs.template.internal.*
 import kotlin.math.*
 import kotlin.reflect.*

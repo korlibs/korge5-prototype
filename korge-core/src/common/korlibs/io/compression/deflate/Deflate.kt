@@ -1,7 +1,6 @@
 package korlibs.io.compression.deflate
 
 import korlibs.memory.FixedSizeByteArrayBuilder
-import korlibs.memory.unsigned
 import korlibs.io.compression.CompressionContext
 import korlibs.io.compression.CompressionMethod
 import korlibs.io.compression.util.BitReader
@@ -15,6 +14,7 @@ import korlibs.io.stream.readBytesExact
 import korlibs.io.stream.write16LE
 import korlibs.io.stream.write8
 import korlibs.io.stream.writeBytes
+import korlibs.math.*
 import kotlin.math.min
 
 expect fun Deflate(windowBits: Int): CompressionMethod

@@ -1,8 +1,7 @@
 package korlibs.number
 
+import korlibs.math.*
 import korlibs.memory.KmemExperimental
-import korlibs.memory.mask
-import korlibs.memory.signExtend
 import kotlin.math.ceil
 import kotlin.math.floor
 

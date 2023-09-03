@@ -1,12 +1,12 @@
 package korlibs.image.paint
 
-import korlibs.memory.clamp01
 import korlibs.image.bitmap.*
 import korlibs.image.color.Colors
 import korlibs.image.color.RGBA
 import korlibs.image.color.RGBAPremultiplied
 import korlibs.image.color.RgbaPremultipliedArray
 import korlibs.image.vector.*
+import korlibs.math.*
 import korlibs.math.geom.*
 
 abstract class BaseFiller {

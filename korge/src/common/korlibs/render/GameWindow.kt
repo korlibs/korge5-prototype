@@ -15,6 +15,7 @@ import korlibs.io.experimental.*
 import korlibs.io.file.*
 import korlibs.io.lang.*
 import korlibs.logger.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 import korlibs.render.GameWindow.Quality.PERFORMANCE

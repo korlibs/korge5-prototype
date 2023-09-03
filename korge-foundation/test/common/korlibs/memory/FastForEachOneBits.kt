@@ -1,5 +1,6 @@
 package korlibs.memory
 
+import korlibs.math.*
 import kotlin.test.*
 
 class FastForEachOneBits {

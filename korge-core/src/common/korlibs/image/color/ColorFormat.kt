@@ -1,8 +1,5 @@
 package korlibs.image.color
 
-import korlibs.memory.extractScaledFF
-import korlibs.memory.extractScaledFFDefault
-import korlibs.memory.insertScaledFF
 import korlibs.memory.readS32BE
 import korlibs.memory.readS32LE
 import korlibs.memory.readU16BE
@@ -16,6 +13,7 @@ import korlibs.memory.write24LE
 import korlibs.memory.write32BE
 import korlibs.memory.write32LE
 import korlibs.image.bitmap.Bitmap32
+import korlibs.math.*
 
 interface ColorFormat {
     val bpp: Int

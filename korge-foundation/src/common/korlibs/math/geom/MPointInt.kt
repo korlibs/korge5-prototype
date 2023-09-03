@@ -1,5 +1,6 @@
 package korlibs.math.geom
 
+import korlibs.math.*
 import korlibs.math.annotations.*
 import korlibs.math.interpolation.*
 import korlibs.memory.*

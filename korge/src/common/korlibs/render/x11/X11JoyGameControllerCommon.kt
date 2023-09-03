@@ -11,6 +11,7 @@ import korlibs.io.concurrent.atomic.KorAtomicInt
 import korlibs.io.file.*
 import korlibs.io.file.sync.*
 import korlibs.io.lang.*
+import korlibs.math.*
 import korlibs.platform.Endian
 import kotlinx.coroutines.*
 import kotlin.coroutines.*

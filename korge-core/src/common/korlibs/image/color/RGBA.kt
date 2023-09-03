@@ -9,10 +9,11 @@ import korlibs.image.internal.packIntClamped
 import korlibs.image.internal.packIntUnchecked
 import korlibs.image.internal.sumPacked4MulR
 import korlibs.image.paint.Paint
-import korlibs.io.util.niceStr
 import korlibs.math.interpolation.*
 import korlibs.crypto.encoding.appendHexByte
+import korlibs.math.*
 import korlibs.math.geom.*
+import korlibs.number.*
 import kotlin.jvm.JvmName
 import kotlin.math.pow
 import kotlin.math.roundToInt

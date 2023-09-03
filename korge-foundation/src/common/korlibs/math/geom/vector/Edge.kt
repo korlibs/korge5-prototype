@@ -1,8 +1,8 @@
 package korlibs.math.geom.vector
 
+import korlibs.math.*
 import korlibs.math.annotations.*
 import korlibs.math.geom.*
-import korlibs.math.internal.*
 import kotlin.math.*
 
 @Suppress("DuplicatedCode")

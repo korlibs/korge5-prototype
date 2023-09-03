@@ -1,8 +1,9 @@
 @file:OptIn(ExperimentalStdlibApi::class)
 @file:Suppress("NOTHING_TO_INLINE")
 
-package korlibs.memory
+package korlibs.math
 
+import korlibs.math.*
 import kotlin.rotateLeft as rotateLeftKotlin
 import kotlin.rotateRight as rotateRightKotlin
 

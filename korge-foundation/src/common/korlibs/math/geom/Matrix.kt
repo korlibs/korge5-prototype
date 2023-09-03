@@ -2,11 +2,11 @@
 
 package korlibs.math.geom
 
-import korlibs.math.internal.niceStr
 import korlibs.math.interpolation.Ratio
 import korlibs.math.interpolation.interpolate
 import korlibs.math.interpolation.toRatio
 import korlibs.math.isAlmostEquals
+import korlibs.number.*
 import kotlin.math.*
 
 //@KormaValueApi

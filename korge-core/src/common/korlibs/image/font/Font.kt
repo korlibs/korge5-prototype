@@ -8,6 +8,7 @@ import korlibs.image.text.*
 import korlibs.image.vector.*
 import korlibs.io.lang.*
 import korlibs.io.resources.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.math.geom.bezier.*
 import korlibs.math.geom.shape.*

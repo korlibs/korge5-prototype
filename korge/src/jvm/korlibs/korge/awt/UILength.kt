@@ -1,5 +1,6 @@
 package korlibs.korge.awt
 
+import korlibs.math.*
 import korlibs.memory.*
 import kotlin.math.*
 

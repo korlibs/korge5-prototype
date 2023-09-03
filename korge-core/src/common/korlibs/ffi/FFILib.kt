@@ -3,6 +3,7 @@ package korlibs.ffi
 import korlibs.datastructure.fastCastTo
 import korlibs.io.file.sync.SyncIOAPI
 import korlibs.io.lang.Closeable
+import korlibs.math.*
 import korlibs.memory.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.*

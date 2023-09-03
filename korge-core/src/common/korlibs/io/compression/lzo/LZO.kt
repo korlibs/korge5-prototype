@@ -1,6 +1,5 @@
 package korlibs.io.compression.lzo
 
-import korlibs.memory.hasFlags
 import korlibs.io.compression.CompressionContext
 import korlibs.io.compression.CompressionMethod
 import korlibs.io.compression.util.BitReader
@@ -24,6 +23,7 @@ import korlibs.io.stream.write8
 import korlibs.io.stream.writeBytes
 import korlibs.io.stream.writeString
 import korlibs.crypto.encoding.hex
+import korlibs.math.*
 
 // @TODO: We might want to support a raw version without headers?
 open class LZO(val headerType: HeaderType = HeaderType.SHORT) : CompressionMethod {

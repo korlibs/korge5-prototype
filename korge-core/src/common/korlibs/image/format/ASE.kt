@@ -2,9 +2,6 @@ package korlibs.image.format
 
 import korlibs.datastructure.*
 import korlibs.time.milliseconds
-import korlibs.memory.clamp
-import korlibs.memory.extract
-import korlibs.memory.hasBitSet
 import korlibs.memory.readIntArray
 import korlibs.memory.readIntArrayLE
 import korlibs.image.bitmap.*
@@ -29,6 +26,7 @@ import korlibs.io.stream.readU32LE
 import korlibs.io.stream.readU8
 import korlibs.math.geom.slice.*
 import korlibs.crypto.encoding.hex
+import korlibs.math.*
 import korlibs.math.geom.*
 
 // If this is true, only processes visible layers from the ASE file.

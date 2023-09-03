@@ -12,8 +12,6 @@ import korlibs.io.file.VfsFile
 import korlibs.io.file.VfsOpenMode
 import korlibs.io.file.VfsStat
 import korlibs.io.file.folder
-import korlibs.io.internal.divCeil
-import korlibs.io.internal.without
 import korlibs.io.lang.IOException
 import korlibs.io.lang.invalidOp
 import korlibs.io.serialization.json.Json
@@ -22,6 +20,7 @@ import korlibs.io.stream.AsyncStreamBase
 import korlibs.io.stream.toAsyncStream
 import korlibs.crypto.encoding.hex
 import korlibs.crypto.encoding.unhex
+import korlibs.math.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlin.math.max
@@ -245,7 +244,7 @@ private class StorageFiles(val storage: SimpleStorage, val timeProvider: () -> T
         // Remove child from parent
         val parentEntry = getEntryInfo(entry.parentFullPath)
         if (parentEntry != null) {
-            setEntryInfo(parentEntry.copy(children = parentEntry.children.without(entry.fullPath), modifiedTime = now()))
+            setEntryInfo(parentEntry.copy(children = parentEntry.children - entry.fullPath, modifiedTime = now()))
         }
     }
 

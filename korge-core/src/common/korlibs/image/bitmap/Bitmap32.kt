@@ -1,12 +1,11 @@
 package korlibs.image.bitmap
 
 import korlibs.memory.arraycopy
-import korlibs.memory.clamp
-import korlibs.memory.toInt
 import korlibs.image.annotation.KorimInternal
 import korlibs.image.color.*
 import korlibs.image.vector.Bitmap32Context2d
 import korlibs.image.vector.Context2d
+import korlibs.math.*
 import korlibs.math.geom.*
 import kotlin.js.JsName
 import kotlin.jvm.JvmName
@@ -267,10 +266,10 @@ class Bitmap32(
         = extract(x, y, width, height).apply { applyColorTransform(ct) }
 
 	fun applyColorTransform(ct: ColorTransform, x: Int = 0, y: Int = 0, width: Int = this.width - x, height: Int = this.height - y) {
-		val R = IntArray(256) { ((it * ct.mR) + ct.aR).toInt().clamp(0x00, 0xFF) }
-		val G = IntArray(256) { ((it * ct.mG) + ct.aG).toInt().clamp(0x00, 0xFF) }
-		val B = IntArray(256) { ((it * ct.mB) + ct.aB).toInt().clamp(0x00, 0xFF) }
-		val A = IntArray(256) { ((it * ct.mA) + ct.aA).toInt().clamp(0x00, 0xFF) }
+		val R = IntArray(256) { ((it * ct.mR) + ct.aR).toInt().clampUByte() }
+		val G = IntArray(256) { ((it * ct.mG) + ct.aG).toInt().clampUByte() }
+		val B = IntArray(256) { ((it * ct.mB) + ct.aB).toInt().clampUByte() }
+		val A = IntArray(256) { ((it * ct.mA) + ct.aA).toInt().clampUByte() }
         updateColors(x, y, width, height) { RGBA(R[it.r], G[it.g], B[it.b], A[it.a]) }
 	}
 

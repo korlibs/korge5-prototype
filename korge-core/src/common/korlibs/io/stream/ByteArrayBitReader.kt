@@ -1,8 +1,8 @@
 package korlibs.io.stream
 
-import korlibs.memory.extract
 import korlibs.io.experimental.KorioExperimentalApi
 import korlibs.io.lang.invalidOp
+import korlibs.math.*
 
 @KorioExperimentalApi
 class ByteArrayBitReader(val data: ByteArray) {

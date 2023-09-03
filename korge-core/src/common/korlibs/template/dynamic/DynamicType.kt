@@ -18,7 +18,6 @@ interface DynamicShapeRegister<T> {
     fun register(vararg items: KCallable<*>, dummy: Unit = Unit) = this.apply { for (item in items) register(item) }
 }
 
-
 class DynamicShape<T> : DynamicShapeRegister<T> {
     private val propertiesByName = LinkedHashMap<String, KProperty<*>>()
     private val methodsByName = LinkedHashMap<String, KCallable<*>>()

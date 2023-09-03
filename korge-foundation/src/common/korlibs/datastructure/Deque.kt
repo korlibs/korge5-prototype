@@ -3,6 +3,7 @@
 package korlibs.datastructure
 
 import korlibs.datastructure.internal.*
+import korlibs.math.*
 import kotlin.math.min
 
 typealias Deque<TGen> = TGenDeque<TGen>

@@ -1,6 +1,5 @@
 package korlibs.io.file.registry
 
-import korlibs.memory.toIntClamp
 import korlibs.io.file.Vfs
 import korlibs.io.file.VfsFile
 import korlibs.io.file.VfsOpenMode
@@ -12,6 +11,7 @@ import korlibs.io.stream.AsyncInputStream
 import korlibs.io.stream.AsyncStream
 import korlibs.io.stream.openAsync
 import korlibs.io.stream.readAll
+import korlibs.math.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlin.reflect.KClass

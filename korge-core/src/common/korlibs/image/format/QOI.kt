@@ -2,9 +2,6 @@ package korlibs.image.format
 
 import korlibs.datastructure.*
 import korlibs.memory.UByteArrayInt
-import korlibs.memory.extract2
-import korlibs.memory.extract4
-import korlibs.memory.extract6
 import korlibs.memory.write32BE
 import korlibs.image.bitmap.Bitmap
 import korlibs.image.bitmap.Bitmap32
@@ -17,6 +14,7 @@ import korlibs.io.stream.readS32BE
 import korlibs.io.stream.readStringz
 import korlibs.io.stream.readU8
 import korlibs.io.stream.writeBytes
+import korlibs.math.*
 
 // You may provide a pre-allocated array as an optimization for QOI encoding.
 // Useful if you know you will be encoding a lot of times, so you can just re-use the same

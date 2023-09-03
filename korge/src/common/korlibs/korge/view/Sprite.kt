@@ -1,11 +1,11 @@
 package korlibs.korge.view
 
-import korlibs.time.*
-import korlibs.memory.umod
 import korlibs.image.bitmap.*
-import korlibs.io.async.Signal
+import korlibs.io.async.*
+import korlibs.math.*
 import korlibs.math.geom.*
-import korlibs.math.geom.vector.VectorPath
+import korlibs.math.geom.vector.*
+import korlibs.time.*
 
 inline fun Container.sprite(
     initialAnimation: SpriteAnimation, anchor: Anchor = Anchor.TOP_LEFT, callback: @ViewDslMarker Sprite.() -> Unit = {}

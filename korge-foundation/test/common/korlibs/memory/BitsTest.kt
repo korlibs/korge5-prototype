@@ -1,9 +1,10 @@
 package korlibs.memory
 
-import korlibs.memory.internal.byteArrayOf
-import korlibs.memory.internal.format
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import korlibs.math.*
+import korlibs.util.*
+import kotlin.rotateLeft
+import kotlin.rotateRight
+import kotlin.test.*
 
 class BitsTest {
 	@kotlin.test.Test

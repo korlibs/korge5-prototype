@@ -8,6 +8,7 @@ import korlibs.korge.annotations.*
 import korlibs.korge.tween.*
 import korlibs.korge.view.*
 import korlibs.io.lang.*
+import korlibs.math.*
 import korlibs.math.interpolation.*
 import kotlin.reflect.*
 

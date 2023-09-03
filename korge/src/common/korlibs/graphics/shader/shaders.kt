@@ -12,6 +12,7 @@ import korlibs.graphics.*
 import korlibs.graphics.annotation.KoragExperimental
 import korlibs.graphics.shader.gl.*
 import korlibs.io.lang.*
+import korlibs.math.*
 import kotlin.reflect.*
 import kotlin.collections.Iterable
 

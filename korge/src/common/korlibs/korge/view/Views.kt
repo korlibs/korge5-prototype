@@ -24,6 +24,7 @@ import korlibs.korge.internal.*
 import korlibs.korge.render.*
 import korlibs.korge.stat.*
 import korlibs.logger.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 import korlibs.render.*

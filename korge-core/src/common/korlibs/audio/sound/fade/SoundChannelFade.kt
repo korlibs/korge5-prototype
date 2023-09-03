@@ -5,6 +5,7 @@ import korlibs.time.*
 import korlibs.memory.*
 import korlibs.audio.sound.*
 import korlibs.io.async.*
+import korlibs.math.*
 import korlibs.math.interpolation.*
 import kotlin.native.concurrent.*
 

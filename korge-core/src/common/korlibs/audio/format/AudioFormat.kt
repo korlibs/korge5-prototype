@@ -12,7 +12,7 @@ import korlibs.io.file.VfsFile
 import korlibs.io.file.extensionLC
 import korlibs.io.lang.unsupported
 import korlibs.io.stream.*
-import korlibs.io.util.niceStr
+import korlibs.number.*
 import korlibs.time.TimeSpan
 import korlibs.time.seconds
 import kotlinx.coroutines.CoroutineDispatcher

@@ -1,8 +1,7 @@
 package korlibs.korge.render
 
-import korlibs.memory.isPowerOfTwo
-import korlibs.memory.nextPowerOfTwo
-import korlibs.image.bitmap.Bitmap32
+import korlibs.image.bitmap.*
+import korlibs.math.*
 
 /**
  * Returns [this] same bitmap if it is already power of two,

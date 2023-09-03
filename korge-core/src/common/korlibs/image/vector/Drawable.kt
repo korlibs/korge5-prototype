@@ -1,11 +1,10 @@
 package korlibs.image.vector
 
-import korlibs.memory.clamp
-import korlibs.memory.toIntCeil
 import korlibs.image.bitmap.Bitmap
 import korlibs.image.bitmap.BitmapWithHotspot
 import korlibs.image.bitmap.NativeImageOrBitmap32
 import korlibs.image.bitmap.context2d
+import korlibs.math.*
 import korlibs.math.geom.*
 
 interface Drawable {

@@ -1,7 +1,6 @@
 package korlibs.io.stream
 
 import korlibs.memory.arraycopy
-import korlibs.memory.nextAlignedTo
 import korlibs.memory.readByteArray
 import korlibs.memory.readCharArrayBE
 import korlibs.memory.readCharArrayLE
@@ -39,6 +38,7 @@ import korlibs.io.lang.Charset
 import korlibs.io.lang.UTF8
 import korlibs.io.lang.toString
 import korlibs.io.util.indexOf
+import korlibs.math.*
 
 class FastByteArrayInputStream(val ba: ByteArray, offset: Int = 0, val start: Int = 0, val end: Int = ba.size) {
     private var offset = offset + start

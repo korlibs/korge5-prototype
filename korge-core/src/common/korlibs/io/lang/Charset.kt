@@ -3,9 +3,8 @@ package korlibs.io.lang
 import korlibs.datastructure.IntIntMap
 import korlibs.datastructure.iterators.fastForEach
 import korlibs.datastructure.lock.NonRecursiveLock
+import korlibs.math.*
 import korlibs.memory.ByteArrayBuilder
-import korlibs.memory.extract
-import korlibs.memory.insert
 import korlibs.memory.readS16
 import korlibs.memory.write16
 import kotlin.math.min

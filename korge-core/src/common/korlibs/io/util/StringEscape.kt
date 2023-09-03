@@ -1,12 +1,12 @@
 package korlibs.io.util
 
-import korlibs.memory.extract
-import korlibs.crypto.encoding.Hex
+import korlibs.encoding.*
+import korlibs.math.*
 
 fun String.escape(): String {
 	val out = StringBuilder()
-	for (n in 0 until this.length) {
-		val c = this[n]
+	for (element in this) {
+		val c = element
 		when (c) {
 			'\\' -> out.append("\\\\")
 			'"' -> out.append("\\\"")
@@ -15,8 +15,8 @@ fun String.escape(): String {
 			'\t' -> out.append("\\t")
 			in '\u0000'..'\u001f' -> {
 				out.append("\\x")
-				out.append(Hex.encodeCharLower(c.toInt().extract(4, 4)))
-				out.append(Hex.encodeCharLower(c.toInt().extract(0, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(4, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(0, 4)))
 			}
 			else -> out.append(c)
 		}
@@ -38,10 +38,10 @@ fun String.uescape(): String {
 				out.append(c)
 			} else {
 				out.append("\\u")
-				out.append(Hex.encodeCharLower(c.toInt().extract(12, 4)))
-				out.append(Hex.encodeCharLower(c.toInt().extract(8, 4)))
-				out.append(Hex.encodeCharLower(c.toInt().extract(4, 4)))
-				out.append(Hex.encodeCharLower(c.toInt().extract(0, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(12, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(8, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(4, 4)))
+				out.append(Hex.encodeCharLower(c.code.extract(0, 4)))
 			}
 		}
 	}

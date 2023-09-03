@@ -1,7 +1,6 @@
 package korlibs.audio.format
 
 import korlibs.time.microseconds
-import korlibs.memory.extract
 import korlibs.io.annotations.Keep
 import korlibs.io.lang.invalidOp
 import korlibs.io.stream.AsyncStream
@@ -11,6 +10,7 @@ import korlibs.io.stream.readS8
 import korlibs.io.stream.readStream
 import korlibs.io.stream.readString
 import korlibs.io.stream.readU8
+import korlibs.math.*
 import kotlin.coroutines.cancellation.CancellationException
 
 @Keep
@@ -36,8 +36,8 @@ open class OggBase : AudioFormat("ogg") {
             val magic = s.readString(5)
             if (magic != "OggS\u0000") invalidAudioFormat("Not an OGG file")
             val type = s.readS8()
-            val cont = type.extract(0);
-            val bos = type.extract(1);
+            val cont = type.extract(0)
+            val bos = type.extract(1)
             val eos = type.extract(2)
             val gpos = s.readS64LE()
             val sn = s.readS32LE()

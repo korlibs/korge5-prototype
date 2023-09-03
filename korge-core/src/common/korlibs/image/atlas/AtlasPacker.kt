@@ -1,8 +1,8 @@
 package korlibs.image.atlas
 
 import korlibs.datastructure.iterators.fastForEach
-import korlibs.memory.nextPowerOfTwo
 import korlibs.image.bitmap.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.math.geom.binpack.BinPacker
 import kotlin.jvm.JvmName

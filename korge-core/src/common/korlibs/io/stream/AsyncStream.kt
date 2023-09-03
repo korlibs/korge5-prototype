@@ -8,8 +8,6 @@ import korlibs.datastructure.iterators.fastForEach
 import korlibs.memory.ByteArrayBuilder
 import korlibs.platform.Endian
 import korlibs.memory.arraycopy
-import korlibs.memory.clamp
-import korlibs.memory.nextAlignedTo
 import korlibs.memory.readCharArrayBE
 import korlibs.memory.readCharArrayLE
 import korlibs.memory.readDoubleArrayBE
@@ -39,8 +37,6 @@ import korlibs.memory.readU24BE
 import korlibs.memory.readU24LE
 import korlibs.memory.readU32BE
 import korlibs.memory.readU32LE
-import korlibs.memory.toIntClamp
-import korlibs.memory.unsigned
 import korlibs.memory.write16BE
 import korlibs.memory.write16LE
 import korlibs.memory.write24BE
@@ -76,6 +72,7 @@ import korlibs.io.lang.toByteArray
 import korlibs.io.lang.toBytez
 import korlibs.io.lang.toString
 import korlibs.io.util.indexOf
+import korlibs.math.*
 import kotlinx.coroutines.Job
 import kotlin.coroutines.coroutineContext
 import kotlin.math.max

@@ -8,7 +8,7 @@ import korlibs.crypto.sha1
 import korlibs.io.async.suspendTest
 import korlibs.io.file.std.resourcesVfs
 import korlibs.logger.*
-import korlibs.memory.divRound
+import korlibs.math.*
 import korlibs.time.measureTimeWithResult
 import kotlin.test.Test
 import kotlin.test.assertEquals

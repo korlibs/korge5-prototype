@@ -5,6 +5,7 @@ import korlibs.io.util.*
 import korlibs.korge.annotations.*
 import korlibs.korge.input.*
 import korlibs.korge.view.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 import korlibs.render.*

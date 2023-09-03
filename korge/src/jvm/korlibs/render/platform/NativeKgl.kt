@@ -6,6 +6,7 @@ import korlibs.image.awt.*
 import korlibs.image.bitmap.*
 import korlibs.image.format.BitmapNativeImage
 import korlibs.kgl.*
+import korlibs.math.*
 import korlibs.memory.*
 
 open class NativeKgl constructor(private val gl: INativeGL) : KmlGl() {

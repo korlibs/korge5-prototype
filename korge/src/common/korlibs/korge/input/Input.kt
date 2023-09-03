@@ -7,7 +7,6 @@ import korlibs.time.TimeSpan
 import korlibs.time.milliseconds
 import korlibs.time.nanoseconds
 import korlibs.memory.arraycopy
-import korlibs.memory.setBits
 import korlibs.graphics.gl.AGOpenglFactory
 import korlibs.event.GamepadInfo
 import korlibs.event.Key
@@ -16,6 +15,7 @@ import korlibs.event.MouseButton
 import korlibs.event.Touch
 import korlibs.event.TouchEvent
 import korlibs.korge.internal.KorgeInternal
+import korlibs.math.*
 import korlibs.math.geom.*
 
 //@Singleton

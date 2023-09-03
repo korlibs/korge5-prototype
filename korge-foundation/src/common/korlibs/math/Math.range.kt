@@ -1,8 +1,10 @@
 @file:Suppress("PackageDirectoryMismatch")
 
-package korlibs.math.geom.range // This should be in korlibs.math.range
+package korlibs.math.geom.range
 
-import korlibs.math.internal.*
+import korlibs.number.*
+
+// This should be in korlibs.math.range
 
 data class DoubleRangeExclusive(val start: Double, val endExclusive: Double) {
     val length: Double get() = endExclusive - start

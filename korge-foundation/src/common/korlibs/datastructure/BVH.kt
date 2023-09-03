@@ -30,8 +30,8 @@ Jon-Carlos Rivera - imbcmdth@hotmail.com
 package korlibs.datastructure.ds
 
 import korlibs.datastructure.*
-import korlibs.datastructure.internal.isAlmostEquals
-import korlibs.datastructure.internal.niceStr
+import korlibs.math.*
+import korlibs.number.*
 
 import kotlin.collections.HashMap
 import kotlin.collections.List

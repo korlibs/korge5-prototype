@@ -1,6 +1,6 @@
 package korlibs.template
 
-import korlibs.template.internal.htmlspecialchars
+import korlibs.io.util.*
 
 class AutoEscapeMode(val transform: (String) -> String) {
     companion object {

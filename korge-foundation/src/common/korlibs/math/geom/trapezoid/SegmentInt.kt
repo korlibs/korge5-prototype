@@ -1,5 +1,6 @@
 package korlibs.math.geom.trapezoid
 
+import korlibs.math.*
 import korlibs.memory.*
 import korlibs.math.annotations.*
 import korlibs.math.geom.*

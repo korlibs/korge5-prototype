@@ -5,10 +5,8 @@ import korlibs.image.bitmap.NativeImage
 import korlibs.io.jsObject
 import korlibs.io.runtime.deno.*
 import korlibs.js.*
+import korlibs.math.*
 import korlibs.memory.Buffer
-import korlibs.memory._high
-import korlibs.memory._low
-import korlibs.memory.fromLowHigh
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.asDeferred
 import org.khronos.webgl.*

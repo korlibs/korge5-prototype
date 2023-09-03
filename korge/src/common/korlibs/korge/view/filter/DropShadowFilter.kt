@@ -7,6 +7,7 @@ import korlibs.korge.render.*
 import korlibs.korge.view.*
 import korlibs.korge.view.property.*
 import korlibs.image.color.*
+import korlibs.math.*
 import korlibs.math.geom.*
 
 open class DropshadowFilter(

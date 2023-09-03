@@ -2,6 +2,7 @@ package korlibs.render.win32
 
 import korlibs.memory.*
 import korlibs.event.*
+import korlibs.math.*
 import kotlin.test.*
 
 class XInputEventAdapterCommonTest {

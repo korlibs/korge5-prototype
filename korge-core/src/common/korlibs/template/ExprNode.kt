@@ -1,13 +1,12 @@
 package korlibs.template
 
+import korlibs.io.util.*
 import korlibs.template.dynamic.Dynamic2
 import korlibs.template.dynamic.DynamicContext
 import korlibs.template.internal.StrReader
-import korlibs.template.internal.isDigit
-import korlibs.template.internal.isLetterDigitOrUnderscore
-import korlibs.template.internal.unescape
 import korlibs.template.util.ListReader
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.text.isDigit
 
 interface ExprNode : DynamicContext {
     suspend fun eval(context: Template.EvalContext): Any?
@@ -422,7 +421,7 @@ interface ExprNode : DynamicContext {
                     val id = r.readWhile(Char::isLetterDigitOrUnderscore)
                     if (id.isNotEmpty()) {
                         if (id[0].isDigit()) {
-                            if (r.peek() == '.' && r.peek(2)[1].isDigit()) {
+                            if (r.peekChar() == '.' && r.peek(2)[1].isDigit()) {
                                 r.skip()
                                 val decimalPart = r.readWhile(Char::isLetterDigitOrUnderscore)
                                 emit(ExprNode.Token.TNumber("$id.$decimalPart"), dstart)
@@ -438,7 +437,7 @@ interface ExprNode : DynamicContext {
                     if (r.peek(3) in ExprNode.Token.OPERATORS) emit(ExprNode.Token.TOperator(r.read(3)), dstart2)
                     if (r.peek(2) in ExprNode.Token.OPERATORS) emit(ExprNode.Token.TOperator(r.read(2)), dstart2)
                     if (r.peek(1) in ExprNode.Token.OPERATORS) emit(ExprNode.Token.TOperator(r.read(1)), dstart2)
-                    if (r.peek() == '\'' || r.peek() == '"') {
+                    if (r.peekChar() == '\'' || r.peekChar() == '"') {
                         val dstart3 = r.pos
                         val strStart = r.read()
                         val strBody = r.readUntil(strStart) ?: context.withPosAdd(dstart3).exception("String literal not closed")
@@ -447,7 +446,7 @@ interface ExprNode : DynamicContext {
                     }
                     val end = r.pos
                     if (end == start) {
-                        context.withPosAdd(end).exception("Don't know how to handle '${r.peek()}'")
+                        context.withPosAdd(end).exception("Don't know how to handle '${r.peekChar()}'")
                     }
                 }
                 val dstart = r.pos

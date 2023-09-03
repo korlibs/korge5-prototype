@@ -7,6 +7,7 @@ import korlibs.memory.*
 import korlibs.io.file.*
 import korlibs.io.util.*
 import korlibs.math.geom.*
+import korlibs.number.*
 
 open class TypedEvent<T : BEvent>(open override var type: EventType<T>) : Event(), TEvent<T>
 

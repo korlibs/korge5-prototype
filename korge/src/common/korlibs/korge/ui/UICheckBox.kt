@@ -12,6 +12,7 @@ import korlibs.korge.style.*
 import korlibs.korge.tween.*
 import korlibs.korge.view.*
 import korlibs.korge.view.property.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.memory.*
 import korlibs.time.*

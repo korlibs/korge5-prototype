@@ -1,12 +1,7 @@
 package korlibs.io
 
-import korlibs.io.async.asyncEntryPoint
-import korlibs.io.internal.KORIO_VERSION
-import kotlinx.coroutines.CoroutineScope
-import kotlin.coroutines.coroutineContext
+import korlibs.io.async.*
+import kotlinx.coroutines.*
+import kotlin.coroutines.*
 
 fun Korio(entry: suspend CoroutineScope.() -> Unit) = asyncEntryPoint { entry(CoroutineScope(coroutineContext)) }
-
-object Korio {
-	val VERSION = KORIO_VERSION
-}

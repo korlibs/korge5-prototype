@@ -2,15 +2,14 @@ package korlibs.math.geom.vector
 
 import korlibs.datastructure.*
 import korlibs.datastructure.iterators.*
+import korlibs.math.*
 import korlibs.math.annotations.*
 import korlibs.math.geom.*
 import korlibs.math.geom.bezier.*
 import korlibs.math.geom.ds.*
 import korlibs.math.geom.shape.*
 import korlibs.math.geom.trapezoid.*
-import korlibs.math.internal.*
-import korlibs.math.roundDecimalPlaces
-import korlibs.memory.*
+import korlibs.number.*
 import kotlin.native.concurrent.*
 
 interface IVectorPath : VectorBuilder {

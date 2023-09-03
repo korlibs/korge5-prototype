@@ -68,6 +68,7 @@ import kotlin.math.*
 @KmemExperimental
 @Deprecated("") public inline fun Number.toInt53(): Int53 = Int53.fromDoubleClamped(this.toDouble())
 
+/*
 ////////////////////
 ////////////////////
 
@@ -313,3 +314,4 @@ private val MINUS_ZERO_F = -0f
 
 /** Checks if [this] value is power of two */
 @Deprecated("") public val Int.isPowerOfTwo: Boolean get() = this.nextPowerOfTwo == this
+*/

@@ -1,6 +1,5 @@
 package korlibs.image.format
 
-import korlibs.memory.unsigned
 import korlibs.image.bitmap.Bitmap32
 import korlibs.image.color.RGBA
 import korlibs.io.lang.invalidOp
@@ -13,6 +12,7 @@ import korlibs.io.stream.readS32BE
 import korlibs.io.stream.readStream
 import korlibs.io.stream.readStringz
 import korlibs.io.stream.readU16BE
+import korlibs.math.*
 
 // https://www.adobe.com/devnet-apps/photoshop/fileformatashtml/
 object PSD : ImageFormat("psd") {

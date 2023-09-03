@@ -10,6 +10,7 @@ import korlibs.math.geom.*
 import korlibs.math.geom.bezier.*
 import korlibs.math.geom.vector.*
 import korlibs.memory.*
+import korlibs.number.*
 import kotlin.test.*
 
 class GraphicsTest {

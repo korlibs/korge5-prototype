@@ -3,6 +3,7 @@ package korlibs.image.bitmap
 import korlibs.memory.*
 import korlibs.image.color.RGBA
 import korlibs.image.color.RGBAf
+import korlibs.math.*
 import kotlin.math.*
 
 class FloatBitmap32(

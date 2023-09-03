@@ -1,6 +1,7 @@
 package korlibs.korge.tween
 
 import korlibs.image.color.*
+import korlibs.math.*
 import korlibs.math.geom.*
 import korlibs.math.geom.bezier.*
 import korlibs.math.geom.vector.*

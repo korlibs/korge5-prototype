@@ -1,8 +1,7 @@
 package korlibs.math.geom
 
-import korlibs.math.internal.niceStr
-import korlibs.math.isAlmostEquals
-import korlibs.memory.clamp
+import korlibs.math.*
+import korlibs.number.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min

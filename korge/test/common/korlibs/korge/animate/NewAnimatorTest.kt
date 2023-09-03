@@ -4,6 +4,7 @@ import korlibs.time.*
 import korlibs.korge.view.*
 import korlibs.io.util.*
 import korlibs.math.interpolation.*
+import korlibs.number.*
 import kotlin.test.*
 
 class NewAnimatorTest {
