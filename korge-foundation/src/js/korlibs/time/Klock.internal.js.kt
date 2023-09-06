@@ -3,28 +3,14 @@
 package korlibs.time.internal
 
 import korlibs.time.*
-import korlibs.time.hr.*
-import kotlinx.browser.*
-import kotlin.time.*
 
-private external val process: dynamic
-
-private val isNode = jsTypeOf(window) == "undefined"
-private val initialHrTime: dynamic by lazy { process.hrtime() }
+@JsName("globalThis")
+private external val globalThis: dynamic
 
 internal actual object KlockInternal {
     actual val currentTime: Double get() = (js("Date.now()").unsafeCast<Double>())
 
-    actual val now: TimeSpan
-        get() = when {
-        isNode -> {
-            val result: Array<Double> = process.hrtime(initialHrTime).unsafeCast<Array<Double>>()
-            Duration.fromSeconds(result[0]) + TimeSpan.fromNanoseconds(result[1])
-        }
-        else -> {
-            TimeSpan.fromMilliseconds(window.performance.now())
-        }
-    }
+    actual val now: TimeSpan get() = TimeSpan.fromMilliseconds(globalThis.performance.now())
 
     actual fun localTimezoneOffsetMinutes(time: DateTime): TimeSpan {
         @Suppress("UNUSED_VARIABLE")
