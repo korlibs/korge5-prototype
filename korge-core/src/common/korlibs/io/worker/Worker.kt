@@ -21,7 +21,7 @@ open class _WorkerImpl {
 
 @JsExport
 class DemoWorkerTask : WorkerTask() {
-    override fun execute() = runSuspend {
+    override fun execute() = runSuspend { params ->
         println("TEST!!!!! $params")
         //delay(1.seconds)
         //error("ERROR!")
@@ -32,14 +32,14 @@ class DemoWorkerTask : WorkerTask() {
 open class WorkerTask {
     private var stackTrace: String? = null
     private var gettingStackTrace = false
-    var params = listOf<Any?>()
+    internal var params = listOf<Any?>()
         get() {
             if (!runSuspend) error("Must wrap function around runSuspend")
             return field
         }
-    var result: Any? = null
+    internal var result: Any? = null
     private var runSuspend = false
-    protected fun runSuspend(block: suspend () -> Any?) {
+    protected fun runSuspend(block: suspend (params: List<Any?>) -> Any?) {
         runSuspend = true
         try {
             if (gettingStackTrace) {
@@ -48,7 +48,7 @@ open class WorkerTask {
             }
             val deferred = CompletableDeferred<Any?>()
             launchImmediately(EmptyCoroutineContext) {
-                deferred.completeWith(runCatching { block() })
+                deferred.completeWith(runCatching { block(this.params) })
             }
             result = deferred
         } finally {

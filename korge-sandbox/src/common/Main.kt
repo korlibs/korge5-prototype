@@ -124,7 +124,7 @@ class MyTask : WorkerTask() {
     //        Worker.register(MyTask::class)
     //    }
     //}
-    override fun execute() = runSuspend {
+    override fun execute() = runSuspend { params ->
         println("TEST!!!!! $params")
         //delay(1.seconds)
         //error("ERROR!")
