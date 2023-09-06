@@ -59,9 +59,11 @@ fun Throwable.printStackTraceWithExtraMessage(msg: String) {
     Console.error(stackTraceToString())
 }
 
-fun currentStackTrace(msg: String = "printStackTrace"): String = Exception(msg).stackTraceToString()
+@Suppress("NOTHING_TO_INLINE")
+inline fun currentStackTrace(msg: String = "printStackTrace"): String = Exception(msg).stackTraceToString()
 
-fun printStackTrace(msg: String = "printStackTrace") {
+@Suppress("NOTHING_TO_INLINE")
+inline fun printStackTrace(msg: String = "printStackTrace") {
     Console.error(currentStackTrace(msg))
 }
 

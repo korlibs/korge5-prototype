@@ -95,8 +95,12 @@ object JsRuntimeDeno : JsRuntime() {
         //val url = URL(import.meta.url)
         //console.log("Deno.mainModule", Deno.mainModule)
         //console.log("import.meta.url", import.meta.url)
-        val str = URL(".", Deno.mainModule).pathname
-        return if (Platform.isWindows) str.substring(1) else str
+        try {
+            val str = URL(".", Deno.mainModule).pathname
+            return if (Platform.isWindows) str.substring(1) else str
+        } catch (e: dynamic) {
+            return "."
+        }
         //return Deno.cwd()
     }
 

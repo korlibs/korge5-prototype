@@ -1,5 +1,6 @@
 package korlibs.io.async
 
+import korlibs.io.worker.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 import kotlin.js.Promise

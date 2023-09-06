@@ -10,6 +10,7 @@ import korlibs.io.net.http.HttpClient
 import korlibs.io.runtime.JsRuntime
 import korlibs.io.stream.*
 import korlibs.memory.checkIsJsBrowser
+import korlibs.platform.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CompletableDeferred
@@ -43,12 +44,13 @@ object JsRuntimeBrowser : JsRuntime() {
     override fun currentDir(): String = baseUrl
 
     override fun envs(): Map<String, String> {
+        //if (js("(typeof document === 'undefined')")) return emptyMap()
         checkIsJsBrowser()
-        return QueryString.decode((document.location?.search ?: "").trimStart('?'))
+        return QueryString.decode((jsGlobalThis.asDynamic().location?.search ?: "").trimStart('?'))
             .map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
     }
 
-    override fun langs(): List<String> = window.navigator.languages.asList()
+    override fun langs(): List<String> = jsWindow.navigator.languages.asList()
     override fun openVfs(path: String): VfsFile {
         return UrlVfs(currentDir())[path].withCatalogJail().root.also {
             logger.info { "BROWSER openVfs: currentDir=${currentDir()}, path=$path, urlVfs=$it" }

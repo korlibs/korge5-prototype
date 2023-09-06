@@ -1,6 +1,7 @@
 package korlibs.logger
 
 import korlibs.js.Deno
+import korlibs.platform.*
 import kotlinx.browser.document
 
 actual object Console : BaseConsole() {
@@ -20,16 +21,12 @@ actual object DefaultLogOutput : Logger.Output {
     override fun output(logger: Logger, level: Logger.Level, msg: Any?) = Logger.ConsoleLogOutput.output(logger, level, msg)
 }
 
-private external val process: dynamic
-
 internal actual val miniEnvironmentVariables: Map<String, String> by lazy {
     when {
-        jsTypeOf(process) != "undefined" -> jsObjectToMap(process.env)
-        jsTypeOf(Deno) != "undefined" -> jsObjectToMap(Deno.env)
-        else -> {
-            //checkIsJsBrowser()
-            QueryString_decode((document.location?.search ?: "").trimStart('?')).map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
-        }
+        isNodeJs -> jsObjectToMap(process.env)
+        isDenoJs -> jsObjectToMap(Deno.env)
+        js("(typeof document !== 'undefined')") -> QueryString_decode((document.location?.search ?: "").trimStart('?')).map { it.key to (it.value.firstOrNull() ?: it.key) }.toMap()
+        else -> mapOf()
     }
 }
 

@@ -20,6 +20,7 @@ import korlibs.io.net.http.HttpClient
 import korlibs.io.net.http.HttpServer
 import korlibs.io.runtime.JsRuntime
 import korlibs.io.stream.*
+import korlibs.platform.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -56,8 +57,6 @@ fun ByteArray.toNodeJsBuffer(offset: Int, size: Int): NodeJsBuffer =
 val REQ get() = "req"
 private external val eval: dynamic
 internal fun require_node(name: String): dynamic = eval("(${REQ}uire('$name'))")
-
-private external val process: dynamic // node.js
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -8,6 +8,7 @@ import korlibs.io.async.launchImmediately
 import korlibs.io.file.std.uniVfs
 import korlibs.io.lang.Cancellable
 import korlibs.memory.checkIsJsBrowser
+import korlibs.platform.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.CancellationException
@@ -67,11 +68,11 @@ object HtmlSimpleSound {
 
 	val ctx: BaseAudioContext? = try {
 		when {
-			jsTypeOf(window.asDynamic().AudioContext) != "undefined" -> AudioContext()
-			jsTypeOf(window.asDynamic().webkitAudioContext) != "undefined" -> webkitAudioContext()
+			jsTypeOf(jsWindow.asDynamic().AudioContext) != "undefined" -> AudioContext()
+			jsTypeOf(jsWindow.asDynamic().webkitAudioContext) != "undefined" -> webkitAudioContext()
 			else -> null
 		}.also {
-            (window.asDynamic()).globalAudioContext = it
+            (jsWindow.asDynamic()).globalAudioContext = it
         }
 	} catch (e: Throwable) {
         logger.error { e }
@@ -146,7 +147,7 @@ object HtmlSimpleSound {
                         val deferred = CompletableDeferred<Unit>()
                         //println("sourceNode: $sourceNode, ctx?.state=${ctx?.state}, buffer.duration=${buffer.duration}")
                         if (sourceNode == null || ctx?.state != "running") {
-                            window.setTimeout(
+                            jsWindow.setTimeout(
                                 { deferred.complete(Unit) },
                                 ((buffer.asDynamic().duration.unsafeCast<Double>()) * 1000).toInt()
                             )
@@ -386,7 +387,7 @@ object HtmlSimpleSound {
 
 			if (ctx != null) {
                 // If already created the audio context, we try to resume it
-                (window.asDynamic()).globalAudioContext.unsafeCast<BaseAudioContext?>()?.resume()
+                (jsWindow.asDynamic()).globalAudioContext.unsafeCast<BaseAudioContext?>()?.resume()
 
                 val source = ctx.createBufferSource()
 

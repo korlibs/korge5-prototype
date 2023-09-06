@@ -93,14 +93,27 @@ tasks {
 
     // For JS testing
     // ./gradlew -t buildDenoDebug
+    val buildDenoDebugModules by creating(Copy::class) {
+        dependsOn("jsDevelopmentExecutableCompileSync")
+        dependsOn(buildDistCopy)
+        from(File(buildDir, "compileSync/js/main/developmentExecutable/kotlin"))
+        into(File(buildDir, "dist"))
+        doLast {
+            File(buildDir, "dist/program.mjs").also {
+                it.writeText("#!/usr/bin/env -S deno run -A --unstable\nimport('./korge5-korge-sandbox.mjs')")
+                it.setExecutable(true)
+            }
+        }
+    }
+
     val buildDenoDebug by creating(Exec::class) {
         dependsOn("jsDevelopmentExecutableCompileSync")
         dependsOn(buildDistCopy)
         group = "dist"
         executable = "esbuild"
         val releaseOutput = File(buildDir, "compileSync/js/main/developmentExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath
-        val outFile = File(buildDir, "dist/out.js").absolutePath
-        args("--bundle", releaseOutput, "--log-level=error", "--outfile=$outFile", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
+        val outFile = File(buildDir, "dist/program.mjs").absolutePath
+        args("--bundle", releaseOutput, "--format=esm", "--log-level=error", "--outfile=$outFile", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
         workingDir(rootProject.rootDir)
         doLast {
             File(outFile).setExecutable(true)
@@ -113,8 +126,8 @@ tasks {
         group = "dist"
         executable = "esbuild"
         val releaseOutput = File(buildDir, "compileSync/js/main/productionExecutable/kotlin/korge5-${project.name.trim(':').replace(':', '-')}.mjs").absolutePath
-        val outFile = File(buildDir, "dist/out.js").absolutePath
-        args("--bundle", releaseOutput, "--log-level=warning", "--outfile=$outFile", "--minify", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
+        val outFile = File(buildDir, "dist/program.mjs").absolutePath
+        args("--bundle", releaseOutput, "--format=esm", "--log-level=warning", "--outfile=$outFile", "--minify", "--banner:js=#!/usr/bin/env -S deno run -A --unstable")
         workingDir(rootProject.rootDir)
         doLast {
             File(outFile).setExecutable(true)
@@ -136,11 +149,21 @@ tasks {
         //jvmArgs("-XstartOnFirstThread")
     }
 
+    afterEvaluate {
+        afterEvaluate {
+            val jvmRun by getting(JavaExec::class) {
+                if (!JvmAddOpens.beforeJava9) jvmArgs(*JvmAddOpens.createAddOpensTypedArray())
+            }
+        }
+    }
+
     val runJsHotreload by creating {
         group = "run"
         doFirst {
+            //val buildTask = "buildDenoDebug"
+            val buildTask = "buildDenoDebugModules"
             exec {
-                commandLine("../gradlew", "buildDenoDebug")
+                commandLine("../gradlew", buildTask)
                 //./gradlew buildDenoDebug
                 //live-server korge-sandbox/build/dist & ./gradlew -t buildDenoDebug
             }
@@ -150,7 +173,7 @@ tasks {
                 }
             }.start()
             exec {
-                commandLine("../gradlew", "-t", "buildDenoDebug")
+                commandLine("../gradlew", "-t", buildTask)
                 //./gradlew buildDenoDebug
                 //live-server korge-sandbox/build/dist & ./gradlew -t buildDenoDebug
             }

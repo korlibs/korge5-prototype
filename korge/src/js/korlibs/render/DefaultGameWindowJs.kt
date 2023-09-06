@@ -10,6 +10,8 @@ import korlibs.io.async.*
 import korlibs.io.file.*
 import korlibs.math.geom.*
 import korlibs.memory.*
+import korlibs.memory.Platform
+import korlibs.platform.*
 import korlibs.render.deno.DenoJsGameWindow
 import kotlinx.browser.*
 import kotlinx.coroutines.*
@@ -30,7 +32,7 @@ open class JsGameWindow : GameWindow() {
 open class BrowserCanvasJsGameWindow(
     val canvas: HTMLCanvasElement = AGDefaultCanvas()
 ) : JsGameWindow() {
-    val tDevicePixelRatio: Float get() = window.devicePixelRatio.toFloat()
+    val tDevicePixelRatio: Float get() = jsWindow.devicePixelRatio.toFloat()
     override val devicePixelRatio: Float get() = when {
         tDevicePixelRatio <= 0f -> 1f
         tDevicePixelRatio.isNaN() -> 1f
@@ -128,16 +130,16 @@ open class BrowserCanvasJsGameWindow(
     private fun onResized() {
         isTouchDeviceCache = null
         if (isCanvasCreatedAndHandled) {
-            val scale = quality.computeTargetScale(window.innerWidth, window.innerHeight, devicePixelRatio)
-            val canvasWidth = (window.innerWidth * scale).toInt()
-            val canvasHeight = (window.innerHeight * scale).toInt()
+            val scale = quality.computeTargetScale(jsWindow.innerWidth, jsWindow.innerHeight, devicePixelRatio)
+            val canvasWidth = (jsWindow.innerWidth * scale).toInt()
+            val canvasHeight = (jsWindow.innerHeight * scale).toInt()
             canvas.width = canvasWidth
             canvas.height = canvasHeight
             canvas.style.position = "absolute"
             canvas.style.left = "0"
             canvas.style.right = "0"
-            canvas.style.width = "${window.innerWidth}px"
-            canvas.style.height = "${window.innerHeight}px"
+            canvas.style.width = "${jsWindow.innerWidth}px"
+            canvas.style.height = "${jsWindow.innerHeight}px"
             canvasRatio = scale
 
             //ag.resized(canvas.width, canvas.height)
@@ -205,7 +207,7 @@ open class BrowserCanvasJsGameWindow(
                 "Slash" -> Key.SLASH
                 "Tab" -> Key.TAB
                 else -> {
-                    if (window.asDynamic().korgwShowUnsupportedKeys) {
+                    if (jsWindow.asDynamic().korgwShowUnsupportedKeys) {
                         logger.info { "Unsupported key key=${me.key}, code=${me.code}" }
                     }
                     Key.UNKNOWN
@@ -378,7 +380,7 @@ open class BrowserCanvasJsGameWindow(
     override fun close(exitCode: Int) {
         MainScope().launchImmediately {
             loopJob?.cancelAndJoin()
-            window.close()
+            jsWindow.close()
         }
         loopJob = null
     }
@@ -393,15 +395,15 @@ open class BrowserCanvasJsGameWindow(
     private lateinit var jsFrame: (Double) -> Unit
 
     init {
-        window.asDynamic().canvas = canvas
-        window.asDynamic().ag = ag
-        window.asDynamic().gl = ag.gl
+        jsWindow.asDynamic().canvas = canvas
+        jsWindow.asDynamic().ag = ag
+        jsWindow.asDynamic().gl = ag.gl
         if (isCanvasCreatedAndHandled) {
-            document.body?.appendChild(canvas)
-            document.body?.style?.margin = "0px"
-            document.body?.style?.padding = "0px"
-            document.body?.style?.overflowX = "hidden"
-            document.body?.style?.overflowY = "hidden"
+            jsDocument.body?.appendChild(canvas)
+            jsDocument.body?.style?.margin = "0px"
+            jsDocument.body?.style?.padding = "0px"
+            jsDocument.body?.style?.overflowX = "hidden"
+            jsDocument.body?.style?.overflowY = "hidden"
         }
 
         canvas.addEventListener("wheel", { mouseEvent(it.unsafeCast<WheelEvent>(), korlibs.event.MouseEvent.Type.SCROLL) })
@@ -420,9 +422,9 @@ open class BrowserCanvasJsGameWindow(
         canvas.addEventListener("touchend", { touchEvent(it.unsafeCast<TouchEvent>(), korlibs.event.TouchEvent.Type.END) })
         //canvas.addEventListener("touchcancel", { touchEvent(it, korlibs.event.TouchEvent.Type.CANCEL) })
 
-        window.addEventListener("keypress", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
-        window.addEventListener("keydown", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
-        window.addEventListener("keyup", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
+        jsWindow.addEventListener("keypress", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
+        jsWindow.addEventListener("keydown", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
+        jsWindow.addEventListener("keyup", { keyEvent(it.unsafeCast<KeyboardEvent>()) })
 
         //window.addEventListener("gamepadconnected", { e ->
         //    //console.log("gamepadconnected")
@@ -440,7 +442,7 @@ open class BrowserCanvasJsGameWindow(
         //        this.gamepad = e.gamepad.index
         //    })
         //})
-        window.addEventListener("resize", { onResized() })
+        jsWindow.addEventListener("resize", { onResized() })
         canvas.ondragenter = { dispatchDropfileEvent(DropFileEvent.Type.START, null) }
         canvas.ondragexit = { dispatchDropfileEvent(DropFileEvent.Type.END, null) }
         canvas.ondragleave = { dispatchDropfileEvent(DropFileEvent.Type.END, null) }
@@ -457,7 +459,7 @@ open class BrowserCanvasJsGameWindow(
         onResized()
 
         jsFrame = { step: Double ->
-            window.requestAnimationFrame(jsFrame) // Execute first to prevent exceptions breaking the loop, not triggering again
+            jsWindow.requestAnimationFrame(jsFrame) // Execute first to prevent exceptions breaking the loop, not triggering again
             frame()
         }
     }

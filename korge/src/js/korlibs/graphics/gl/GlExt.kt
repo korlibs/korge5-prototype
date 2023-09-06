@@ -2,6 +2,7 @@ package korlibs.graphics.gl
 
 import korlibs.kgl.*
 import korlibs.graphics.*
+import korlibs.platform.*
 import org.w3c.dom.*
 import kotlinx.browser.*
 
@@ -22,7 +23,7 @@ fun jsObject(vararg pairs: Pair<String, Any?>): dynamic {
 	return out
 }
 
-val korgwCanvasQuery: String? by lazy { window.asDynamic().korgwCanvasQuery.unsafeCast<String?>() }
+val korgwCanvasQuery: String? by lazy { jsWindow.asDynamic().korgwCanvasQuery.unsafeCast<String?>() }
 val isCanvasCreatedAndHandled get() = korgwCanvasQuery == null
 
 fun AGDefaultCanvas(): HTMLCanvasElement {
@@ -40,7 +41,7 @@ fun AGWebgl(config: AGConfig, canvas: HTMLCanvasElement = AGDefaultCanvas()): AG
         )
     )
 ).also { ag ->
-    (window.asDynamic()).ag = ag
+    (jsWindow.asDynamic()).ag = ag
 
     // https://www.khronos.org/webgl/wiki/HandlingContextLost
     // https://gist.github.com/mattdesl/9995467

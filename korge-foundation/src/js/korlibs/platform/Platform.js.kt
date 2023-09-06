@@ -1,9 +1,11 @@
 package korlibs.platform
 
 import korlibs.js.Deno
+import kotlinx.browser.*
 import org.khronos.webgl.Uint32Array
 import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
+import org.w3c.dom.*
 
 internal val isDenoJs: Boolean by lazy { js("(typeof Deno === 'object' && Deno.statSync)").unsafeCast<Boolean>() }
 internal val isWeb: Boolean by lazy { js("(typeof window === 'object')").unsafeCast<Boolean>() }
@@ -43,7 +45,55 @@ internal actual val currentRawPlatformName: String = when {
 }
 
 private external val navigator: dynamic // browser
-private external val process: dynamic // nodejs
+
+@JsName("process")
+private external val _process: dynamic // nodejs
+
+val process: dynamic get() {
+    if (js("(typeof process === 'undefined')")) {
+        try {
+            error("Not in NodeJS. Can't access process")
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+    return _process
+}
+
+val jsWindow: Window get() {
+    if (js("(typeof window === 'undefined')")) {
+        try {
+            error("Not in Browser. Can't access window")
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+    return window
+}
+
+@JsName("import")
+external fun jsImport(url: String): dynamic
+
+@JsName("globalThis")
+private external val globalThis: dynamic // all
+
+val jsGlobalThis: WindowOrWorkerGlobalScope get() {
+    return globalThis
+}
+
+val jsDocument: Document get() {
+    if (js("(typeof document === 'undefined')")) {
+        try {
+            error("Not in Browser. Can't access document")
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+    return document
+}
 
 internal actual val currentRawOsName: String = when {
     isDenoJs -> "deno"

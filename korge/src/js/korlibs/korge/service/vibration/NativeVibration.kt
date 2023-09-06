@@ -1,8 +1,8 @@
 package korlibs.korge.service.vibration
 
-import korlibs.korge.view.Views
+import korlibs.korge.view.*
+import korlibs.platform.*
 import korlibs.time.*
-import kotlinx.browser.window
 
 actual class NativeVibration actual constructor(val views: Views) {
 
@@ -12,7 +12,7 @@ actual class NativeVibration actual constructor(val views: Views) {
      */
     @ExperimentalUnsignedTypes
     actual fun vibratePattern(timings: Array<TimeSpan>, amplitudes: Array<Double>) {
-        window.navigator.vibrate(timings.map { it.milliseconds }.toTypedArray())
+        jsWindow.navigator.vibrate(timings.map { it.milliseconds }.toTypedArray())
     }
 
     /**
@@ -21,6 +21,6 @@ actual class NativeVibration actual constructor(val views: Views) {
      */
     @ExperimentalUnsignedTypes
     actual fun vibrate(time: TimeSpan, amplitude: Double) {
-        window.navigator.vibrate(time.milliseconds)
+        jsWindow.navigator.vibrate(time.milliseconds)
     }
 }

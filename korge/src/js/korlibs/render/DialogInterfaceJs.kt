@@ -3,6 +3,7 @@ package korlibs.render
 import korlibs.io.async.*
 import korlibs.io.file.*
 import korlibs.io.net.*
+import korlibs.platform.*
 import kotlinx.browser.*
 import kotlinx.coroutines.*
 import org.w3c.dom.*
@@ -15,15 +16,15 @@ class DialogInterfaceJs : DialogInterface {
     }
 
     override suspend fun alert(message: String) {
-        window.alert(message)
+        jsWindow.alert(message)
     }
 
     override suspend fun confirm(message: String): Boolean {
-        return window.confirm(message)
+        return jsWindow.confirm(message)
     }
 
     override suspend fun prompt(message: String, default: String): String {
-        return window.prompt(message, default) ?: throw CancellationException("cancelled")
+        return jsWindow.prompt(message, default) ?: throw CancellationException("cancelled")
     }
 
     override suspend fun openFileDialog(filter: FileFilter?, write: Boolean, multi: Boolean, currentDir: VfsFile?): List<VfsFile> {
@@ -49,7 +50,7 @@ class DialogInterfaceJs : DialogInterface {
         }
         document.body?.appendChild(input)
         input.click()
-        window.setTimeout({
+        jsWindow.setTimeout({
             document.body?.removeChild(input)
         }, 100)
         return deferred.await()

@@ -37,8 +37,9 @@ fun <T : Element> HTMLCollection.toTypedList(): List<T> = (0 until length).map {
 
 private external class Date(time: Double)
 
-fun jsNew(clazz: dynamic): dynamic = js("(new (clazz))()")
-fun jsNew(clazz: dynamic, a0: dynamic): dynamic = js("(new (clazz))(a0)")
+//fun jsNew(clazz: dynamic): dynamic = js("(new (clazz))()")
+fun jsNew(clazz: dynamic): dynamic = js("new clazz()")
+fun jsNew(clazz: dynamic, a0: dynamic): dynamic = js("new clazz(a0)")
 fun jsNew(clazz: dynamic, a0: dynamic, a1: dynamic): dynamic = js("(new (clazz))(a0, a1)")
 fun jsNew(clazz: dynamic, a0: dynamic, a1: dynamic, a2: dynamic): dynamic = js("(new (clazz))(a0, a1, a2)")
 fun jsEnsureNumber(v: dynamic): Number = js("(+v)")
@@ -56,11 +57,19 @@ fun jsArray(vararg elements: dynamic): Array<dynamic> {
 	return out
 }
 
+@JsName("Object")
+external object JSObject {
+    fun keys(obj: dynamic): Array<String>
+}
+
 inline fun <reified T> jsToArrayT(obj: dynamic): Array<T> = Array<T>(obj.length) { obj[it] }
 fun jsObject(vararg pairs: Pair<String, Any?>): dynamic {
 	val out = jsEmptyObj()
 	for (pair in pairs) out[pair.first] = pair.second
 	return out
+}
+fun jsObject(map: Map<String, Any?>): dynamic {
+    return jsObject(*map.map { it.key to it.value }.toTypedArray())
 }
 
 fun Map<String, Any?>.toJsObject() = jsObject(*this.entries.map { it.key to it.value }.toTypedArray())

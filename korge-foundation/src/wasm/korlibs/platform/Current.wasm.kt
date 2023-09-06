@@ -37,7 +37,7 @@ private external class Process {
     val platform: String
 }
 private external val navigator: Navigator // browser
-private external val process: Process // nodejs
+private external val process: dynamic // browser
 
 internal actual val currentRawOsName: String = when {
     isDenoJs() -> "deno"

@@ -1,6 +1,5 @@
 package korlibs.render
 
-import korlibs.io.async.*
 import korlibs.io.file.*
 import korlibs.io.net.*
 import kotlinx.browser.*
@@ -14,7 +13,7 @@ private external interface WindowExSetTimeout : JsAny {
 
 private val windowExSetTimeout get() = window.unsafeCast<WindowExSetTimeout>()
 
-class DialogInterfaceJs : DialogInterface {
+class DialogInterfaceWasm : DialogInterface {
 
     override suspend fun browse(url: URL) {
         document.open(url.fullUrl)

@@ -12,6 +12,7 @@ import korlibs.io.async.*
 import korlibs.io.dynamic.*
 import korlibs.io.file.std.*
 import korlibs.io.resources.*
+import korlibs.io.worker.*
 import korlibs.korge.input.*
 import korlibs.korge.internal.*
 import korlibs.korge.logger.*
@@ -34,7 +35,7 @@ import kotlin.reflect.*
  * You have to call the [KorgeConfig] method by either providing some parameters, or a [KorgeConfig.Config] object.
  */
 object KorgeRunner {
-    suspend operator fun invoke(config: KorgeConfig) {
+    suspend operator fun invoke(config: KorgeConfig) = Worker.init {
         RegisteredImageFormats.register(config.imageFormats)
 
         val iconPath = config.icon

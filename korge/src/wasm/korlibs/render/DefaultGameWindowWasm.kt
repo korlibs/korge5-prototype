@@ -58,7 +58,7 @@ open class BrowserCanvasJsGameWindow(
     //override val pixelsPerInch: Float get() = 96f * devicePixelRatio
 
     override val ag: AGOpengl = AGWebgl(AGConfig(), canvas)
-    override val dialogInterface: DialogInterfaceJs = DialogInterfaceJs()
+    override val dialogInterface: DialogInterfaceWasm = DialogInterfaceWasm()
     private var isTouchDeviceCache: Boolean? = null
     fun is_touch_device(): Boolean {
         if (isTouchDeviceCache == null) {

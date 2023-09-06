@@ -2,9 +2,7 @@ package korlibs.io.file.std
 
 import korlibs.io.isNodeJs
 import korlibs.io.runtime.node.require_node
-
-@JsName("process")
-private external val process: dynamic
+import korlibs.platform.*
 
 actual object StandardPaths : StandardPathsBase {
     override val cwd: String get() = when {
