@@ -1,23 +1,18 @@
 package korlibs.wasm
 
-import korlibs.datastructure.*
-import korlibs.ffi.*
 import korlibs.io.*
 import korlibs.js.*
-import korlibs.memory.*
-import kotlinx.coroutines.*
 import org.khronos.webgl.*
-import kotlin.js.*
 import kotlin.reflect.*
 
-actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
-    val symbolsByName: Map<String, NewWASMLib.FuncDelegate<*>> by lazy { lib.functions.associateBy { it.name } }
+actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(content) {
+    val symbolsByName: Map<String, FuncDelegate<*>> by lazy { functions.associateBy { it.name } }
     private var _wasmExports: dynamic = null
 
     val wasmExports: dynamic get() {
         if (_wasmExports == null) {
             _wasmExports = try {
-                val module = WebAssembly.Module(lib.content!!)
+                val module = WebAssembly.Module(content!!)
                 val dummyFunc = { console.log("proc_exit", js("(arguments)")) }
                 val imports = jsObject(
                     "env" to jsObject(
@@ -74,7 +69,7 @@ actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
     override fun stackRestore(ptr: Int): Unit = wasmExports.stackRestore(ptr)
     override fun stackAlloc(size: Int): Int = wasmExports.stackAlloc(size)
 
-    override fun <T> wasmFuncPointer(address: Int, type: KType): T {
+    override fun <T : Function<*>> funcPointer(address: Int, type: KType): T {
         if (!wasmExports.table && !wasmExports.__indirect_function_table) {
             console.log("wasmExports", Deno.inspect(wasmExports))
             error("Table not exported with 'table' name")
@@ -85,7 +80,7 @@ actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
         return preprocessFunc(type, func, "func\$$address").unsafeCast<T>()
     }
 
-    override fun <T> get(name: String, type: KType): T {
+    override fun <T> symGet(name: String, type: KType): T {
         val syms = wasmExports
         //return syms[name]
         return preprocessFunc(symbolsByName[name]!!.type, syms[name], name)
@@ -95,48 +90,15 @@ actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
         super.close()
     }
 
-    // @TODO: Optimize this
-    // @TODO: This might not be required if we are only using ints, floats, etc.?
     private fun preprocessFunc(type: KType, func: dynamic, name: String?): dynamic {
-        val ftype = BaseLib.extractTypeFunc(type)
-        val convertToString = ftype.retClass == String::class
-        return {
-            val arguments = js("(arguments)")
-            val params = ftype.paramsClass
-            for (n in 0 until params.size) {
-                val param = params[n]
-                var v = arguments[n]
-                if (param == String::class) {
-                    v = (v.toString() + "\u0000").encodeToByteArray()
-                }
-                if (v is FFIPointerArray) v = v.data
-                if (v is Buffer) v = v.dataView
-                if (v is Boolean) v = if (v) 1 else 0
-                if (v is Long) v = (v as Long).toJsBigInt()
-                //console.log("param", n, v)
-                arguments[n] = v
-            }
-            //console.log("arguments", arguments)
-            try {
-                val result = func.apply(null, arguments)
-                //console.log("result", result)
-                val res2 = when {
-                    result == null -> null
-                    convertToString -> {
-                        val ptr = (result.unsafeCast<DenoPointer>())
-                        getCString(ptr)
-                    }
-                    else -> result
-                }
-                if (res2 is Promise<*>) {
-                    (res2.unsafeCast<Promise<*>>()).asDeferred()
-                } else {
-                    res2
-                }
-            } catch (e: dynamic) {
-                println("ERROR calling[$name]: $type : ${JsArray.from(arguments).toList()}")
-                throw e
-            }
-        }
+        return func
     }
+}
+
+private external class WebAssembly {
+    class Instance(module: Module, imports: dynamic) {
+        val exports: dynamic
+        val memory: ArrayBuffer
+    }
+    class Module(data: ByteArray)
 }

@@ -1,12 +1,11 @@
 package korlibs.wasm
 
-import com.sun.jna.Function
 import korlibs.ffi.*
 import kotlin.reflect.*
 
-actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
-    val functions: Map<String, kotlin.Function<*>> by lazy {
-        lib.functions.associate { nfunc ->
+actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(content) {
+    val functionsNamed: Map<String, kotlin.Function<*>> by lazy {
+        functions.associate { nfunc ->
             //val lib = NativeLibrary.getInstance("")
             nfunc.name to createFunction(nfunc.name, nfunc.type)
         }
@@ -17,7 +16,7 @@ actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
     }
 
     val wasm: DenoWASM by lazy {
-        DenoWasmProcessStdin.open(lib.content)
+        DenoWasmProcessStdin.open(content)
     }
 
     override fun readBytes(pos: Int, size: Int): ByteArray = wasm.readBytes(pos, size)
@@ -29,11 +28,11 @@ actual fun WasmSYMLib(lib: NewWASMLib): WasmSYMLib = object : WasmSYMLib {
     override fun stackAlloc(size: Int): Int = wasm.stackAlloc(size)
     override fun stackAllocAndWrite(bytes: ByteArray): Int = wasm.stackAllocAndWrite(bytes)
 
-    override fun <T> wasmFuncPointer(address: Int, type: KType): T =
+    override fun <T : Function<*>> funcPointer(address: Int, type: KType): T =
         createWasmFunctionToPlainFunctionIndirect(wasm, address, type)
 
-    override fun <T> get(name: String, type: KType): T {
-        return functions[name] as T
+    override fun <T> symGet(name: String, type: KType): T {
+        return functionsNamed[name] as T
     }
 
     override fun close() {
