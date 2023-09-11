@@ -9,7 +9,6 @@ import korlibs.datastructure.ByteArrayDeque
 import korlibs.datastructure.DoubleArrayList
 import korlibs.datastructure.binarySearch
 import korlibs.encoding.*
-import korlibs.ffi.WASMLib
 import korlibs.time.TimeSpan
 import korlibs.time.measureTimeWithResult
 import korlibs.time.microseconds
@@ -20,6 +19,7 @@ import korlibs.io.lang.*
 import korlibs.io.stream.*
 import korlibs.math.*
 import korlibs.memory.*
+import korlibs.wasm.*
 
 object MP3 : AudioFormat("mp3") {
 	override suspend fun tryReadInfo(data: AsyncStream, props: AudioDecodingProps): Info? {
@@ -567,7 +567,7 @@ object MP3 : AudioFormat("mp3") {
 // emcc -Oz MiniMp3Program.c -s STANDALONE_WASM --no-entry -s WASM -o MiniMp3Program.wasm
 // ~/go/bin/zlib < MiniMp3Program.wasm > MiniMp3Program.wasm.zlib
 // base64 -i MiniMp3Program.wasm.zlib
-private object MiniMp3Wasm : WASMLib(MINIMP3_WASM_BYTES) {
+private object MiniMp3Wasm : NewWASMLib(MINIMP3_WASM_BYTES) {
 	val mp3dec_init: (ptr: Int) -> Unit by func()
 	val mp3dec_decode_frame: (dec: Int, mp3: Int, mp3_bytes: Int, pcm: Int, info: Int) -> Int by func()
 }
