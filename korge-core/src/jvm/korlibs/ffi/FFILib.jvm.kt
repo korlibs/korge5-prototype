@@ -1,27 +1,15 @@
 package korlibs.ffi
 
+import com.sun.jna.*
 import com.sun.jna.Function
-import com.sun.jna.Memory
-import com.sun.jna.NativeLibrary
-import com.sun.jna.Pointer
-import korlibs.datastructure.lock.Lock
 import korlibs.io.file.sync.*
-import korlibs.io.serialization.json.Json
 import korlibs.memory.*
-import korlibs.wasm.*
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import java.io.Closeable
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
-import java.lang.reflect.Proxy
-import java.util.concurrent.Executors
-import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.typeOf
+import kotlinx.coroutines.*
+import java.lang.reflect.*
+import java.util.concurrent.*
+import kotlin.reflect.*
 
-actual fun FFILibSym(lib: BaseLib): FFILibSym {
+actual fun FFILibSym(lib: FFILib): FFILibSym {
     return FFILibSymJVM(lib)
 }
 
@@ -59,7 +47,7 @@ actual fun <T> FFIPointer.castToFunc(type: KType): T =
     createJNAFunctionToPlainFunc(Function.getFunction(this), type)
 
 fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: KType): T {
-    val ftype = BaseLib.extractTypeFunc(type)
+    val ftype = FFILib.extractTypeFunc(type)
 
     return Proxy.newProxyInstance(
         FFILibSymJVM::class.java.classLoader,
@@ -100,34 +88,10 @@ fun <T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function, type: 
     } as T
 }
 
-fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunction(wasm: DenoWASM, funcName: String, type: KType): T {
-    val ftype = BaseLib.extractTypeFunc(type)
-    return Proxy.newProxyInstance(
-        FFILibSymJVM::class.java.classLoader,
-        arrayOf((type.classifier as KClass<*>).java)
-    ) { proxy, method, args ->
-        val sargs = args ?: emptyArray()
-        //return wasm.evalWASMFunction(nfunc.name, *sargs)
-        wasm.executeFunction(funcName, *sargs)
-    } as T
-}
-
-fun <T : kotlin.Function<*>> createWasmFunctionToPlainFunctionIndirect(wasm: DenoWASM, address: Int, type: KType): T {
-    val ftype = BaseLib.extractTypeFunc(type)
-    return Proxy.newProxyInstance(
-        FFILibSymJVM::class.java.classLoader,
-        arrayOf((type.classifier as KClass<*>).java)
-    ) { proxy, method, args ->
-        val sargs = args ?: emptyArray()
-        //return wasm.evalWASMFunction(nfunc.name, *sargs)
-        wasm.executeFunctionIndirect(address, *sargs)
-    } as T
-}
-
 inline fun <reified T : kotlin.Function<*>> createJNAFunctionToPlainFunc(func: Function): T =
     createJNAFunctionToPlainFunc(func, typeOf<T>())
 
-class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
+class FFILibSymJVM(val lib: FFILib) : FFILibSym {
     @OptIn(SyncIOAPI::class)
     val nlib by lazy {
         lib as FFILib
@@ -137,15 +101,9 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
         }
     }
 
-    val libWasm = lib as? WASMLib?
-
     fun <T : kotlin.Function<*>> createFunction(funcName: String, type: KType): T {
-        return if (libWasm != null) {
-            createWasmFunctionToPlainFunction<T>(wasm, funcName, type)
-        } else {
-            val func: Function = nlib!!.getFunction(funcName) ?: error("Can't find function ${funcName}")
-            createJNAFunctionToPlainFunc<T>(func, type)
-        }
+        val func: Function = nlib!!.getFunction(funcName) ?: error("Can't find function ${funcName}")
+        return createJNAFunctionToPlainFunc<T>(func, type)
     }
 
     val functions: Map<String, kotlin.Function<*>> by lazy {
@@ -155,27 +113,8 @@ class FFILibSymJVM(val lib: BaseLib) : FFILibSym {
         }
     }
 
-    val wasm: DenoWASM by lazy {
-        if (libWasm == null) error("Not a WASM module")
-        DenoWasmProcessStdin.open(libWasm.content)
-    }
-
     override fun <T> get(name: String, type: KType): T = functions[name] as T
-    override fun readBytes(pos: Int, size: Int): ByteArray = wasm.readBytes(pos, size)
-    override fun writeBytes(pos: Int, data: ByteArray) = wasm.writeBytes(pos, data)
-    override fun allocBytes(bytes: ByteArray): Int = wasm.allocAndWrite(bytes)
-    override fun freeBytes(vararg ptrs: Int) = wasm.free(*ptrs)
-    override fun stackSave(): Int = wasm.stackSave()
-    override fun stackRestore(ptr: Int) = wasm.stackRestore(ptr)
-    override fun stackAlloc(size: Int): Int = wasm.stackAlloc(size)
-    override fun stackAllocAndWrite(bytes: ByteArray): Int = wasm.stackAllocAndWrite(bytes)
-
-    override fun <T> wasmFuncPointer(address: Int, type: KType): T =
-        createWasmFunctionToPlainFunctionIndirect(wasm, address, type)
 
     override fun close() {
-        if (libWasm != null) {
-            wasm.close()
-        }
     }
 }

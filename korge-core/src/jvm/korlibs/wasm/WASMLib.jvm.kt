@@ -1,6 +1,7 @@
 package korlibs.wasm
 
 import korlibs.ffi.*
+import java.lang.reflect.*
 import kotlin.reflect.*
 
 actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(content) {
@@ -12,7 +13,7 @@ actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(c
     }
 
     fun <T : kotlin.Function<*>> createFunction(funcName: String, type: KType): T {
-        return createWasmFunctionToPlainFunction<T>(wasm, funcName, type)
+        return _createWasmFunctionToPlainFunction(wasm, type, -1, funcName)
     }
 
     val wasm: DenoWASM by lazy {
@@ -29,7 +30,7 @@ actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(c
     override fun stackAllocAndWrite(bytes: ByteArray): Int = wasm.stackAllocAndWrite(bytes)
 
     override fun <T : Function<*>> funcPointer(address: Int, type: KType): T =
-        createWasmFunctionToPlainFunctionIndirect(wasm, address, type)
+        _createWasmFunctionToPlainFunction(wasm, type, address, null)
 
     override fun <T> symGet(name: String, type: KType): T {
         return functionsNamed[name] as T
@@ -37,5 +38,22 @@ actual open class WASMLib actual constructor(content: ByteArray) : BaseWASMLib(c
 
     override fun close() {
         wasm.close()
+    }
+
+
+    fun <T : kotlin.Function<*>> _createWasmFunctionToPlainFunction(wasm: DenoWASM, type: KType, address: Int, funcName: String?): T {
+        val ftype = extractTypeFunc(type)
+        return Proxy.newProxyInstance(
+            FFILibSymJVM::class.java.classLoader,
+            arrayOf((type.classifier as KClass<*>).java)
+        ) { proxy, method, args ->
+            val sargs = args ?: emptyArray()
+            //return wasm.evalWASMFunction(nfunc.name, *sargs)
+            if (funcName != null) {
+                wasm.executeFunction(funcName, *sargs)
+            } else {
+                wasm.executeFunctionIndirect(address, *sargs)
+            }
+        } as T
     }
 }

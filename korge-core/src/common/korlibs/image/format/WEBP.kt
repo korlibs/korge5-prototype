@@ -1,7 +1,6 @@
 package korlibs.image.format
 
 import korlibs.encoding.*
-import korlibs.ffi.WASMLib
 import korlibs.image.bitmap.Bitmap32
 import korlibs.io.compression.deflate.ZLib
 import korlibs.io.compression.uncompress
@@ -30,7 +29,7 @@ object WEBP : ImageFormat("webp") {
     }
 }
 
-private class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
+private class WebpWASM(bytes: ByteArray) : korlibs.wasm.WASMLib(bytes) {
     constructor() : this(WEBP_WASM_BYTES)
     val decode: (data: Int, size: Int, widthPtr: Int, heightPtr: Int) -> Int by func()
     val get_info: (data: Int, size: Int) -> Int by func()

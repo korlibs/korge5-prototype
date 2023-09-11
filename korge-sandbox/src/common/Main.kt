@@ -12,6 +12,7 @@ import korlibs.io.worker.*
 import korlibs.korge.Korge
 import korlibs.korge.view.*
 import korlibs.time.*
+import korlibs.wasm.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.coroutineContext
 import kotlin.js.*

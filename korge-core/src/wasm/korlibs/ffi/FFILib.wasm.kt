@@ -2,7 +2,7 @@ package korlibs.ffi
 
 import kotlin.reflect.KType
 
-actual fun FFILibSym(lib: BaseLib): FFILibSym {
+actual fun FFILibSym(lib: FFILib): FFILibSym {
     return object : FFILibSym {
     }
 }
