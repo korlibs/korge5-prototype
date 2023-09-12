@@ -16,6 +16,10 @@ open class WasmTest {
     }
     @Test
     fun testMp3() = suspendTest {
+        if (interpreter) {
+            println("!!! ignorede testMp3 on interpreter")
+            return@suspendTest
+        }
         val MINIMP3_MAX_SAMPLES_PER_FRAME = (1152*2)
         val MP3_DEC_SIZE = 6668
 

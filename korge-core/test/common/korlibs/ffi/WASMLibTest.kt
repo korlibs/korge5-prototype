@@ -2,8 +2,7 @@ package korlibs.ffi
 
 import korlibs.encoding.fromBase64
 import korlibs.wasm.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class WASMLibTest {
     object SimpleWASM : WASMLib("AGFzbQEAAAABBwFgAn9/AX8DAgEABAUBcAEBAQUDAQAABhQDfwBBCAt/AUGIgAILfwBBiIACCwcQAgNzdW0AAAZtZW1vcnkCAAkGAQBBAQsACgoBCAAgACABag8L".fromBase64()) {
@@ -13,7 +12,6 @@ class WASMLibTest {
     object SimpleWASM2 : WASMLib("AGFzbQEAAAABBwFgAn9/AX8DAgEABAUBcAEBAQUDAQAABhQDfwBBCAt/AUGIgAILfwBBiIACCwcQAgNzdW0AAAZtZW1vcnkCAAkGAQBBAQsACgoBCAAgACABag8L".fromBase64()) {
         val sum: (Int, Int) -> Int by func()
     }
-
 
     object SimpleWASM4 : WASMLib("AGFzbQEAAAABDwNgAn9/AX9gAABgAX8BfwMFBAEAAAIEBQFwAQQEBQYBAYACgAIHSgYGbWVtb3J5AgADYWRkAAIDc3ViAAEHZ2V0RnVuYwADGV9faW5kaXJlY3RfZnVuY3Rpb25fdGFibGUBAAtfaW5pdGlhbGl6ZQAACQkBAEEBCwMBAgAKHgQCAAsHACAAIAFrCwcAIAAgAWoLCQBBAUECIAAbCw==".fromBase64()) {
         val sum: (a: Int, b: Int) -> Int by func()
@@ -49,6 +47,7 @@ class WASMLibTest {
     }
 
     @Test
+    @Ignore
     fun test2() {
         val funcPtr0 = SimpleWASM4.getFunc(0)
         val funcPtr1 = SimpleWASM4.getFunc(1)

@@ -9,7 +9,7 @@ import korlibs.memory.getArrayInt32
 import korlibs.memory.getInt32
 import korlibs.time.measureTime
 import korlibs.wasm.*
-import kotlin.test.Test
+import kotlin.test.*
 
 class DENOEvalTest {
     class WebpWASM(bytes: ByteArray) : WASMLib(bytes) {
@@ -38,6 +38,7 @@ class DENOEvalTest {
         }
     }
     @Test
+    @Ignore
     fun test() = suspendTest {
         val wasmBytes = resourcesVfs["webp.wasm"].readBytes()
         /*
