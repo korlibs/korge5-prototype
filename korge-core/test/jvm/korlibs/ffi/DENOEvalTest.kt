@@ -8,6 +8,7 @@ import korlibs.memory.Buffer
 import korlibs.memory.getArrayInt32
 import korlibs.memory.getInt32
 import korlibs.time.measureTime
+import korlibs.wasm.*
 import kotlin.test.Test
 
 class DENOEvalTest {

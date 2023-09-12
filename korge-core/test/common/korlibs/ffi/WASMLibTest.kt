@@ -1,6 +1,7 @@
 package korlibs.ffi
 
 import korlibs.encoding.fromBase64
+import korlibs.wasm.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

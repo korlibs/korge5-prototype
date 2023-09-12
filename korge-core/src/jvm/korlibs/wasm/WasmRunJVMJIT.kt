@@ -44,6 +44,7 @@ open class WasmRunJVMJIT(memSize: Int, memMax: Int) : WasmRuntime(memSize, memMa
      */
 
     val declaredMethodsByName by lazy {
+        //(this::class.java.declaredMethods + WasmRuntime::class.java.declaredMethods).associateBy { it.name }
         this::class.java.declaredMethods.associateBy { it.name }
     }
 
@@ -51,7 +52,7 @@ open class WasmRunJVMJIT(memSize: Int, memMax: Int) : WasmRuntime(memSize, memMa
 
     override operator fun invoke(name: String, vararg params: Any?) : Any? {
         //return declaredMethodsByName[name]!!.invoke(this, *params)
-        val method = declaredMethodsByName[name] ?: error("Can't find method '$name'")
+        val method = declaredMethodsByName[name] ?: error("Can't find method '$name' in ${declaredMethodsByName.keys}")
         if (!method.modifiers.hasBits(Modifier.STATIC)) error("Can't call non-static method '$name'")
         //if (params == null) error("Params is null")
         return method.invoke(null, *params, this)
@@ -76,7 +77,7 @@ open class WasmRunJVMJIT(memSize: Int, memMax: Int) : WasmRuntime(memSize, memMa
 
         val declaredMethodsByName by lazy {
             //WasmRunJVMJIT::class.java.declaredMethods.associateBy { it.name }
-            WasmRuntime::class.java.declaredMethods.associateBy { it.name }
+            (WasmRunJVMJIT::class.java.declaredMethods + WasmRuntime::class.java.declaredMethods).associateBy { it.name }
         }
 
         fun build(module: WasmModule, codeTrace: Boolean = false): WasmRunJVMJIT =
