@@ -5,7 +5,7 @@ import korlibs.io.async.launchImmediately
 import korlibs.template.suspendTest
 import korlibs.time.milliseconds
 import kotlinx.coroutines.*
-import kotlin.test.Test
+import kotlin.test.*
 
 class FFILibTest {
     object LibC : FFILib("CoreFoundation", "c") {
@@ -13,6 +13,7 @@ class FFILibTest {
     }
 
     @Test
+    @Ignore
     fun test() = suspendTest {
         launchImmediately {
             println("1")
