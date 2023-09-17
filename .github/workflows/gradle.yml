@@ -16,6 +16,9 @@ on:
 permissions:
   contents: read
 
+env:
+  DISPLAY: ":99"
+
 jobs:
   build:
 
